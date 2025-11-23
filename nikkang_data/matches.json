@@ -1,0 +1,158 @@
+{
+  "1": [
+    {
+      "home": "Brighton",
+      "away": "Bournemouth",
+      "gotw": false
+    },
+    {
+      "home": "Arsenal",
+      "away": "Nottingham Forest",
+      "gotw": false
+    },
+    {
+      "home": "West Ham",
+      "away": "Brentford",
+      "gotw": false
+    },
+    {
+      "home": "Aston Villa",
+      "away": "Wolves",
+      "gotw": false
+    },
+    {
+      "home": "Everton",
+      "away": "Fulham",
+      "gotw": true
+    },
+    {
+      "home": "Chelsea",
+      "away": "Tottenham",
+      "gotw": false
+    },
+    {
+      "home": "Liverpool",
+      "away": "Newcastle",
+      "gotw": false
+    },
+    {
+      "home": "Man United",
+      "away": "Man City",
+      "gotw": false
+    },
+    {
+      "home": "Wolves",
+      "away": "Liverpool",
+      "gotw": false
+    },
+    {
+      "home": "Nottingham Forest",
+      "away": "Man City",
+      "gotw": false
+    }
+  ],
+  "2": [
+    {
+      "home": "Nottingham Forest",
+      "away": "Crystal Palace",
+      "gotw": false
+    },
+    {
+      "home": "Everton",
+      "away": "West Ham",
+      "gotw": false
+    },
+    {
+      "home": "Arsenal",
+      "away": "Man United",
+      "gotw": false
+    },
+    {
+      "home": "Liverpool",
+      "away": "Wolves",
+      "gotw": false
+    },
+    {
+      "home": "Fulham",
+      "away": "Chelsea",
+      "gotw": true
+    },
+    {
+      "home": "Aston Villa",
+      "away": "Brentford",
+      "gotw": false
+    },
+    {
+      "home": "Brighton",
+      "away": "Newcastle",
+      "gotw": false
+    },
+    {
+      "home": "Tottenham",
+      "away": "Bournemouth",
+      "gotw": false
+    },
+    {
+      "home": "Everton",
+      "away": "Bournemouth",
+      "gotw": false
+    },
+    {
+      "home": "Man United",
+      "away": "Nottingham Forest",
+      "gotw": false
+    }
+  ],
+  "3": [
+    {
+      "home": "Tottenham",
+      "away": "Everton",
+      "gotw": false
+    },
+    {
+      "home": "Chelsea",
+      "away": "Newcastle",
+      "gotw": false
+    },
+    {
+      "home": "Aston Villa",
+      "away": "Bournemouth",
+      "gotw": false
+    },
+    {
+      "home": "Nottingham Forest",
+      "away": "Liverpool",
+      "gotw": false
+    },
+    {
+      "home": "Fulham",
+      "away": "Wolves",
+      "gotw": true
+    },
+    {
+      "home": "Brighton",
+      "away": "West Ham",
+      "gotw": false
+    },
+    {
+      "home": "Man United",
+      "away": "Crystal Palace",
+      "gotw": false
+    },
+    {
+      "home": "Brentford",
+      "away": "Arsenal",
+      "gotw": false
+    },
+    {
+      "home": "Nottingham Forest",
+      "away": "Newcastle",
+      "gotw": false
+    },
+    {
+      "home": "Brentford",
+      "away": "Wolves",
+      "gotw": false
+    }
+  ]
+}
