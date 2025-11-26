@@ -15,12 +15,7 @@ st.set_page_config(
 
 # Import branding utility if available
 try:
-    from utils.branding import (
-        setup_page,
-        display_page_header,
-        display_footer,
-        inject_custom_css
-    )
+    from utils.branding import inject_custom_css
     inject_custom_css()
 except:
     pass
@@ -58,33 +53,11 @@ st.markdown("""
         border-radius: 8px;
         border-left: 3px solid #28a745;
     }
-    
-    .screenshot-placeholder {
-        background: #e9ecef;
-        border: 2px dashed #adb5bd;
-        border-radius: 8px;
-        padding: 2rem;
-        text-align: center;
-        color: #6c757d;
-        margin: 1rem 0;
-    }
-    
-    .platform-tab {
-        display: inline-block;
-        padding: 0.75rem 1.5rem;
-        margin: 0.25rem;
-        background: #f8f9fa;
-        border-radius: 8px;
-        cursor: pointer;
-        transition: all 0.3s;
-    }
-    
-    .platform-tab:hover {
-        background: #667eea;
-        color: white;
-    }
 </style>
 """, unsafe_allow_html=True)
+
+# App URL - SINGLE PLACE TO UPDATE
+APP_URL = "https://nikkang-epl.streamlit.app"
 
 # Logo in sidebar
 if Path("nikkang_logo.png").exists():
@@ -150,11 +123,11 @@ st.markdown("---")
 if "iPhone" in platform or "iPad" in platform:
     st.markdown("## 🍎 Install on iPhone/iPad")
     
-    st.markdown("""
+    st.markdown(f"""
     <div class="install-card">
         <h3><span class="step-number">1</span>Open Safari Browser</h3>
         <p>Make sure you're using <strong>Safari</strong> (not Chrome or other browsers)</p>
-        <p>Go to: <code>https://nikkang-kk-epl.streamlit.app</code></p>
+        <p>Go to: <code>{APP_URL}</code></p>
     </div>
     """, unsafe_allow_html=True)
     
@@ -169,7 +142,7 @@ if "iPhone" in platform or "iPad" in platform:
     # Visual representation
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
-        st.info("🔍 The Share button is usually at the bottom center or bottom right of Safari")
+        st.info("📍 The Share button is usually at the bottom center or bottom right of Safari")
     
     st.markdown("""
     <div class="install-card">
@@ -210,7 +183,7 @@ if "iPhone" in platform or "iPad" in platform:
         """)
         
         st.info("""
-        **🔍 Finding the App**
+        **📍 Finding the App**
         - Look on your home screen
         - May be on the last page
         - Use Spotlight search if needed
@@ -235,11 +208,11 @@ if "iPhone" in platform or "iPad" in platform:
 else:
     st.markdown("## 🤖 Install on Android")
     
-    st.markdown("""
+    st.markdown(f"""
     <div class="install-card">
         <h3><span class="step-number">1</span>Open Chrome Browser</h3>
         <p>Make sure you're using <strong>Chrome</strong> browser</p>
-        <p>Go to: <code>https://nikkang-kk-epl.streamlit.app</code></p>
+        <p>Go to: <code>{APP_URL}</code></p>
     </div>
     """, unsafe_allow_html=True)
     
@@ -254,7 +227,7 @@ else:
     # Visual representation
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
-        st.info("🔍 The menu icon (⋮) is in the top right corner of Chrome")
+        st.info("📍 The menu icon (⋮) is in the top right corner of Chrome")
     
     st.markdown("""
     <div class="install-card">
@@ -301,7 +274,7 @@ else:
         """)
         
         st.info("""
-        **🔍 Finding the App**
+        **📍 Finding the App**
         - Check your home screen
         - Look in app drawer
         - May be in a folder
@@ -321,33 +294,6 @@ else:
         - Professional appearance
         - Easy to recognize
         """)
-
-st.markdown("---")
-
-# Video tutorials section
-st.markdown("## 🎥 Video Tutorials (Optional)")
-
-vid_col1, vid_col2 = st.columns(2)
-
-with vid_col1:
-    st.markdown("""
-    <div class="install-card">
-        <h3>📱 iPhone Tutorial</h3>
-        <p>Need a visual guide?</p>
-        <p>Search YouTube for: <strong>"Add to Home Screen iPhone Safari"</strong></p>
-        <p>Or visit Apple Support for official instructions</p>
-    </div>
-    """, unsafe_allow_html=True)
-
-with vid_col2:
-    st.markdown("""
-    <div class="install-card">
-        <h3>🤖 Android Tutorial</h3>
-        <p>Need a visual guide?</p>
-        <p>Search YouTube for: <strong>"Install PWA Android Chrome"</strong></p>
-        <p>Or visit Google Support for official instructions</p>
-    </div>
-    """, unsafe_allow_html=True)
 
 st.markdown("---")
 
@@ -445,11 +391,11 @@ st.markdown("---")
 # Quick access section
 st.markdown("## 🔗 Quick Access")
 
-st.info("""
+st.info(f"""
 **Don't want to install?** No problem!
 
 You can always access the competition at:
-**https://nikkang-kk-epl.streamlit.app**
+**{APP_URL}**
 
 Just bookmark this page in your browser for easy access!
 """)
@@ -457,12 +403,12 @@ Just bookmark this page in your browser for easy access!
 # QR Code section
 st.markdown("## 📱 Share with Friends")
 
-st.markdown("""
+st.markdown(f"""
 Want to help others join? Share this page or the main app URL:
 
-**Main App**: `https://nikkang-kk-epl.streamlit.app`
+**Main App**: `{APP_URL}`
 
-**This Install Guide**: `https://nikkang-kk-epl.streamlit.app/7_mobile_install`
+**This Install Guide**: `{APP_URL}/7_mobile_install`
 
 Or generate a QR code at: **qr-code-generator.com**
 """)

@@ -1269,49 +1269,5 @@
   "AME76IMV": {},
   "6TF6LDIN": {},
   "S67F9LGN": {},
-  "5XEIF377": {},
-  "11": {
-    "Y8PX0JE4": [
-      {
-        "home": 2,
-        "away": 1
-      },
-      {
-        "home": 1,
-        "away": 0
-      },
-      {
-        "home": 2,
-        "away": 1
-      },
-      {
-        "home": 1,
-        "away": 2
-      },
-      {
-        "home": 2,
-        "away": 0
-      },
-      {
-        "home": 1,
-        "away": 1
-      },
-      {
-        "home": 1,
-        "away": 0
-      },
-      {
-        "home": 1,
-        "away": 0
-      },
-      {
-        "home": 1,
-        "away": 0
-      },
-      {
-        "home": 1,
-        "away": 2
-      }
-    ]
-  }
+  "5XEIF377": {}
 }

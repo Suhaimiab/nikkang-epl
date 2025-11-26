@@ -1,430 +1,445 @@
 """
-Leaderboard Page - Competition Standings with Weekly Highlights
+Leaderboard Page - With Stages
+Stage 1: Manual (locked) | Stage 2-4: Automated
+Shows points, KK count (Kemut Keliling), and season tally
 """
 
 import streamlit as st
 import pandas as pd
-from utils.config import setup_page, apply_custom_css
+from pathlib import Path
+from datetime import datetime
+import sys
+import json
+
+sys.path.append(str(Path(__file__).parent.parent))
+
 from utils.data_manager import DataManager
 
-setup_page()
-apply_custom_css()
+st.set_page_config(page_title="Leaderboard - Nikkang KK", page_icon="🏆", layout="wide")
 
-dm = DataManager()
+try:
+    from utils.branding import inject_custom_css
+    inject_custom_css()
+except:
+    pass
 
-st.title("🏆 Leaderboard")
+# Custom CSS
+st.markdown("""
+<style>
+    .stage-card {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin: 0.5rem 0;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        text-align: center;
+    }
+    .stage-1 { border-top: 4px solid #667eea; }
+    .stage-2 { border-top: 4px solid #28a745; }
+    .stage-3 { border-top: 4px solid #ffc107; }
+    .stage-4 { border-top: 4px solid #dc3545; }
+    .stage-locked { background: #f8f9fa; }
+    .stage-active { background: #e8f5e9; }
+    .rank-1 { background: linear-gradient(135deg, #ffd700 0%, #ffec8b 100%); }
+    .rank-2 { background: linear-gradient(135deg, #c0c0c0 0%, #e8e8e8 100%); }
+    .rank-3 { background: linear-gradient(135deg, #cd7f32 0%, #daa06d 100%); }
+    .leader-card {
+        border-radius: 12px;
+        padding: 1rem;
+        margin: 0.5rem;
+        text-align: center;
+        color: #333;
+    }
+    .kk-badge {
+        display: inline-block;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-weight: bold;
+        font-size: 0.85rem;
+    }
+    .current-stage {
+        border: 3px solid #28a745;
+        animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+        0% { box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.4); }
+        70% { box-shadow: 0 0 0 10px rgba(40, 167, 69, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(40, 167, 69, 0); }
+    }
+</style>
+""", unsafe_allow_html=True)
 
-st.markdown("---")
-
-# Refresh button
-col1, col2, col3 = st.columns([1, 2, 1])
-
-with col2:
-    if st.button("🔄 Refresh Leaderboard", use_container_width=True):
-        st.rerun()
-
-st.markdown("---")
-
-# Calculate leaderboard
-leaderboard = dm.calculate_leaderboard()
-
-if not leaderboard:
-    st.info("No scores available yet. Predictions and results need to be submitted first.")
-    st.stop()
-
-# Display top 3 Overall
-st.subheader("🥇 Season Leaders - Top 3")
-
-cols = st.columns(3)
-
-medals = ["🥇", "🥈", "🥉"]
-
-for idx, col in enumerate(cols):
-    if idx < len(leaderboard):
-        entry = leaderboard[idx]
-        with col:
-            st.markdown(f"""
-            <div class="leaderboard-item top3">
-                <div style="text-align: center;">
-                    <div style="font-size: 48px;">{medals[idx]}</div>
-                    <h3>{entry['name']}</h3>
-                    <p style="font-size: 32px; font-weight: bold; color: #c41e3a;">{entry['total_points']}</p>
-                    <p style="margin: 0;">points</p>
-                    <hr style="margin: 10px 0;">
-                    <p style="margin: 5px 0; font-size: 14px;">⚡ {entry['exact_scores']} exact scores</p>
-                    <p style="margin: 5px 0; font-size: 14px;">✓ {entry['correct_results']} correct results</p>
-                    <p style="margin: 5px 0; font-size: 14px;">📅 {entry['weeks_played']} weeks played</p>
-                    <p style="margin: 5px 0; font-size: 14px;">⚽ {entry['team']}</p>
-                </div>
-            </div>
-            """, unsafe_allow_html=True)
-
-st.markdown("---")
-
-# Weekly Performance Highlights
-st.subheader("📅 Weekly Highlights")
-
-current_week = dm.get_current_week()
-last_completed_week = current_week - 1 if current_week > 1 else 1
-
-# Check if last week has results
-week_results = dm.get_week_results(last_completed_week)
-
-if week_results and len(week_results) > 0:
-    # Calculate weekly performance
-    weekly_data = []
-    predictions = dm.load_predictions()
-    matches = dm.load_matches()
-    
-    week_str = str(last_completed_week)
-    week_predictions = predictions.get(week_str, {})
-    week_matches = matches.get(week_str, [])
-    
-    is_week38 = (last_completed_week == 38)
-    
-    for pid, pred_list in week_predictions.items():
-        participant = dm.get_participant(pid)
-        if not participant:
-            continue
-            
-        weekly_points = 0
-        weekly_exact = 0
-        weekly_correct = 0
-        
-        for idx, pred in enumerate(pred_list):
-            if idx >= len(week_results) or idx >= len(week_matches):
-                continue
-            
-            result = week_results[idx]
-            match = week_matches[idx]
-            is_gotw = match.get('gotw', False)
-            
-            points = dm.calculate_points(pred, result, is_gotw, is_week38)
-            weekly_points += points
-            
-            if pred.get('home') == result.get('home') and pred.get('away') == result.get('away'):
-                weekly_exact += 1
-            elif points > 0:
-                weekly_correct += 1
-        
-        weekly_data.append({
-            'id': pid,
-            'name': participant['name'],
-            'team': participant.get('team', ''),
-            'points': weekly_points,
-            'exact_scores': weekly_exact,
-            'correct_results': weekly_correct
-        })
-    
-    # Sort by points
-    weekly_data.sort(key=lambda x: (x['points'], x['exact_scores']), reverse=True)
-    
-    if weekly_data:
-        # Weekly Top 3 and Bottom 3
-        col_left, col_right = st.columns(2)
-        
-        with col_left:
-            st.markdown(f"""
-            <div style="background: linear-gradient(135deg, #fff8e1 0%, #fffbf5 100%); 
-                        padding: 20px; border-radius: 10px; border: 2px solid #ffd700;">
-                <h3 style="text-align: center; color: #c41e3a;">🔥 Week {last_completed_week} Top 3</h3>
-            </div>
-            """, unsafe_allow_html=True)
-            
-            for idx in range(min(3, len(weekly_data))):
-                entry = weekly_data[idx]
-                medal = ["🥇", "🥈", "🥉"][idx]
-                st.markdown(f"""
-                <div style="background: #f8f9fa; padding: 15px; margin: 10px 0; 
-                            border-radius: 8px; border-left: 4px solid #ffd700;">
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <div>
-                            <span style="font-size: 24px;">{medal}</span>
-                            <strong style="font-size: 18px;"> {entry['name']}</strong>
-                            <div style="font-size: 12px; color: #666;">
-                                ⚡ {entry['exact_scores']} KK | ✓ {entry['correct_results']} results
-                            </div>
-                        </div>
-                        <div style="text-align: right;">
-                            <div style="font-size: 28px; font-weight: bold; color: #c41e3a;">
-                                {entry['points']}
-                            </div>
-                            <div style="font-size: 12px;">points</div>
-                        </div>
-                    </div>
-                </div>
-                """, unsafe_allow_html=True)
-        
-        with col_right:
-            st.markdown(f"""
-            <div style="background: linear-gradient(135deg, #ffe0e0 0%, #fff5f5 100%); 
-                        padding: 20px; border-radius: 10px; border: 2px solid #ff9999;">
-                <h3 style="text-align: center; color: #c41e3a;">⚠️ Week {last_completed_week} Bottom 3</h3>
-            </div>
-            """, unsafe_allow_html=True)
-            
-            # Bottom 3
-            bottom_3 = weekly_data[-3:] if len(weekly_data) >= 3 else weekly_data
-            bottom_3.reverse()  # Show worst first
-            
-            for idx, entry in enumerate(bottom_3):
-                st.markdown(f"""
-                <div style="background: #f8f9fa; padding: 15px; margin: 10px 0; 
-                            border-radius: 8px; border-left: 4px solid #ff9999;">
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <div>
-                            <strong style="font-size: 18px;">{entry['name']}</strong>
-                            <div style="font-size: 12px; color: #666;">
-                                ⚡ {entry['exact_scores']} KK | ✓ {entry['correct_results']} results
-                            </div>
-                        </div>
-                        <div style="text-align: right;">
-                            <div style="font-size: 28px; font-weight: bold; color: #666;">
-                                {entry['points']}
-                            </div>
-                            <div style="font-size: 12px;">points</div>
-                        </div>
-                    </div>
-                </div>
-                """, unsafe_allow_html=True)
-else:
-    st.info(f"Week {last_completed_week} results not yet available. Check back after matches complete!")
-
-st.markdown("---")
-
-# Season to Date KK Champions
-st.subheader("⚡ Season KK Champions (Exact Scores)")
+if Path("nikkang_logo.png").exists():
+    st.sidebar.image("nikkang_logo.png", use_container_width=True)
+    st.sidebar.markdown("---")
 
 st.markdown("""
-<div style="background: linear-gradient(135deg, #e3f2fd 0%, #f5f5f5 100%); 
-            padding: 20px; border-radius: 10px; border: 2px solid #2196F3; margin-bottom: 20px;">
-    <h4 style="text-align: center; color: #c41e3a; margin: 0;">
-        🎯 Most Exact Score Predictions (KK) - Season 2025/26
-    </h4>
-    <p style="text-align: center; color: #666; margin: 5px 0; font-size: 14px;">
-        The ultimate prediction masters!
-    </p>
+<div style="text-align: center; padding: 1.5rem 0;">
+    <h1 style="color: #667eea; font-size: 2.5rem; margin: 0;">🏆 Leaderboard</h1>
+    <p style="color: #6c757d; font-size: 1.2rem;">Season 2025/26 Standings</p>
 </div>
 """, unsafe_allow_html=True)
 
-# Sort by exact scores
-kk_leaders = sorted(leaderboard, key=lambda x: (x['exact_scores'], x['total_points']), reverse=True)
+dm = DataManager()
 
-# Top 3 KK Champions
-cols = st.columns(3)
+STAGE_SCORES_FILE = Path("nikkang_data/stage_scores.json")
 
-for idx, col in enumerate(cols):
-    if idx < len(kk_leaders):
-        entry = kk_leaders[idx]
-        medal = ["🥇", "🥈", "🥉"][idx]
-        with col:
-            st.markdown(f"""
-            <div style="background: linear-gradient(135deg, #e3f2fd 0%, #ffffff 100%); 
-                        padding: 20px; border-radius: 10px; border: 2px solid #2196F3; text-align: center;">
-                <div style="font-size: 36px; margin-bottom: 10px;">{medal}</div>
-                <h3 style="margin: 10px 0;">{entry['name']}</h3>
-                <div style="font-size: 48px; font-weight: bold; color: #2196F3; margin: 15px 0;">
-                    {entry['exact_scores']}
-                </div>
-                <div style="font-size: 14px; color: #666; margin-bottom: 15px;">Exact Scores (KK)</div>
-                <hr style="margin: 15px 0; border-color: #2196F3;">
-                <div style="font-size: 16px; color: #c41e3a; font-weight: bold; margin: 10px 0;">
-                    {entry['total_points']} pts
-                </div>
-                <div style="font-size: 12px; color: #666;">
-                    ✓ {entry['correct_results']} correct results<br>
-                    📅 {entry['weeks_played']} weeks<br>
-                    ⚽ {entry['team']}
-                </div>
-            </div>
-            """, unsafe_allow_html=True)
+def load_stage_scores():
+    if STAGE_SCORES_FILE.exists():
+        try:
+            with open(STAGE_SCORES_FILE, 'r') as f:
+                return json.load(f)
+        except:
+            pass
+    return {}
 
-st.markdown("---")
+stage_scores = load_stage_scores()
 
-# Full leaderboard table
-st.subheader("📊 Full Standings")
+STAGES = {
+    1: {"name": "Stage 1", "weeks": list(range(1, 11)), "label": "Week 1-10", "color": "#667eea", "key": "stage_1"},
+    2: {"name": "Stage 2", "weeks": list(range(11, 21)), "label": "Week 11-20", "color": "#28a745", "key": "stage_2"},
+    3: {"name": "Stage 3", "weeks": list(range(21, 31)), "label": "Week 21-30", "color": "#ffc107", "key": "stage_3"},
+    4: {"name": "Stage 4", "weeks": list(range(31, 39)), "label": "Week 31-38", "color": "#dc3545", "key": "stage_4"},
+}
 
-# Create DataFrame
-df = pd.DataFrame(leaderboard)
-
-# Select and rename columns
-df_display = df[['rank', 'name', 'total_points', 'exact_scores', 'correct_results', 'weeks_played', 'team']].copy()
-df_display.columns = ['Rank', 'Name', 'Total Points', 'Exact Scores (KK)', 'Correct Results', 'Weeks Played', 'Team']
-
-# Display table with styling
-st.dataframe(
-    df_display,
-    use_container_width=True,
-    hide_index=True,
-    column_config={
-        "Rank": st.column_config.NumberColumn(
-            "Rank",
-            help="Current position",
-            format="%d"
-        ),
-        "Total Points": st.column_config.NumberColumn(
-            "Total Points",
-            help="Total points accumulated",
-            format="%d"
-        ),
-        "Exact Scores (KK)": st.column_config.NumberColumn(
-            "Exact Scores (KK)",
-            help="Number of exact score predictions",
-            format="%d"
-        ),
-        "Correct Results": st.column_config.NumberColumn(
-            "Correct Results",
-            help="Number of correct result predictions",
-            format="%d"
-        ),
-        "Weeks Played": st.column_config.NumberColumn(
-            "Weeks Played",
-            help="Number of weeks participated",
-            format="%d"
-        ),
-    }
-)
-
-st.markdown("---")
-
-# Statistics
-st.subheader("📈 Competition Statistics")
-
-col1, col2, col3, col4 = st.columns(4)
-
-with col1:
-    st.metric("Total Participants", len(leaderboard))
-
-with col2:
-    total_points = sum(entry['total_points'] for entry in leaderboard)
-    st.metric("Total Points", total_points)
-
-with col3:
-    total_exact = sum(entry['exact_scores'] for entry in leaderboard)
-    st.metric("Total Exact Scores", total_exact)
-
-with col4:
-    avg_points = total_points / len(leaderboard) if leaderboard else 0
-    st.metric("Avg Points", f"{avg_points:.1f}")
-
-st.markdown("---")
-
-# Individual participant lookup
-st.subheader("🔍 Look Up Your Stats")
-
-participants = dm.load_participants()
-participant_names = {p['name']: pid for pid, p in participants.items()}
-
-selected_name = st.selectbox("Select Participant", [""] + list(participant_names.keys()))
-
-if selected_name:
-    participant_id = participant_names[selected_name]
-    stats = dm.get_participant_stats(participant_id)
+def get_stage_scores(participant_id, stage_num):
+    stage_info = STAGES[stage_num]
+    stage_key = stage_info['key']
+    is_locked = stage_scores.get(f"{stage_key}_locked", False)
     
-    if stats:
+    if is_locked:
+        manual = stage_scores.get(stage_key, {}).get(participant_id, {})
+        return {'points': manual.get('points', 0), 'kk_count': manual.get('kk_count', 0), 'source': 'manual'}
+    
+    # Load data - YOUR FORMAT: 
+    # predictions: {"11": {"Y8PX0JE4": [{home, away}, ...]}}
+    # results: {"11": [{home, away}, ...]} or {"11_0": {home_score, away_score}}
+    # matches: {"11": [{home, away, gotw}, ...]}
+    predictions = dm.load_predictions()
+    results = dm.load_results()
+    matches_data = dm.load_matches()
+    
+    total_points = 0
+    kk_count = 0
+    
+    # Iterate through weeks in this stage
+    for week in stage_info['weeks']:
+        week_str = str(week)
+        
+        # Get matches for this week
+        week_matches = matches_data.get(week_str, [])
+        if not isinstance(week_matches, list):
+            continue
+        
+        # Get user predictions for this week
+        week_predictions = predictions.get(week_str, {})
+        user_pred_list = week_predictions.get(participant_id, [])
+        
+        # Get results for this week
+        week_results = results.get(week_str, [])
+        
+        # Process each match
+        for idx, match in enumerate(week_matches):
+            is_gotw = match.get('gotw', False)
+            
+            # Get result - handle both list and dict formats
+            result = None
+            if isinstance(week_results, list) and idx < len(week_results):
+                result = week_results[idx]
+            else:
+                # Try indexed format like "11_0"
+                match_key = f"{week_str}_{idx}"
+                result = results.get(match_key, None)
+            
+            if not result:
+                continue
+            
+            # Get prediction
+            pred = user_pred_list[idx] if idx < len(user_pred_list) else None
+            
+            if not pred:
+                continue
+            
+            # Get scores - handle both formats
+            pred_home = pred.get('home_score', pred.get('home', -1))
+            pred_away = pred.get('away_score', pred.get('away', -1))
+            res_home = result.get('home_score', result.get('home', -2))
+            res_away = result.get('away_score', result.get('away', -2))
+            
+            # Calculate points (Week 38 finale = all matches get bonus points)
+            points = dm.calculate_points(pred_home, pred_away, res_home, res_away, is_gotw, week)
+            total_points += points
+            
+            # Check for exact score (KK)
+            if pred_home == res_home and pred_away == res_away:
+                kk_count += 1
+    
+    return {'points': total_points, 'kk_count': kk_count, 'source': 'auto'}
+
+def get_current_stage():
+    """
+    Automatically determine current stage based on:
+    1. Locked stages (from admin)
+    2. Matches with results (fallback)
+    """
+    # Check locked stages first
+    if stage_scores.get("stage_4_locked", False):
+        return 5  # Season complete
+    elif stage_scores.get("stage_3_locked", False):
+        return 4
+    elif stage_scores.get("stage_2_locked", False):
+        return 3
+    elif stage_scores.get("stage_1_locked", False):
+        return 2
+    
+    # Fallback: Detect based on match results
+    try:
+        results = dm.load_results()
+        all_matches = dm.get_all_matches()
+        
+        # Find the highest week with results
+        max_week_with_results = 0
+        for match in all_matches:
+            if match.get('id') in results:
+                week = match.get('week', 0)
+                if week > max_week_with_results:
+                    max_week_with_results = week
+        
+        # Determine stage based on max week
+        if max_week_with_results >= 31:
+            return 4
+        elif max_week_with_results >= 21:
+            return 3
+        elif max_week_with_results >= 11:
+            return 2
+        elif max_week_with_results >= 1:
+            return 1
+        else:
+            return 1  # No results yet, start at Stage 1
+    except:
+        return 1
+
+def get_completed_stages():
+    """
+    Determine which stages are completed based on:
+    1. Locked status (admin confirmed)
+    2. All matches in stage have results (auto-detect)
+    """
+    completed = set()
+    
+    # Check locked stages
+    for stage_num in [1, 2, 3, 4]:
+        if stage_scores.get(f"stage_{stage_num}_locked", False):
+            completed.add(stage_num)
+    
+    # Auto-detect based on results (if all matches in a stage have results)
+    try:
+        results = dm.load_results()
+        all_matches = dm.get_all_matches()
+        
+        for stage_num, info in STAGES.items():
+            if stage_num in completed:
+                continue
+            
+            stage_weeks = info['weeks']
+            stage_matches = [m for m in all_matches if m.get('week', 0) in stage_weeks]
+            
+            if stage_matches:  # Only check if there are matches
+                all_have_results = all(m.get('id') in results for m in stage_matches)
+                if all_have_results:
+                    completed.add(stage_num)
+    except:
+        pass
+    
+    return completed
+
+def get_full_leaderboard():
+    participants = dm.get_all_participants()
+    leaderboard = []
+    
+    for p in participants:
+        uid = p.get('id', '')
+        s1, s2, s3, s4 = get_stage_scores(uid, 1), get_stage_scores(uid, 2), get_stage_scores(uid, 3), get_stage_scores(uid, 4)
+        
+        leaderboard.append({
+            'id': uid, 'name': p.get('display_name') or p.get('name', 'Unknown'), 'team': p.get('team', '-'),
+            's1_pts': s1['points'], 's1_kk': s1['kk_count'], 's1_src': s1['source'],
+            's2_pts': s2['points'], 's2_kk': s2['kk_count'], 's2_src': s2['source'],
+            's3_pts': s3['points'], 's3_kk': s3['kk_count'], 's3_src': s3['source'],
+            's4_pts': s4['points'], 's4_kk': s4['kk_count'], 's4_src': s4['source'],
+            'total_pts': s1['points'] + s2['points'] + s3['points'] + s4['points'],
+            'total_kk': s1['kk_count'] + s2['kk_count'] + s3['kk_count'] + s4['kk_count']
+        })
+    
+    leaderboard.sort(key=lambda x: (-x['total_pts'], -x['total_kk']))
+    for i, e in enumerate(leaderboard, 1):
+        e['rank'] = i
+    return leaderboard
+
+current_stage = get_current_stage()
+completed_stages = get_completed_stages()
+
+# Stage cards
+st.markdown("### 📊 Season Stages")
+cols = st.columns(4)
+
+for i, (stage_num, info) in enumerate(STAGES.items()):
+    with cols[i]:
+        is_completed = stage_num in completed_stages
+        is_current = stage_num == current_stage and not is_completed
+        
+        if is_completed:
+            status = "✅ COMPLETED"
+            extra = "stage-locked"
+        elif is_current:
+            status = "🔴 CURRENT"
+            extra = "current-stage stage-active"
+        else:
+            status = "⏳ UPCOMING"
+            extra = ""
+        
         st.markdown(f"""
-        <div class="info-box info">
-            <h3>📊 Stats for {stats['name']}</h3>
+        <div class="stage-card stage-{stage_num} {extra}">
+            <div style="font-size: 1.2rem; font-weight: bold;">{info['name']}</div>
+            <div style="color: #6c757d;">{info['label']}</div>
+            <div style="margin-top: 0.5rem; color: {info['color']};">{status}</div>
         </div>
         """, unsafe_allow_html=True)
+
+st.markdown("---")
+
+# Tabs
+tab1, tab2, tab3, tab4, tab5 = st.tabs(["🏆 Season Total", "📊 Stage 1", "📊 Stage 2", "📊 Stage 3", "📊 Stage 4"])
+
+with tab1:
+    st.markdown("### 🏆 Season Leaderboard")
+    st.caption(f"Updated: {datetime.now().strftime('%d %b %Y, %H:%M')}")
+    
+    lb = get_full_leaderboard()
+    
+    if not lb:
+        st.warning("No participants found")
+    else:
+        # Top 3 by Points
+        if len(lb) >= 3:
+            st.markdown("#### 🥇🥈🥉 Top 3 - Points Leaders")
+            cols = st.columns(3)
+            for col_idx, lb_idx in enumerate([1, 0, 2]):
+                p = lb[lb_idx]
+                medals = ["🥈", "🥇", "🥉"]
+                classes = ["rank-2", "rank-1", "rank-3"]
+                with cols[col_idx]:
+                    st.markdown(f"""
+                    <div class="leader-card {classes[col_idx]}">
+                        <div style="font-size: 2rem;">{medals[col_idx]}</div>
+                        <div style="font-size: 1.2rem; font-weight: bold;">{p['name']}</div>
+                        <div style="font-size: 1.5rem; font-weight: bold;">{p['total_pts']} pts</div>
+                        <div class="kk-badge">KK: {p['total_kk']}</div>
+                    </div>
+                    """, unsafe_allow_html=True)
+            st.markdown("---")
         
-        col1, col2, col3, col4 = st.columns(4)
+        # Top 3 by KK (Exact Scores)
+        kk_sorted = sorted(lb, key=lambda x: (-x['total_kk'], -x['total_pts']))
+        if len(kk_sorted) >= 3 and kk_sorted[0]['total_kk'] > 0:
+            st.markdown("#### 🎯 Top 3 - KK Masters (Exact Scores)")
+            cols = st.columns(3)
+            for col_idx, lb_idx in enumerate([1, 0, 2]):
+                p = kk_sorted[lb_idx]
+                medals = ["🥈", "🥇", "🥉"]
+                # Custom gradient for KK leaders
+                kk_classes = [
+                    "background: linear-gradient(135deg, #667eea 0%, #9f7aea 100%); color: white;",
+                    "background: linear-gradient(135deg, #6b46c1 0%, #805ad5 100%); color: white;",
+                    "background: linear-gradient(135deg, #9f7aea 0%, #b794f4 100%); color: white;"
+                ]
+                with cols[col_idx]:
+                    st.markdown(f"""
+                    <div class="leader-card" style="{kk_classes[col_idx]}">
+                        <div style="font-size: 2rem;">{medals[col_idx]} 🎯</div>
+                        <div style="font-size: 1.2rem; font-weight: bold;">{p['name']}</div>
+                        <div style="font-size: 1.5rem; font-weight: bold;">{p['total_kk']} KK</div>
+                        <div style="background: rgba(255,255,255,0.2); padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.85rem;">
+                            {p['total_pts']} pts
+                        </div>
+                    </div>
+                    """, unsafe_allow_html=True)
+            st.markdown("---")
         
-        with col1:
-            st.metric("Rank", f"#{stats['rank']}")
+        # Table
+        s1_i = "🔒" if stage_scores.get('stage_1_locked') else "🔄"
+        s2_i = "🔒" if stage_scores.get('stage_2_locked') else "🔄"
+        s3_i = "🔒" if stage_scores.get('stage_3_locked') else "🔄"
+        s4_i = "🔒" if stage_scores.get('stage_4_locked') else "🔄"
         
-        with col2:
-            st.metric("Total Points", stats['total_points'])
-        
-        with col3:
-            st.metric("Exact Scores", stats['exact_scores'])
-        
-        with col4:
-            st.metric("Correct Results", stats['correct_results'])
-        
+        df = pd.DataFrame([{
+            'Rank': p['rank'], 'Name': p['name'], 'Team': p['team'],
+            f'S1{s1_i}': p['s1_pts'], f'S2{s2_i}': p['s2_pts'],
+            f'S3{s3_i}': p['s3_pts'], f'S4{s4_i}': p['s4_pts'],
+            'Total': p['total_pts'], 'KK': p['total_kk']
+        } for p in lb])
+        st.dataframe(df, use_container_width=True, hide_index=True)
+        st.caption("🔒 = Manual (Locked) | 🔄 = Auto-calculated")
+
+def display_stage_tab(stage_num, info):
+    is_locked = stage_scores.get(f"{info['key']}_locked", False)
+    st.success(f"🔒 **{info['name']} COMPLETED**" if is_locked else f"🔄 **{info['name']} IN PROGRESS**")
+    st.markdown(f"### {info['name']} ({info['label']})")
+    
+    lb = get_full_leaderboard()
+    stage_lb = sorted(lb, key=lambda x: (-x[f's{stage_num}_pts'], -x[f's{stage_num}_kk']))
+    
+    for i, e in enumerate(stage_lb, 1):
+        e['stage_rank'] = i
+    
+    # Top 3
+    with_pts = [p for p in stage_lb if p[f's{stage_num}_pts'] > 0]
+    if with_pts:
+        st.markdown("#### 🏆 Stage Leaders")
+        top3 = with_pts[:min(3, len(with_pts))]
+        cols = st.columns(len(top3))
+        for i, p in enumerate(top3):
+            with cols[i]:
+                st.markdown(f"""
+                <div class="leader-card {'rank-1' if i==0 else ('rank-2' if i==1 else 'rank-3')}">
+                    <div style="font-size: 1.5rem;">{'🥇' if i==0 else ('🥈' if i==1 else '🥉')}</div>
+                    <div style="font-weight: bold;">{p['name']}</div>
+                    <div style="font-size: 1.3rem; font-weight: bold;">{p[f's{stage_num}_pts']} pts</div>
+                    <div class="kk-badge">KK: {p[f's{stage_num}_kk']}</div>
+                </div>
+                """, unsafe_allow_html=True)
         st.markdown("---")
-        
-        # Weekly breakdown
-        st.subheader(f"📅 Weekly Performance")
-        
-        predictions = dm.load_predictions()
-        results = dm.load_results()
-        matches = dm.load_matches()
-        
-        weekly_data = []
-        
-        for week_str, week_predictions in predictions.items():
-            if participant_id in week_predictions:
-                week = int(week_str)
-                week_results = results.get(week_str, [])
-                week_matches = matches.get(week_str, [])
-                
-                if not week_results or not week_matches:
-                    continue
-                
-                week_points = 0
-                week_exact = 0
-                week_correct = 0
-                
-                pred_list = week_predictions[participant_id]
-                
-                for idx, pred in enumerate(pred_list):
-                    if idx >= len(week_results) or idx >= len(week_matches):
-                        continue
-                    
-                    result = week_results[idx]
-                    match = week_matches[idx]
-                    is_gotw = match.get('gotw', False)
-                    is_week38 = (week == 38)
-                    
-                    points = dm.calculate_points(pred, result, is_gotw, is_week38)
-                    week_points += points
-                    
-                    if pred['home'] == result['home'] and pred['away'] == result['away']:
-                        week_exact += 1
-                    elif points > 0:
-                        week_correct += 1
-                
-                weekly_data.append({
-                    'Week': week,
-                    'Points': week_points,
-                    'Exact Scores': week_exact,
-                    'Correct Results': week_correct
-                })
-        
-        if weekly_data:
-            df_weekly = pd.DataFrame(weekly_data)
-            df_weekly = df_weekly.sort_values('Week')
-            
-            st.dataframe(
-                df_weekly,
-                use_container_width=True,
-                hide_index=True
-            )
-            
-            # Chart
-            st.line_chart(df_weekly.set_index('Week')['Points'])
-        else:
-            st.info("No predictions submitted yet.")
+    
+    # Table with carry-forward
+    data = []
+    for p in stage_lb:
+        carry = sum(p[f's{s}_pts'] for s in range(1, stage_num) if stage_scores.get(f"stage_{s}_locked"))
+        row = {'Rank': p['stage_rank'], 'Name': p['name'], 'Stage Pts': p[f's{stage_num}_pts'], 'KK': p[f's{stage_num}_kk']}
+        if stage_num > 1:
+            row['Carry Forward'] = carry
+            row['Running Total'] = carry + p[f's{stage_num}_pts']
+        data.append(row)
+    st.dataframe(pd.DataFrame(data), use_container_width=True, hide_index=True)
+
+with tab2:
+    display_stage_tab(1, STAGES[1])
+with tab3:
+    display_stage_tab(2, STAGES[2])
+with tab4:
+    display_stage_tab(3, STAGES[3])
+with tab5:
+    display_stage_tab(4, STAGES[4])
+
+# Sidebar
+st.sidebar.markdown("---")
+st.sidebar.markdown("### 📖 Scoring")
+st.sidebar.markdown("""
+**Normal:** Exact=6, Correct=3  
+**GOTW:** Exact=10, Correct=5  
+**KK** = Kemut Keliling (Exact Score)
+""")
 
 st.markdown("---")
-
-# Points breakdown
-with st.expander("📖 Points System Reminder"):
-    st.markdown("""
-    ### Standard Matches:
-    - **Exact Score (KK):** 6 points
-    - **Correct Result:** 3 points
-    
-    ### GOTW (Game of the Week):
-    - **Exact Score (KK):** 10 points
-    - **Correct Result:** 5 points
-    
-    ### Week 38 (Finale):
-    - **All matches:** Double points!
-    - **Exact Score:** 10 points
-    - **Correct Result:** 5 points
-    """)
-
-st.markdown("---")
-st.caption("Nikkang KK - EPL Prediction Competition 2025/26")
+st.caption("Nikkang KK EPL Prediction League | Season 2025-26")

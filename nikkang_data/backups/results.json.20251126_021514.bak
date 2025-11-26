@@ -86,103 +86,61 @@
   "11_0": {
     "home_score": 2,
     "away_score": 2,
-    "entered_at": "2025-11-26T10:19:01.101922",
+    "entered_at": "2025-11-26 05:45:31",
     "source": "API"
   },
   "11_1": {
     "home_score": 2,
     "away_score": 0,
-    "entered_at": "2025-11-26T10:19:01.101922",
+    "entered_at": "2025-11-26 05:45:31",
     "source": "API"
   },
   "11_2": {
     "home_score": 3,
     "away_score": 2,
-    "entered_at": "2025-11-26T10:19:01.101922",
+    "entered_at": "2025-11-26 05:45:31",
     "source": "API"
   },
   "11_3": {
     "home_score": 2,
     "away_score": 2,
-    "entered_at": "2025-11-26T10:19:01.101922",
+    "entered_at": "2025-11-26 05:45:31",
     "source": "API"
   },
   "11_4": {
     "home_score": 3,
     "away_score": 0,
-    "entered_at": "2025-11-26T10:19:01.101922",
+    "entered_at": "2025-11-26 05:45:31",
     "source": "API"
   },
   "11_5": {
     "home_score": 4,
     "away_score": 0,
-    "entered_at": "2025-11-26T10:19:01.101922",
+    "entered_at": "2025-11-26 05:45:31",
     "source": "API"
   },
   "11_7": {
-    "home_score": 3,
-    "away_score": 1,
-    "entered_at": "2025-11-26T10:19:01.101922",
+    "home_score": 0,
+    "away_score": 0,
+    "entered_at": "2025-11-26 05:45:31",
     "source": "API"
   },
   "11_6": {
-    "home_score": 0,
-    "away_score": 0,
-    "entered_at": "2025-11-26T10:19:01.101922",
+    "home_score": 3,
+    "away_score": 1,
+    "entered_at": "2025-11-26 05:45:31",
     "source": "API"
   },
   "11_8": {
     "home_score": 3,
     "away_score": 1,
-    "entered_at": "2025-11-26T10:19:01.101922",
+    "entered_at": "2025-11-26 05:45:31",
     "source": "API"
   },
   "11_9": {
     "home_score": 3,
     "away_score": 0,
-    "entered_at": "2025-11-26T10:19:01.101922",
+    "entered_at": "2025-11-26 05:45:31",
     "source": "API"
-  },
-  "11": [
-    {
-      "home": 2,
-      "away": 2
-    },
-    {
-      "home": 2,
-      "away": 0
-    },
-    {
-      "home": 3,
-      "away": 2
-    },
-    {
-      "home": 2,
-      "away": 2
-    },
-    {
-      "home": 3,
-      "away": 0
-    },
-    {
-      "home": 4,
-      "away": 0
-    },
-    {
-      "home": 0,
-      "away": 0
-    },
-    {
-      "home": 3,
-      "away": 1
-    },
-    {
-      "home": 3,
-      "away": 1
-    },
-    {
-      "home": 3,
-      "away": 0
-    }
-  ]
+  }
 }

@@ -1,162 +1,232 @@
 """
-Registration Page - Participant Registration
+Registration Page
+Nikkang KK EPL Prediction Competition
+Public page for new participant registration
 """
 
 import streamlit as st
-from utils.config import setup_page, apply_custom_css, TEAMS
-from utils.data_manager import DataManager
-from utils.whatsapp import generate_participant_link, generate_whatsapp_message, get_whatsapp_url
+from datetime import datetime
+from utils.data_manager import (
+    load_participants,
+    save_participants,
+    generate_user_id
+)
 
-setup_page()
-apply_custom_css()
+# Page configuration
+st.set_page_config(
+    page_title="Nikkang KK EPL - Registration",
+    page_icon="⚽",
+    layout="centered"
+)
 
-dm = DataManager()
+# Helper functions
+def safe_get(item, key, default=None):
+    """Safely get attribute from dict or object"""
+    if isinstance(item, dict):
+        return item.get(key, default)
+    return default
 
-st.title("📝 Participant Registration")
+def to_dict_format(data):
+    """Convert list format to dict format if needed"""
+    if isinstance(data, dict):
+        return data
+    elif isinstance(data, list):
+        result = {}
+        for i, item in enumerate(data):
+            if isinstance(item, dict):
+                key = item.get('id', f'item_{i}')
+                result[key] = item
+        return result
+    return {}
+
+# Page header
+st.title("⚽ Nikkang KK EPL Prediction Competition")
+st.markdown("### Season 2025-26 Registration")
+st.markdown("---")
+
+# Display logo if available
+try:
+    col1, col2, col3 = st.columns([1, 2, 1])
+    with col2:
+        st.image("nikkang_logo.png", width=200)
+except:
+    pass
+
+st.markdown("""
+Welcome to the Nikkang KK English Premier League Prediction Competition!
+
+**How it works:**
+- Predict the scores for 10 EPL matches each gameweek
+- Earn 6 points for an exact score prediction
+- Earn 3 points for predicting the correct result (win/draw/loss)
+- Game of the Week predictions earn double points!
+- Compete against friends and colleagues for bragging rights
+
+**Register below to get started!**
+""")
 
 st.markdown("---")
 
 # Registration form
-st.subheader("Register New Participant")
+st.subheader("📝 Register Now")
 
 with st.form("registration_form"):
     col1, col2 = st.columns(2)
     
     with col1:
-        name = st.text_input("Full Name*", placeholder="Enter your full name")
-        email = st.text_input("Email*", placeholder="your.email@example.com")
+        name = st.text_input("Full Name *", placeholder="Enter your full name")
+        email = st.text_input("Email", placeholder="your@email.com (optional)")
     
     with col2:
-        phone = st.text_input("WhatsApp Number*", placeholder="+60123456789")
-        team = st.selectbox("Favorite EPL Team", [""] + TEAMS)
+        phone = st.text_input("Phone Number *", placeholder="+968XXXXXXXX")
+        nickname = st.text_input("Nickname (for leaderboard)", placeholder="Optional display name")
     
-    submit = st.form_submit_button("✅ Register", use_container_width=True)
+    # Terms agreement
+    agree = st.checkbox("I agree to participate in the competition and follow the rules")
+    
+    submit = st.form_submit_button("🎯 Register", use_container_width=True)
     
     if submit:
-        if not name or not email or not phone:
-            st.error("❌ Please fill in all required fields (Name, Email, Phone)")
+        # Validation
+        if not name:
+            st.error("❌ Please enter your full name")
+        elif not phone:
+            st.error("❌ Please enter your phone number")
+        elif not agree:
+            st.error("❌ Please agree to the terms to continue")
         else:
-            # Add participant
-            participant_id = dm.add_participant(name, email, phone, team)
+            # Load existing participants
+            participants_raw = load_participants()
+            participants = to_dict_format(participants_raw)
             
-            if participant_id:
-                st.success(f"✅ Registration successful! Welcome, {name}!")
-                
-                # Generate link and message
-                current_week = dm.get_current_week()
-                link = generate_participant_link(participant_id, base_url="http://localhost:8501")
-                
-                participant = dm.get_participant(participant_id)
-                message = generate_whatsapp_message(participant, link, current_week)
-                
-                # Display information
-                st.markdown("---")
-                st.subheader("📱 Your Personal Prediction Link")
-                
-                st.info("**Important:** Save this link! You'll need it to submit predictions each week.")
-                
-                st.code(link, language=None)
-                
-                # WhatsApp section
-                st.markdown("---")
-                st.subheader("💬 WhatsApp Message")
-                
-                st.text_area("Copy and send this message:", message, height=200)
-                
-                whatsapp_url = get_whatsapp_url(phone, message)
-                st.link_button("📱 Open WhatsApp", whatsapp_url, use_container_width=True)
-                
-                st.success("✅ Link and message ready! Send it via WhatsApp.")
+            # Check if phone already registered
+            phone_exists = False
+            for p in participants.values():
+                if safe_get(p, 'phone', '') == phone:
+                    phone_exists = True
+                    break
+            
+            if phone_exists:
+                st.warning("⚠️ This phone number is already registered!")
+                st.info("If you forgot your prediction link, please contact the admin.")
             else:
-                st.error("❌ This email is already registered. Please use a different email.")
+                # Generate unique ID
+                user_id = generate_user_id()
+                
+                # Ensure unique ID
+                while user_id in participants:
+                    user_id = generate_user_id()
+                
+                # Create new participant
+                display_name = nickname if nickname else name
+                new_participant = {
+                    'id': user_id,
+                    'name': name,
+                    'display_name': display_name,
+                    'email': email,
+                    'phone': phone,
+                    'status': 'active',
+                    'registration_date': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                    'link': f"?user_id={user_id}",
+                    'notes': '',
+                    'predictions': {},
+                    'total_points': 0
+                }
+                
+                # Add to participants
+                participants[user_id] = new_participant
+                save_participants(participants)
+                
+                # Success message
+                st.success("✅ Registration successful!")
+                st.balloons()
+                
+                st.markdown("---")
+                st.markdown("### Your Prediction Link")
+                
+                # Generate prediction link
+                # Note: Update this URL when deploying to Streamlit Cloud
+                base_url = "https://your-app.streamlit.app"  # Update this!
+                prediction_link = f"{base_url}?user_id={user_id}"
+                
+                st.code(prediction_link)
+                
+                st.info(f"""
+                **Save this link!** You'll need it to make predictions.
+                
+                **Your User ID:** {user_id}
+                
+                You can also bookmark this page after clicking the link.
+                """)
+                
+                # WhatsApp option
+                if phone:
+                    clean_phone = phone.replace('+', '').replace(' ', '').replace('-', '')
+                    message = f"Welcome to Nikkang KK EPL Competition! Your prediction link: {prediction_link}"
+                    whatsapp_url = f"https://wa.me/{clean_phone}?text={message}"
+                    st.markdown(f"[📱 Send link to yourself via WhatsApp]({whatsapp_url})")
 
 st.markdown("---")
 
-# List of registered participants
-st.subheader("👥 Registered Participants")
+# Already registered section
+st.subheader("🔑 Already Registered?")
+st.markdown("""
+If you've already registered, you should have received a unique link.
 
-participants = dm.load_participants()
+- Check your WhatsApp messages
+- Contact the competition admin
+- Use your User ID to access predictions
+""")
 
-if participants:
-    st.info(f"Total Participants: **{len(participants)}**")
-    
-    # Search/filter
-    search = st.text_input("🔍 Search by name or email", "")
-    
-    # Display participants
-    filtered = {k: v for k, v in participants.items() 
-                if search.lower() in v['name'].lower() or search.lower() in v['email'].lower()}
-    
-    if filtered:
-        for pid, p in filtered.items():
-            with st.container():
-                col1, col2, col3 = st.columns([3, 2, 2])
-                
-                with col1:
-                    st.markdown(f"""
-                    <div class="participant-card">
-                        <strong>{p['name']}</strong><br>
-                        <small>📧 {p['email']}</small><br>
-                        <small>📱 {p['phone']}</small><br>
-                        <small>⚽ Team: {p.get('team', 'Not selected')}</small>
-                    </div>
-                    """, unsafe_allow_html=True)
-                
-                with col2:
-                    if st.button(f"📋 Copy Link", key=f"copy_{pid}"):
-                        link = generate_participant_link(pid, base_url="http://localhost:8501")
-                        st.code(link, language=None)
-                        st.caption("Link copied! Share with participant.")
-                
-                with col3:
-                    if st.button(f"💬 WhatsApp", key=f"wa_{pid}"):
-                        current_week = dm.get_current_week()
-                        link = generate_participant_link(pid, base_url="http://localhost:8501")
-                        message = generate_whatsapp_message(p, link, current_week)
-                        whatsapp_url = get_whatsapp_url(p['phone'], message)
-                        st.link_button("Open WhatsApp", whatsapp_url, key=f"wa_link_{pid}")
-    else:
-        st.warning("No participants found matching your search.")
-else:
-    st.info("No participants registered yet. Be the first to register!")
+# Enter user ID manually
+with st.expander("Enter User ID manually"):
+    manual_id = st.text_input("Your User ID", placeholder="e.g., ABC12345")
+    if st.button("Go to Predictions"):
+        if manual_id:
+            st.markdown(f"[Click here to go to predictions](?user_id={manual_id})")
+        else:
+            st.warning("Please enter your User ID")
 
 st.markdown("---")
 
-# Bulk actions
-st.subheader("⚙️ Bulk Actions")
+# Rules section
+with st.expander("📜 Competition Rules"):
+    st.markdown("""
+    **Scoring System:**
+    - Exact score: 6 points
+    - Correct result (win/draw/loss): 3 points
+    - Incorrect prediction: 0 points
+    - Game of the Week: Points × 2
+    
+    **Prediction Deadlines:**
+    - All predictions must be submitted before match kickoff
+    - Late predictions will not be accepted
+    - You can change predictions until the deadline
+    
+    **Leaderboard:**
+    - Updated after each gameweek
+    - Ties broken by number of exact scores
+    - Final standings announced at season end
+    
+    **Fair Play:**
+    - One account per person
+    - No sharing of prediction links
+    - Admin decision is final on disputes
+    """)
 
-col1, col2 = st.columns(2)
+# Contact section
+with st.expander("📞 Contact Admin"):
+    st.markdown("""
+    Having trouble registering? Need help?
+    
+    Contact the competition administrator:
+    - **WhatsApp:** +968XXXXXXXX
+    - **Email:** admin@example.com
+    
+    We'll respond as soon as possible!
+    """)
 
-with col1:
-    if st.button("📋 Generate All Links", use_container_width=True):
-        participants = dm.load_participants()
-        current_week = dm.get_current_week()
-        
-        all_links = []
-        for pid, p in participants.items():
-            link = generate_participant_link(pid, current_week, base_url="http://localhost:8501")
-            all_links.append(f"**{p['name']}**\n{link}\n📱 {p['phone']}\n")
-        
-        links_text = "\n".join(all_links)
-        
-        st.text_area("All Participant Links", links_text, height=300)
-        st.success("✅ All links generated! Copy and share.")
-
-with col2:
-    if st.button("💬 Generate WhatsApp Messages", use_container_width=True):
-        participants = dm.load_participants()
-        current_week = dm.get_current_week()
-        
-        all_messages = []
-        for pid, p in participants.items():
-            link = generate_participant_link(pid, current_week, base_url="http://localhost:8501")
-            message = generate_whatsapp_message(p, link, current_week)
-            all_messages.append(f"--- {p['name']} ({p['phone']}) ---\n{message}\n")
-        
-        messages_text = "\n\n".join(all_messages)
-        
-        st.text_area("All WhatsApp Messages", messages_text, height=300)
-        st.success("✅ All messages generated! Copy and send individually.")
-
+# Footer
 st.markdown("---")
-st.caption("Nikkang KK - EPL Prediction Competition 2025/26")
+st.caption("Nikkang KK EPL Prediction Competition 2025-26")
+st.caption("Good luck and enjoy the season! ⚽🏆")
