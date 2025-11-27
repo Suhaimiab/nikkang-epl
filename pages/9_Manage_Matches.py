@@ -53,9 +53,9 @@ with tab1:
     st.markdown("### ⭐ Set Game of the Week")
     st.info("""
 **Scoring System:**
-- **Normal:** Exact: 6pts, Correct: 3pts
-- **GOTW:** Exact: 10pts, Correct: 5pts
-- **Week 38 FINALE:** ALL matches score 10pts / 5pts / 0pts
+- **Normal:** Exact (KK) = 6 pts, Correct = 3 pts
+- **GOTW Bonus Bonanza:** 10 pts / 5 pts
+- **Week 38 FINALE:** ALL matches score 10 / 5 / 0
 """)
     
     weeks = dm.get_weeks()

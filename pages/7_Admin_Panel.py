@@ -178,26 +178,26 @@ col1, col2, col3 = st.columns(3)
 with col1:
     st.subheader("Participant Management")
     if st.button("➕ Add Participant", use_container_width=True):
-        st.switch_page("pages/9_participant_management.py")
+        st.switch_page("pages/8_Manage_Participants.py")
     
     if st.button("📋 View All Participants", use_container_width=True):
-        st.switch_page("pages/9_participant_management.py")
+        st.switch_page("pages/8_Manage_Participants.py")
 
 with col2:
     st.subheader("Match Management")
     if st.button("⚽ Enter Results", use_container_width=True):
-        st.switch_page("pages/4_results.py")
+        st.switch_page("pages/4_Results.py")
     
     if st.button("📥 Import Fixtures", use_container_width=True):
-        st.switch_page("pages/10_api_integration.py")
+        st.switch_page("pages/10_Results_Management.py")
 
 with col3:
     st.subheader("Communications")
     if st.button("📱 Send WhatsApp", use_container_width=True):
-        st.switch_page("pages/8_whatsapp_notifications.py")
+        st.switch_page("pages/14_WhatsApp.py")
     
     if st.button("📊 View Leaderboard", use_container_width=True):
-        st.switch_page("pages/5_leaderboard.py")
+        st.switch_page("pages/5_Leaderboard.py")
 
 st.markdown("---")
 

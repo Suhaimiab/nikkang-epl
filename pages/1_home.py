@@ -6,9 +6,6 @@ Enhanced with branding, stage system integration, and attractive layout
 import streamlit as st
 from pathlib import Path
 import json
-import sys
-
-sys.path.append(str(Path(__file__).parent.parent))
 
 # Page config
 st.set_page_config(
@@ -79,6 +76,15 @@ st.markdown("""
         margin: 0.5rem;
     }
     
+    .sidebar-logo-container {
+        text-align: center;
+        padding: 1rem 0;
+        margin-bottom: 1rem;
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    
     .stage-badge {
         display: inline-block;
         padding: 0.25rem 0.75rem;
@@ -92,48 +98,141 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# Sidebar - Logo and Info
-if Path("nikkang_logo.png").exists():
-    st.sidebar.image("nikkang_logo.png", use_container_width=True)
-st.sidebar.markdown("---")
+# Stage scores file
+STAGE_SCORES_FILE = Path("nikkang_data/stage_scores.json")
 
-# Scoring guide
-with st.sidebar.expander("📖 Scoring System"):
-    st.markdown("""
-    ### Points System:
-    
-    | Prediction | Normal Match | Game of the Week |
-    |------------|--------------|------------------|
-    | **Exact Score (KK)** | 5 points | 10 points |
-    | **Correct Result** | 3 points | 5 points |
-    | **Wrong** | 0 points | 0 points |
-    
-    **KK = Kemut Keliling** (Exact Score Prediction)
-    
-    ### Stages:
-    - **Stage 1**: Week 1-10 ✅ Completed
-    - **Stage 2**: Week 11-20 🔴 Current
-    - **Stage 3**: Week 21-30 ⏳ Upcoming
-    - **Stage 4**: Week 31-38 ⏳ Upcoming
-    """)
-
-st.sidebar.markdown("---")
-st.sidebar.caption("Nikkang KK | Season 2025-26")
-
-# Load data functions
 def load_stage_scores():
-    score_file = Path("nikkang_data/stage_scores.json")
-    if score_file.exists():
+    if STAGE_SCORES_FILE.exists():
         try:
-            with open(score_file, 'r') as f:
+            with open(STAGE_SCORES_FILE, 'r') as f:
                 return json.load(f)
         except:
             pass
     return {}
 
+def get_leaderboard_data():
+    """Get full leaderboard with stage data"""
+    try:
+        from utils.data_manager import DataManager
+        dm = DataManager()
+        
+        stage_scores = load_stage_scores()
+        participants = dm.get_all_participants()
+        predictions = dm.load_predictions()
+        results = dm.load_results()
+        all_matches = dm.get_all_matches()
+        
+        STAGES = {
+            1: list(range(1, 11)),
+            2: list(range(11, 21)),
+            3: list(range(21, 31)),
+            4: list(range(31, 39)),
+        }
+        
+        leaderboard = []
+        
+        for p in participants:
+            uid = p.get('id', '')
+            name = p.get('name', 'Unknown')
+            team = p.get('team', '-')
+            
+            total_pts = 0
+            total_kk = 0
+            correct_results = 0
+            weeks_played = set()
+            
+            for stage_num in [1, 2, 3, 4]:
+                stage_key = f"stage_{stage_num}"
+                is_locked = stage_scores.get(f"{stage_key}_locked", False)
+                
+                if is_locked:
+                    # Use manual scores
+                    manual = stage_scores.get(stage_key, {}).get(uid, {})
+                    total_pts += manual.get('points', 0)
+                    total_kk += manual.get('kk_count', 0)
+                else:
+                    # Calculate from predictions
+                    user_preds = predictions.get(uid, {})
+                    stage_weeks = STAGES[stage_num]
+                    
+                    for match in all_matches:
+                        mid = match.get('id', '')
+                        week = match.get('week', 0)
+                        
+                        if week not in stage_weeks:
+                            continue
+                        
+                        if mid in results and mid in user_preds:
+                            result = results[mid]
+                            pred = user_preds[mid]
+                            is_gotw = match.get('gotw', False)
+                            
+                            weeks_played.add(week)
+                            
+                            pts = dm.calculate_points(
+                                pred.get('home_score', -1),
+                                pred.get('away_score', -1),
+                                result.get('home_score', -2),
+                                result.get('away_score', -2),
+                                is_gotw
+                            )
+                            total_pts += pts
+                            
+                            if (pred.get('home_score') == result.get('home_score') and
+                                pred.get('away_score') == result.get('away_score')):
+                                total_kk += 1
+                            elif pts > 0:
+                                correct_results += 1
+            
+            leaderboard.append({
+                'id': uid,
+                'name': name,
+                'team': team,
+                'points': total_pts,
+                'kk_count': total_kk,
+                'correct_results': correct_results,
+                'weeks_played': len(weeks_played)
+            })
+        
+        # Sort by points, then KK
+        leaderboard.sort(key=lambda x: (-x['points'], -x['kk_count']))
+        
+        for i, e in enumerate(leaderboard, 1):
+            e['rank'] = i
+        
+        return leaderboard
+    
+    except Exception as e:
+        return []
+
+def display_logo_sidebar():
+    """Display logo in sidebar"""
+    if Path("nikkang_logo.png").exists():
+        st.sidebar.image("nikkang_logo.png", use_container_width=True)
+        st.sidebar.markdown("---")
+    
+def display_logo_main():
+    """Display logo in main page"""
+    col1, col2, col3 = st.columns([1, 2, 1])
+    with col2:
+        logo_path = Path("nikkang_logo.png")
+        if logo_path.exists():
+            st.image("nikkang_logo.png", use_container_width=True)
+
+# Display logos
+display_logo_sidebar()
+display_logo_main()
+
+# Main header
+st.markdown('<div class="main-header">', unsafe_allow_html=True)
+st.markdown('<h1>🏠 Home - Nikkang KK EPL League</h1>', unsafe_allow_html=True)
+st.markdown('</div>', unsafe_allow_html=True)
+
+# Current stage info - AUTOMATED
+stage_scores = load_stage_scores()
+
 def get_stage_status():
     """Auto-detect stage status based on locked stages and match results"""
-    stage_scores = load_stage_scores()
     completed = set()
     
     # Check locked stages
@@ -190,19 +289,6 @@ def get_stage_status():
     
     return completed, current
 
-# Header
-st.markdown('<div class="main-header">', unsafe_allow_html=True)
-st.markdown('<h1>⚽ Welcome to Nikkang KK EPL Prediction League</h1>', unsafe_allow_html=True)
-st.markdown('</div>', unsafe_allow_html=True)
-
-st.markdown("""
-### 🎯 Premier League Prediction Competition
-
-Test your football knowledge and compete with friends to predict Premier League match results.
-Will you become the ultimate EPL prediction champion?
-""")
-
-# Season Progress
 completed_stages, current_stage = get_stage_status()
 
 st.markdown("### 📅 Season Progress")
@@ -230,215 +316,133 @@ for i, (stage_num, name, weeks) in enumerate(stages_display):
 st.markdown("---")
 
 # Get leaderboard data
-def get_combined_leaderboard():
-    """Get combined leaderboard from stage scores"""
-    try:
-        from utils.data_manager import DataManager
-        dm = DataManager()
-        
-        stage_scores = load_stage_scores()
-        participants = dm.get_all_participants()
-        
-        STAGES = {
-            1: {"weeks": list(range(1, 11)), "key": "stage_1"},
-            2: {"weeks": list(range(11, 21)), "key": "stage_2"},
-            3: {"weeks": list(range(21, 31)), "key": "stage_3"},
-            4: {"weeks": list(range(31, 39)), "key": "stage_4"},
-        }
-        
-        leaderboard = []
-        
-        for p in participants:
-            uid = p.get('id', '')
-            total_points = 0
-            total_kk = 0
-            correct_results = 0
-            weeks_played = 0
-            
-            for stage_num in [1, 2, 3, 4]:
-                stage_info = STAGES[stage_num]
-                stage_key = stage_info['key']
-                is_locked = stage_scores.get(f"{stage_key}_locked", False)
-                
-                if is_locked:
-                    # Use manual scores
-                    manual = stage_scores.get(stage_key, {}).get(uid, {})
-                    total_points += manual.get('points', 0)
-                    total_kk += manual.get('kk_count', 0)
-                else:
-                    # Calculate from predictions
-                    predictions = dm.load_predictions()
-                    results = dm.load_results()
-                    all_matches = dm.get_all_matches()
-                    user_preds = predictions.get(uid, {})
-                    
-                    for match in all_matches:
-                        mid = match.get('id', '')
-                        week = match.get('week', 0)
-                        
-                        if week not in stage_info['weeks']:
-                            continue
-                        
-                        if mid in results and mid in user_preds:
-                            result = results[mid]
-                            pred = user_preds[mid]
-                            is_gotw = match.get('gotw', False)
-                            
-                            points = dm.calculate_points(
-                                pred.get('home_score', -1), pred.get('away_score', -1),
-                                result.get('home_score', -2), result.get('away_score', -2), is_gotw
-                            )
-                            total_points += points
-                            
-                            # Check for exact score (KK)
-                            if pred.get('home_score') == result.get('home_score') and pred.get('away_score') == result.get('away_score'):
-                                total_kk += 1
-                            
-                            # Check for correct result
-                            if points > 0:
-                                correct_results += 1
-                            
-                            weeks_played = max(weeks_played, week)
-            
-            leaderboard.append({
-                'id': uid,
-                'name': p.get('name', 'Unknown'),
-                'team': p.get('team', '-'),
-                'points': total_points,
-                'kk_count': total_kk,
-                'correct_results': correct_results,
-                'weeks_played': weeks_played
-            })
-        
-        # Sort by points, then KK
-        leaderboard.sort(key=lambda x: (-x['points'], -x['kk_count']))
-        
-        return leaderboard
-    except Exception as e:
-        return []
-
-leaderboard = get_combined_leaderboard()
+leaderboard = get_leaderboard_data()
 
 if leaderboard:
-    # Top 3 Leaders
+    # Season Leaders - Top 3
     st.markdown("### 🏆 Season Leaders - Top 3")
     
     top_3 = leaderboard[:3]
+    cols = st.columns(3)
     medals = ["🥇", "🥈", "🥉"]
     
-    cols = st.columns(3)
-    for idx, (leader, medal) in enumerate(zip(top_3, medals)):
-        with cols[idx]:
+    for i, p in enumerate(top_3):
+        with cols[i]:
             st.markdown(f"""
             <div class="leader-card">
-                <h2 style="margin: 0;">{medal}</h2>
-                <h3 style="color: #667eea; margin: 0.5rem 0;">{leader['name']}</h3>
-                <p style="font-size: 2rem; font-weight: bold; margin: 0.5rem 0;">{leader['points']} pts</p>
-                <p style="color: #6c757d; margin: 0;">
-                    🎯 {leader['kk_count']} KK | ✅ {leader['correct_results']} correct<br>
-                    📅 {leader['weeks_played']} weeks | ⚽ {leader['team']}
-                </p>
+                <div style="font-size: 2.5rem;">{medals[i]}</div>
+                <h3 style="margin: 0.5rem 0;">{p['name']}</h3>
+                <div style="font-size: 2rem; font-weight: bold; color: #667eea;">{p['points']}</div>
+                <div style="color: #6c757d;">points</div>
+                <hr style="margin: 1rem 0;">
+                <div>⚡ {p['kk_count']} exact scores</div>
+                <div>✓ {p['correct_results']} correct results</div>
+                <div>📅 {p['weeks_played']} weeks played</div>
+                <div>⚽ {p.get('team', '-')}</div>
             </div>
             """, unsafe_allow_html=True)
     
     st.markdown("---")
     
-    # Most Exact Score Predictions (KK Champions)
-    st.markdown("### 🎯 Most Exact Score Predictions (KK Champions)")
+    # Most KK (Kemut Keliling)
+    st.markdown("### 🎯 Most Exact Score Predictions (KK) - Season 2025/26")
     st.caption("The ultimate prediction masters!")
     
+    # Sort by KK count
     kk_leaders = sorted(leaderboard, key=lambda x: (-x['kk_count'], -x['points']))[:3]
     
     cols = st.columns(3)
-    for idx, leader in enumerate(kk_leaders):
-        with cols[idx]:
-            medal = ["🥇", "🥈", "🥉"][idx]
+    
+    for i, p in enumerate(kk_leaders):
+        with cols[i]:
             st.markdown(f"""
             <div class="kk-card">
-                <h2 style="margin: 0;">{medal}</h2>
-                <h3 style="color: #28a745; margin: 0.5rem 0;">{leader['name']}</h3>
-                <p style="font-size: 2rem; font-weight: bold; margin: 0.5rem 0;">{leader['kk_count']} KK</p>
-                <p style="color: #6c757d; margin: 0;">
-                    🏆 {leader['points']} pts | ✅ {leader['correct_results']} correct<br>
-                    📅 {leader['weeks_played']} weeks | ⚽ {leader['team']}
-                </p>
+                <div style="font-size: 2rem;">{medals[i]}</div>
+                <h3 style="margin: 0.5rem 0;">{p['name']}</h3>
+                <div style="font-size: 2.5rem; font-weight: bold; color: #28a745;">{p['kk_count']}</div>
+                <div style="color: #6c757d;">Exact Scores (KK)</div>
+                <hr style="margin: 1rem 0;">
+                <div style="color: #dc3545; font-weight: bold;">{p['points']} pts</div>
+                <div>✓ {p['correct_results']} correct results</div>
+                <div>📅 {p['weeks_played']} weeks</div>
+                <div>⚽ {p.get('team', '-')}</div>
             </div>
             """, unsafe_allow_html=True)
     
     st.markdown("---")
     
-    # Bottom 3 - Room for Improvement
+    # Bottom 3 (if more than 3 participants)
     if len(leaderboard) > 3:
-        st.markdown("### 📉 Bottom 3 - Room for Improvement!")
-        st.caption("Keep trying, there's still time to climb the leaderboard! 💪")
+        st.markdown("### 😅 Bottom 3 - Room for Improvement!")
+        st.caption("Keep trying, there's still time!")
         
         bottom_3 = leaderboard[-3:]
+        bottom_3.reverse()  # Show worst first
         
         cols = st.columns(3)
-        for idx, participant in enumerate(bottom_3):
-            with cols[idx]:
+        bottom_icons = ["😰", "😓", "🙃"]
+        
+        for i, p in enumerate(bottom_3):
+            with cols[i]:
                 st.markdown(f"""
                 <div class="bottom-card">
-                    <h3 style="color: #dc3545; margin: 0.5rem 0;">{participant['name']}</h3>
-                    <p style="font-size: 1.5rem; font-weight: bold; margin: 0.5rem 0;">{participant['points']} pts</p>
-                    <p style="color: #6c757d; margin: 0;">
-                        🎯 {participant['kk_count']} KK | ✅ {participant['correct_results']} correct<br>
-                        📅 {participant['weeks_played']} weeks | ⚽ {participant['team']}
-                    </p>
+                    <div style="font-size: 2rem;">{bottom_icons[i]}</div>
+                    <h3 style="margin: 0.5rem 0;">{p['name']}</h3>
+                    <div style="font-size: 2rem; font-weight: bold; color: #dc3545;">{p['points']}</div>
+                    <div style="color: #6c757d;">points</div>
+                    <hr style="margin: 1rem 0;">
+                    <div>⚡ {p['kk_count']} exact scores</div>
+                    <div>✓ {p['correct_results']} correct results</div>
+                    <div>📅 {p['weeks_played']} weeks</div>
+                    <div>⚽ {p.get('team', '-')}</div>
                 </div>
                 """, unsafe_allow_html=True)
+        
+        st.markdown("---")
 
-st.markdown("---")
+else:
+    st.info("Competition data will appear here once you start!")
 
-# Quick Actions
-st.markdown("### 🚀 Quick Actions")
-
-col1, col2, col3 = st.columns(3)
-
-with col1:
-    if st.button("📝 Register Now", use_container_width=True, type="primary"):
-        st.switch_page("pages/2_Register.py")
-
-with col2:
-    if st.button("🎯 Make Predictions", use_container_width=True):
-        st.switch_page("pages/3_Predictions.py")
-
-with col3:
-    if st.button("🏆 View Leaderboard", use_container_width=True):
-        st.switch_page("pages/5_Leaderboard.py")
-
-st.markdown("---")
-
-# Feature cards
-st.markdown("### 🎮 How It Works")
+# Feature showcase
+st.markdown("### 🎮 Quick Actions")
 
 col1, col2, col3 = st.columns(3)
 
 with col1:
     st.markdown("""
     <div class="stats-card">
-        <h3>📝 Easy Registration</h3>
-        <p>Get your unique prediction link and start competing in minutes.</p>
+        <h3 style="color: #667eea;">📝 Register</h3>
+        <p>Get your unique prediction link and join the competition!</p>
     </div>
     """, unsafe_allow_html=True)
+    if st.button("Go to Registration", use_container_width=True, type="primary"):
+        st.switch_page("pages/2_register.py")
 
 with col2:
     st.markdown("""
     <div class="stats-card">
-        <h3>🎯 Weekly Predictions</h3>
-        <p>Predict 10 matches each week. GOTW matches worth double points!</p>
+        <h3 style="color: #667eea;">🎯 Predictions</h3>
+        <p>Submit your weekly match predictions and choose your GOTW!</p>
     </div>
     """, unsafe_allow_html=True)
+    if st.button("Make Predictions", use_container_width=True):
+        st.switch_page("pages/3_predictions.py")
 
 with col3:
     st.markdown("""
     <div class="stats-card">
-        <h3>🏆 Live Leaderboard</h3>
-        <p>Track your ranking by stage and compete for KK Champion title!</p>
+        <h3 style="color: #667eea;">📊 Leaderboard</h3>
+        <p>Check rankings, stage scores, and KK Champions!</p>
     </div>
     """, unsafe_allow_html=True)
+    if st.button("View Leaderboard", use_container_width=True):
+        st.switch_page("pages/5_leaderboard.py")
 
-# Competition overview
+st.markdown("---")
+
+# Stats overview
+st.markdown("### 📊 Competition Overview")
+
 try:
     from utils.data_manager import DataManager
     dm = DataManager()
@@ -447,30 +451,56 @@ try:
     all_matches = dm.get_all_matches()
     results = dm.load_results()
     
-    st.markdown("---")
-    st.markdown("### 📊 Competition Overview")
+    stat_col1, stat_col2, stat_col3, stat_col4 = st.columns(4)
     
-    col1, col2, col3, col4 = st.columns(4)
+    with stat_col1:
+        st.metric("👥 Total Participants", len(participants))
     
-    with col1:
-        st.metric("Total Participants", len(participants))
+    with stat_col2:
+        st.metric("⚽ Total Matches", len(all_matches))
     
-    with col2:
-        st.metric("Total Matches", len(all_matches))
+    with stat_col3:
+        st.metric("✅ Results Entered", len(results))
     
-    with col3:
-        st.metric("Results Entered", len(results))
+    with stat_col4:
+        current_stage = 1
+        if s1_locked:
+            current_stage = 2
+        if s2_locked:
+            current_stage = 3
+        st.metric("📅 Current Stage", f"Stage {current_stage}")
+
+except Exception as e:
+    st.info("Competition data will appear here once you start!")
+
+st.markdown("---")
+
+# Scoring guide
+with st.expander("📖 Scoring System"):
+    st.markdown("""
+    ### Points System:
     
-    with col4:
-        st.metric("Current Stage", f"Stage {current_stage}")
-except:
-    pass
+    | Prediction | Normal Match | GOTW Bonus Bonanza 🌟 |
+    |------------|--------------|----------------------|
+    | **Exact Score (KK)** | 6 points | 10 points |
+    | **Correct Result** | 3 points | 5 points |
+    | **Wrong** | 0 points | 0 points |
+    
+    **KK = Kemut Keliling** (Exact Score Prediction)
+    
+    **Week 38 FINALE:** All matches score GOTW Bonus Bonanza points!
+    
+    ### Stages:
+    - **Stage 1**: Week 1-10
+    - **Stage 2**: Week 11-20
+    - **Stage 3**: Week 21-30
+    - **Stage 4**: Week 31-38 (Finale!)
+    """)
 
 # Footer
-st.markdown("---")
 st.markdown("""
-<div style="text-align: center; color: #6c757d; padding: 2rem 0;">
+<div style="text-align: center; padding: 2rem 0 1rem 0; color: #6c757d; font-size: 0.9rem; border-top: 1px solid #dee2e6; margin-top: 3rem;">
     <p><strong>Nikkang KK EPL Prediction League</strong> | Season 2025-26</p>
-    <p style="font-size: 0.9rem;">Powered by Streamlit | Football-Data.org API</p>
+    <p>© 2025 Nikkang KK. All rights reserved.</p>
 </div>
 """, unsafe_allow_html=True)

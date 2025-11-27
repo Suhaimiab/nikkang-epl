@@ -57,9 +57,10 @@ Welcome to the Nikkang KK English Premier League Prediction Competition!
 
 **How it works:**
 - Predict the scores for 10 EPL matches each gameweek
-- Earn 6 points for an exact score prediction
+- Earn 6 points for an exact score prediction (KK)
 - Earn 3 points for predicting the correct result (win/draw/loss)
-- Game of the Week predictions earn double points!
+- **GOTW Bonus Bonanza:** 10 pts / 5 pts for Game of the Week!
+- **Week 38 Finale:** All matches score bonus points!
 - Compete against friends and colleagues for bragging rights
 
 **Register below to get started!**
@@ -70,12 +71,19 @@ st.markdown("---")
 # Registration form
 st.subheader("📝 Register Now")
 
+# EPL Teams list
+EPL_TEAMS = ["-- Select Team (Optional) --", "Arsenal", "Aston Villa", "Bournemouth", "Brentford", "Brighton", 
+             "Chelsea", "Crystal Palace", "Everton", "Fulham", "Ipswich Town", 
+             "Leicester City", "Liverpool", "Man City", "Man United", "Newcastle", 
+             "Nott'm Forest", "Southampton", "Tottenham", "West Ham", "Wolves"]
+
 with st.form("registration_form"):
     col1, col2 = st.columns(2)
     
     with col1:
         name = st.text_input("Full Name *", placeholder="Enter your full name")
         email = st.text_input("Email", placeholder="your@email.com (optional)")
+        team = st.selectbox("Favorite Team ⚽ (Optional)", EPL_TEAMS, index=0)
     
     with col2:
         phone = st.text_input("Phone Number *", placeholder="+968XXXXXXXX")
@@ -119,12 +127,14 @@ with st.form("registration_form"):
                 
                 # Create new participant
                 display_name = nickname if nickname else name
+                selected_team = team if team != "-- Select Team (Optional) --" else ''
                 new_participant = {
                     'id': user_id,
                     'name': name,
                     'display_name': display_name,
                     'email': email,
                     'phone': phone,
+                    'team': selected_team,
                     'status': 'active',
                     'registration_date': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
                     'link': f"?user_id={user_id}",
@@ -193,10 +203,11 @@ st.markdown("---")
 with st.expander("📜 Competition Rules"):
     st.markdown("""
     **Scoring System:**
-    - Exact score: 6 points
+    - Exact score (KK): 6 points
     - Correct result (win/draw/loss): 3 points
     - Incorrect prediction: 0 points
-    - Game of the Week: Points × 2
+    - **GOTW Bonus Bonanza:** 10 pts / 5 pts
+    - **Week 38 Finale:** All matches 10 pts / 5 pts
     
     **Prediction Deadlines:**
     - All predictions must be submitted before match kickoff
@@ -205,7 +216,7 @@ with st.expander("📜 Competition Rules"):
     
     **Leaderboard:**
     - Updated after each gameweek
-    - Ties broken by number of exact scores
+    - Ties broken by number of exact scores (KK)
     - Final standings announced at season end
     
     **Fair Play:**

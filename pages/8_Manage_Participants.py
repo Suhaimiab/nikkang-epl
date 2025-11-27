@@ -134,11 +134,12 @@ with tab1:
                 df_data.append({
                     'ID': uid,
                     'Name': safe_get(p, 'name', 'N/A'),
+                    'Nickname': safe_get(p, 'display_name', ''),
+                    'Team': safe_get(p, 'team', ''),
                     'Email': safe_get(p, 'email', 'N/A'),
                     'Phone': safe_get(p, 'phone', 'N/A'),
                     'Status': safe_get(p, 'status', 'active'),
-                    'Points': safe_get(p, 'total_points', 0),
-                    'Registered': safe_get(p, 'registration_date', 'N/A')
+                    'Points': safe_get(p, 'total_points', 0)
                 })
             
             df = pd.DataFrame(df_data)
@@ -161,10 +162,25 @@ with tab1:
                 
                 with col1:
                     st.markdown("**Edit Participant**")
+                    
+                    # EPL Teams list
+                    EPL_TEAMS = ["-- Select Team --", "Arsenal", "Aston Villa", "Bournemouth", "Brentford", "Brighton", 
+                                 "Chelsea", "Crystal Palace", "Everton", "Fulham", "Ipswich Town", 
+                                 "Leicester City", "Liverpool", "Man City", "Man United", "Newcastle", 
+                                 "Nott'm Forest", "Southampton", "Tottenham", "West Ham", "Wolves"]
+                    
                     with st.form("edit_participant"):
                         new_name = st.text_input("Name", value=safe_get(selected_participant, 'name', ''))
+                        new_nickname = st.text_input("Nickname (Display Name)", value=safe_get(selected_participant, 'display_name', ''),
+                                                     help="This name will be shown on leaderboard")
                         new_email = st.text_input("Email", value=safe_get(selected_participant, 'email', ''))
                         new_phone = st.text_input("Phone", value=safe_get(selected_participant, 'phone', ''))
+                        
+                        # Favorite team dropdown
+                        current_team = safe_get(selected_participant, 'team', '')
+                        team_index = EPL_TEAMS.index(current_team) if current_team in EPL_TEAMS else 0
+                        new_team = st.selectbox("Favorite Team ⚽", EPL_TEAMS, index=team_index)
+                        
                         current_status = safe_get(selected_participant, 'status', 'active')
                         new_status = st.selectbox("Status", ["active", "inactive"], 
                                                  index=0 if current_status == 'active' else 1)
@@ -174,8 +190,10 @@ with tab1:
                             if new_name:
                                 participants[selected_id].update({
                                     'name': new_name,
+                                    'display_name': new_nickname if new_nickname else new_name,
                                     'email': new_email,
                                     'phone': new_phone,
+                                    'team': new_team if new_team != "-- Select Team --" else '',
                                     'status': new_status,
                                     'notes': new_notes
                                 })
@@ -203,15 +221,24 @@ with tab1:
 with tab2:
     st.subheader("Add New Participant")
     
+    # EPL Teams list
+    EPL_TEAMS = ["-- Select Team --", "Arsenal", "Aston Villa", "Bournemouth", "Brentford", "Brighton", 
+                 "Chelsea", "Crystal Palace", "Everton", "Fulham", "Ipswich Town", 
+                 "Leicester City", "Liverpool", "Man City", "Man United", "Newcastle", 
+                 "Nott'm Forest", "Southampton", "Tottenham", "West Ham", "Wolves"]
+    
     with st.form("add_participant"):
         col1, col2 = st.columns(2)
         
         with col1:
-            name = st.text_input("Name *", placeholder="John Doe")
-            email = st.text_input("Email", placeholder="john@example.com")
+            name = st.text_input("Name *", placeholder="Full Name")
+            nickname = st.text_input("Nickname (Display Name)", placeholder="Nickname for leaderboard",
+                                     help="This name will be shown on leaderboard")
+            email = st.text_input("Email", placeholder="email@example.com")
             phone = st.text_input("Phone", placeholder="+96812345678")
         
         with col2:
+            team = st.selectbox("Favorite Team ⚽", EPL_TEAMS, index=0)
             status = st.selectbox("Status", ["active", "inactive"], index=0)
             notes = st.text_area("Notes", placeholder="VIP member, special considerations, etc.")
         
@@ -228,8 +255,10 @@ with tab2:
                 new_participant = {
                     'id': user_id,
                     'name': name,
+                    'display_name': nickname if nickname else name,
                     'email': email,
                     'phone': phone,
+                    'team': team if team != "-- Select Team --" else '',
                     'status': status,
                     'registration_date': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
                     'link': f"?user_id={user_id}",

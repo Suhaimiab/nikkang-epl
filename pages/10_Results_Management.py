@@ -655,9 +655,9 @@ with tab4:
     st.info("""
     **Recalculate all participant points** based on:
     
-    | Result | Normal | GOTW | Week 38 🏆 |
-    |--------|--------|------|------------|
-    | Exact Score | 6 pts | 10 pts | 10 pts |
+    | Result | Normal | GOTW Bonus Bonanza 🌟 | Week 38 🏆 |
+    |--------|--------|----------------------|------------|
+    | Exact Score (KK) | 6 pts | 10 pts | 10 pts |
     | Correct Outcome | 3 pts | 5 pts | 5 pts |
     | Wrong | 0 pts | 0 pts | 0 pts |
     

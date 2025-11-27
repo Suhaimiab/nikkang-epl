@@ -436,9 +436,9 @@ with tab5:
 st.sidebar.markdown("---")
 st.sidebar.markdown("### 📖 Scoring")
 st.sidebar.markdown("""
-**Normal:** Exact=6, Correct=3  
-**GOTW:** Exact=10, Correct=5  
-**KK** = Kemut Keliling (Exact Score)
+**Normal:** Exact (KK) = 6, Correct = 3  
+**GOTW Bonus Bonanza:** 10 / 5  
+**Week 38 Finale:** All matches 10 / 5
 """)
 
 st.markdown("---")
