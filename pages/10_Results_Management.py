@@ -485,17 +485,25 @@ with tab2:
             if st.button("✅ Apply Results", type="primary", use_container_width=True):
                 applied = 0
                 skipped = 0
+                not_matched = 0
                 
                 results_data = dm.load_results()
+                matches_data = dm.load_matches()
                 
                 # Group results by week (matchday)
                 week_results = {}
                 
                 for idx, mapping in match_mapping.items():
                     api_result = mapping['api_result']
+                    fixture = mapping.get('fixture')
                     matchday = str(api_result.get('matchday', ''))
                     
                     if not matchday:
+                        continue
+                    
+                    # Skip if no matching fixture found
+                    if only_matched and not fixture:
+                        not_matched += 1
                         continue
                     
                     # Initialize week if needed
@@ -507,8 +515,21 @@ with tab2:
                         else:
                             week_results[matchday] = []
                     
-                    # Find the match index
-                    match_idx = idx  # This is the order in API results
+                    # FIXED: Find the correct match index from fixtures, not API order
+                    match_idx = None
+                    week_fixtures = matches_data.get(matchday, [])
+                    
+                    for fix_idx, fix in enumerate(week_fixtures):
+                        fix_home = fix.get('home', fix.get('home_team', ''))
+                        fix_away = fix.get('away', fix.get('away_team', ''))
+                        
+                        if fix_home == api_result['home_team'] and fix_away == api_result['away_team']:
+                            match_idx = fix_idx
+                            break
+                    
+                    if match_idx is None:
+                        not_matched += 1
+                        continue
                     
                     # Ensure list is long enough
                     while len(week_results[matchday]) <= match_idx:
@@ -521,7 +542,7 @@ with tab2:
                             skipped += 1
                             continue
                     
-                    # Save result
+                    # Save result in list format (matches fixture order)
                     week_results[matchday][match_idx] = {
                         'home': api_result['home_score'],
                         'away': api_result['away_score']
@@ -533,21 +554,41 @@ with tab2:
                     results_data[week] = week_res
                 
                 # Also save in the indexed format for compatibility (e.g., "11_0")
+                # Use the correct fixture index, not API order
                 for idx, mapping in match_mapping.items():
                     api_result = mapping['api_result']
                     matchday = str(api_result.get('matchday', ''))
+                    
                     if matchday:
-                        match_key = f"{matchday}_{idx}"
-                        results_data[match_key] = {
-                            'home_score': api_result['home_score'],
-                            'away_score': api_result['away_score'],
-                            'entered_at': datetime.now().isoformat(),
-                            'source': 'API'
-                        }
+                        # Find correct fixture index again
+                        week_fixtures = matches_data.get(matchday, [])
+                        fix_idx = None
+                        
+                        for i, fix in enumerate(week_fixtures):
+                            fix_home = fix.get('home', fix.get('home_team', ''))
+                            fix_away = fix.get('away', fix.get('away_team', ''))
+                            
+                            if fix_home == api_result['home_team'] and fix_away == api_result['away_team']:
+                                fix_idx = i
+                                break
+                        
+                        if fix_idx is not None:
+                            match_key = f"{matchday}_{fix_idx}"
+                            results_data[match_key] = {
+                                'home_score': api_result['home_score'],
+                                'away_score': api_result['away_score'],
+                                'entered_at': datetime.now().isoformat(),
+                                'source': 'API'
+                            }
                 
                 dm.save_results(results_data)
                 
-                st.success(f"✅ Applied {applied} results for Week {matchday}! (Skipped: {skipped})")
+                msg = f"✅ Applied {applied} results for Week {matchday}!"
+                if skipped > 0:
+                    msg += f" (Skipped: {skipped})"
+                if not_matched > 0:
+                    msg += f" (Not matched: {not_matched})"
+                st.success(msg)
                 
                 # Clear
                 if "fetched_results" in st.session_state:
@@ -891,34 +932,103 @@ Base URL: {BASE_URL}
     
     if st.button("📋 Show All Entered Results"):
         results = dm.load_results()
-        all_matches = dm.get_all_matches()
+        matches_data = dm.load_matches()
         
         if results:
             display = []
-            for mid, result in results.items():
-                # Find match
-                match = None
-                for m in all_matches:
-                    if m.get('id') == mid:
-                        match = m
-                        break
-                
-                if match:
-                    display.append({
-                        'Week': match.get('week', match.get('matchday', '?')),
-                        'Home': match.get('home', match.get('home_team', '?')),
-                        'Score': f"{result.get('home_score', '?')}-{result.get('away_score', '?')}",
-                        'Away': match.get('away', match.get('away_team', '?')),
-                        'Source': result.get('source', '?')
-                    })
+            
+            # Process results by week
+            for week_key, week_data in results.items():
+                if not week_key.isdigit():
+                    continue  # Skip indexed keys like "11_0"
+                    
+                if isinstance(week_data, list):
+                    week_fixtures = matches_data.get(week_key, [])
+                    
+                    for idx, result in enumerate(week_data):
+                        if not result or (result.get('home', 0) == 0 and result.get('away', 0) == 0):
+                            continue
+                        
+                        # Get fixture info
+                        if idx < len(week_fixtures):
+                            fix = week_fixtures[idx]
+                            home_team = fix.get('home', '?')
+                            away_team = fix.get('away', '?')
+                        else:
+                            home_team = f"Match {idx+1}"
+                            away_team = "?"
+                        
+                        display.append({
+                            'Week': week_key,
+                            'Index': idx,
+                            'Home': home_team,
+                            'Score': f"{result.get('home', result.get('home_score', '?'))}-{result.get('away', result.get('away_score', '?'))}",
+                            'Away': away_team
+                        })
             
             if display:
                 df = pd.DataFrame(display)
-                df = df.sort_values('Week')
+                df = df.sort_values(['Week', 'Index'])
                 st.dataframe(df, use_container_width=True, hide_index=True)
                 st.info(f"Total: {len(display)} results")
+            else:
+                st.info("No results in list format found.")
         else:
             st.info("No results entered yet.")
+    
+    st.markdown("---")
+    
+    st.markdown("#### 🔧 Debug: View Raw Results Data")
+    
+    with st.expander("View raw results.json structure"):
+        results = dm.load_results()
+        if results:
+            # Show structure summary
+            st.write("**Keys in results:**")
+            week_keys = [k for k in results.keys() if k.isdigit()]
+            indexed_keys = [k for k in results.keys() if '_' in k]
+            
+            st.write(f"- Week keys (e.g., '11'): {sorted(week_keys)}")
+            st.write(f"- Indexed keys (e.g., '11_0'): {len(indexed_keys)} total")
+            
+            # Show sample data for each week
+            for week in sorted(week_keys):
+                week_data = results.get(week, [])
+                if isinstance(week_data, list) and week_data:
+                    st.write(f"\n**Week {week}:** {len(week_data)} matches")
+                    for i, r in enumerate(week_data[:3]):  # Show first 3
+                        if r:
+                            st.code(f"  [{i}]: {r}")
+        else:
+            st.info("No results data.")
+    
+    st.markdown("---")
+    
+    st.markdown("#### 🔄 Repair Mismatched Results")
+    
+    st.warning("""
+    **Use this if results were imported with wrong match indices.**
+    This will clear ALL results for a week and allow you to re-import them.
+    """)
+    
+    repair_week = st.number_input("Week to repair:", min_value=1, max_value=38, value=11, key="repair_week")
+    
+    if st.button("🗑️ Clear Results for This Week", type="secondary"):
+        results = dm.load_results()
+        week_str = str(repair_week)
+        
+        # Remove week list
+        if week_str in results:
+            del results[week_str]
+        
+        # Remove indexed keys for this week
+        keys_to_remove = [k for k in results.keys() if k.startswith(f"{week_str}_")]
+        for k in keys_to_remove:
+            del results[k]
+        
+        dm.save_results(results)
+        st.success(f"✅ Cleared all results for Week {repair_week}. Now re-import from API.")
+        st.rerun()
     
     st.markdown("---")
     

@@ -364,178 +364,6 @@ def show_group_send_buttons(group_id, message, button_key, filename="group_messa
             label_visibility="collapsed"
         )
         st.caption(f"📏 {len(message)} characters")
-    """Show both WhatsApp link and copy message buttons"""
-    
-    # Check if it's a group invite link
-    is_invite_link = 'chat.whatsapp.com' in group_id if group_id else False
-    
-    if is_invite_link:
-        # For invite links, emphasize copy/paste method
-        st.info("💡 **How to send:** (1) Copy message → (2) Open WhatsApp group → (3) Paste & send")
-        
-        # Make copy button more prominent
-        st.markdown("### Step 1: Copy Your Message")
-        if st.button("📋 Copy Message to Clipboard", key=f"{button_key}_copy_btn", use_container_width=True, type="primary"):
-            # Store in session state to show success
-            st.session_state[f"{button_key}_copied"] = True
-        
-        if st.session_state.get(f"{button_key}_copied", False):
-            st.success("✅ Message copied to clipboard! Now open WhatsApp and paste.")
-        
-        st.markdown("---")
-        
-        # Open WhatsApp button
-        st.markdown("### Step 2: Open WhatsApp")
-        notifier = WhatsAppNotifier(method='url')
-        url = notifier.send_whatsapp_url(group_id, message)
-        
-        if st.button("🟢 Open WhatsApp Group", key=f"{button_key}_open", use_container_width=True):
-            st.markdown(f"[Click here if WhatsApp didn't open automatically]({url})")
-        
-        st.markdown(f"Or click this link: [🟢 Open WhatsApp Group]({url})")
-        
-        st.markdown("---")
-        
-        # Show the message for reference - this is THE actual message that will be copied
-        with st.expander("👁️ View message (your edits included)"):
-            st.caption("⚠️ **This is exactly what will be copied** - if your edits aren't here, scroll up and make sure you finished editing")
-            st.text_area(
-                "Message content:",
-                value=message,
-                height=250,
-                key=f"{button_key}_view",
-                label_visibility="collapsed",
-                disabled=True
-            )
-            st.caption(f"📏 Message length: {len(message)} characters")
-        
-        # JavaScript to handle clipboard
-        st.components.v1.html(f"""
-            <script>
-            (function() {{
-                const message = {repr(message)};
-                
-                function copyToClipboard() {{
-                    if (navigator.clipboard && navigator.clipboard.writeText) {{
-                        navigator.clipboard.writeText(message).then(() => {{
-                            console.log('Copied to clipboard successfully');
-                        }}).catch(err => {{
-                            console.error('Failed to copy:', err);
-                            fallbackCopy();
-                        }});
-                    }} else {{
-                        fallbackCopy();
-                    }}
-                }}
-                
-                function fallbackCopy() {{
-                    const textArea = document.createElement("textarea");
-                    textArea.value = message;
-                    textArea.style.position = "fixed";
-                    textArea.style.left = "-999999px";
-                    textArea.style.top = "-999999px";
-                    document.body.appendChild(textArea);
-                    textArea.focus();
-                    textArea.select();
-                    try {{
-                        document.execCommand('copy');
-                        console.log('Fallback copy succeeded');
-                    }} catch (err) {{
-                        console.error('Fallback copy failed:', err);
-                    }}
-                    document.body.removeChild(textArea);
-                }}
-                
-                // Find and attach to the copy button
-                setTimeout(() => {{
-                    const buttons = window.parent.document.querySelectorAll('button');
-                    buttons.forEach(button => {{
-                        const buttonText = button.innerText || button.textContent;
-                        if (buttonText && buttonText.includes('Copy Message to Clipboard')) {{
-                            button.addEventListener('click', copyToClipboard);
-                        }}
-                    }});
-                }}, 100);
-            }})();
-            </script>
-        """, height=0)
-        
-    else:
-        # For phone numbers, both methods work
-        col1, col2 = st.columns(2)
-        
-        with col1:
-            if st.button("🚀 Generate WhatsApp Link", key=f"{button_key}_link", use_container_width=True, type="primary"):
-                if not group_id:
-                    st.warning("⚠️ No group phone entered. Use copy button instead →")
-                else:
-                    notifier = WhatsAppNotifier(method='url')
-                    url = notifier.send_whatsapp_url(group_id, message)
-                    
-                    st.success("✅ Link generated!")
-                    st.markdown(f"### 📲 [🟢 Open WhatsApp]({url})")
-        
-        with col2:
-            if st.button("📋 Copy Message", key=f"{button_key}_copy_btn2", use_container_width=True, type="primary"):
-                st.session_state[f"{button_key}_copied2"] = True
-            
-            if st.session_state.get(f"{button_key}_copied2", False):
-                st.success("✅ Copied!")
-        
-        with st.expander("👁️ View message"):
-            st.text_area(
-                "Message:",
-                value=message,
-                height=250,
-                key=f"{button_key}_view2",
-                label_visibility="collapsed",
-                disabled=True
-            )
-        
-        st.components.v1.html(f"""
-            <script>
-            (function() {{
-                const message = {repr(message)};
-                
-                function copyToClipboard() {{
-                    if (navigator.clipboard && navigator.clipboard.writeText) {{
-                        navigator.clipboard.writeText(message).then(() => {{
-                            console.log('Copied');
-                        }}).catch(err => {{
-                            fallbackCopy();
-                        }});
-                    }} else {{
-                        fallbackCopy();
-                    }}
-                }}
-                
-                function fallbackCopy() {{
-                    const textArea = document.createElement("textarea");
-                    textArea.value = message;
-                    textArea.style.position = "fixed";
-                    textArea.style.left = "-999999px";
-                    document.body.appendChild(textArea);
-                    textArea.select();
-                    try {{
-                        document.execCommand('copy');
-                    }} catch (err) {{
-                        console.error('Copy failed');
-                    }}
-                    document.body.removeChild(textArea);
-                }}
-                
-                setTimeout(() => {{
-                    const buttons = window.parent.document.querySelectorAll('button');
-                    buttons.forEach(button => {{
-                        const buttonText = button.innerText || button.textContent;
-                        if (buttonText && buttonText.includes('Copy Message')) {{
-                            button.addEventListener('click', copyToClipboard);
-                        }}
-                    }});
-                }}, 100);
-            }})();
-            </script>
-        """, height=0)
 
 # Info box
 st.info("""
@@ -570,7 +398,7 @@ with tab1:
         week_number = st.number_input("Week Number:", min_value=1, max_value=38, value=1)
     
     with col2:
-        deadline = st.text_input("Deadline:", value="Saturday, 3:00 PM")
+        deadline = st.text_input("Deadline:", value="Saturday, 10:00 PM")
     
     # Send option: Individual or Group
     st.markdown("#### 📤 Send To:")
@@ -591,6 +419,9 @@ Hi everyone! 👋
 
 📝 Submit your predictions using your personal link
 (Check your WhatsApp DM for your link)
+
+📱 *Predictions Page:*
+{base_url}/3_Predictions
 
 Good luck to all! 🍀
 
@@ -758,7 +589,7 @@ Thanks for joining our Premier League prediction competition!
 📖 *How to Play:*
 • Predict 10 matches each week
 • Choose your Game of the Week (double points!)
-• Exact Score (KK) = 5 pts (10 for GOTW)
+• Exact Score (KK) = 6 pts (10 for GOTW)
 • Correct Result = 3 pts (5 for GOTW)
 • Competition runs in 4 stages
 
@@ -813,7 +644,7 @@ Thanks for joining our Premier League prediction competition!
 📖 *How to Play:*
 • Predict 10 matches each week
 • Choose your Game of the Week (double points!)
-• Exact Score (KK) = 5 pts (10 for GOTW)
+• Exact Score (KK) = 6 pts (10 for GOTW)
 • Correct Result = 3 pts (5 for GOTW)
 • Competition runs in 4 stages
 

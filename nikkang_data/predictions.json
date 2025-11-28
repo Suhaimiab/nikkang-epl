@@ -1312,6 +1312,258 @@
         "home": 1,
         "away": 2
       }
+    ],
+    "AME76IMV": [
+      {
+        "home": 2,
+        "away": 1
+      },
+      {
+        "home": 2,
+        "away": 2
+      },
+      {
+        "home": 2,
+        "away": 2
+      },
+      {
+        "home": 1,
+        "away": 2
+      },
+      {
+        "home": 3,
+        "away": 1
+      },
+      {
+        "home": 2,
+        "away": 1
+      },
+      {
+        "home": 2,
+        "away": 1
+      },
+      {
+        "home": 2,
+        "away": 1
+      },
+      {
+        "home": 2,
+        "away": 1
+      },
+      {
+        "home": 2,
+        "away": 1
+      }
+    ],
+    "6TF6LDIN": [
+      {
+        "home": 0,
+        "away": 1
+      },
+      {
+        "home": 2,
+        "away": 1
+      },
+      {
+        "home": 2,
+        "away": 1
+      },
+      {
+        "home": 0,
+        "away": 2
+      },
+      {
+        "home": 3,
+        "away": 0
+      },
+      {
+        "home": 2,
+        "away": 2
+      },
+      {
+        "home": 2,
+        "away": 2
+      },
+      {
+        "home": 2,
+        "away": 1
+      },
+      {
+        "home": 2,
+        "away": 1
+      },
+      {
+        "home": 1,
+        "away": 1
+      }
+    ],
+    "S67F9LGN": [
+      {
+        "home": 2,
+        "away": 1
+      },
+      {
+        "home": 2,
+        "away": 0
+      },
+      {
+        "home": 3,
+        "away": 1
+      },
+      {
+        "home": 1,
+        "away": 2
+      },
+      {
+        "home": 3,
+        "away": 0
+      },
+      {
+        "home": 2,
+        "away": 2
+      },
+      {
+        "home": 3,
+        "away": 2
+      },
+      {
+        "home": 2,
+        "away": 0
+      },
+      {
+        "home": 3,
+        "away": 1
+      },
+      {
+        "home": 0,
+        "away": 2
+      }
+    ],
+    "5XEIF377": [
+      {
+        "home": 2,
+        "away": 2
+      },
+      {
+        "home": 2,
+        "away": 1
+      },
+      {
+        "home": 2,
+        "away": 1
+      },
+      {
+        "home": 0,
+        "away": 1
+      },
+      {
+        "home": 3,
+        "away": 0
+      },
+      {
+        "home": 2,
+        "away": 1
+      },
+      {
+        "home": 1,
+        "away": 0
+      },
+      {
+        "home": 1,
+        "away": 1
+      },
+      {
+        "home": 2,
+        "away": 1
+      },
+      {
+        "home": 2,
+        "away": 0
+      }
+    ],
+    "CZW9R5D7": [
+      {
+        "home": 1,
+        "away": 0
+      },
+      {
+        "home": 2,
+        "away": 1
+      },
+      {
+        "home": 1,
+        "away": 1
+      },
+      {
+        "home": 0,
+        "away": 2
+      },
+      {
+        "home": 2,
+        "away": 0
+      },
+      {
+        "home": 1,
+        "away": 0
+      },
+      {
+        "home": 1,
+        "away": 2
+      },
+      {
+        "home": 1,
+        "away": 0
+      },
+      {
+        "home": 2,
+        "away": 0
+      },
+      {
+        "home": 1,
+        "away": 1
+      }
+    ],
+    "VEGX01BX": [
+      {
+        "home": 2,
+        "away": 1
+      },
+      {
+        "home": 1,
+        "away": 0
+      },
+      {
+        "home": 1,
+        "away": 0
+      },
+      {
+        "home": 1,
+        "away": 2
+      },
+      {
+        "home": 2,
+        "away": 0
+      },
+      {
+        "home": 1,
+        "away": 0
+      },
+      {
+        "home": 1,
+        "away": 1
+      },
+      {
+        "home": 2,
+        "away": 0
+      },
+      {
+        "home": 2,
+        "away": 1
+      },
+      {
+        "home": 2,
+        "away": 2
+      }
     ]
   }
 }

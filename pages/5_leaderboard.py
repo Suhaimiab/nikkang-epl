@@ -10,10 +10,121 @@ from pathlib import Path
 from datetime import datetime
 import sys
 import json
+import io
+import base64
+import matplotlib.pyplot as plt
+import matplotlib
+matplotlib.use('Agg')  # Use non-interactive backend
 
 sys.path.append(str(Path(__file__).parent.parent))
 
 from utils.data_manager import DataManager
+
+def generate_leaderboard_png(df, title="Leaderboard", subtitle=""):
+    """Generate a styled PNG image from a DataFrame"""
+    # Setup figure
+    n_rows = len(df) + 1  # +1 for header
+    n_cols = len(df.columns)
+    
+    # Calculate figure size
+    fig_width = max(12, n_cols * 1.2)
+    fig_height = max(4, n_rows * 0.45 + 1.5)
+    
+    fig, ax = plt.subplots(figsize=(fig_width, fig_height))
+    ax.axis('off')
+    ax.set_xlim(0, 1)
+    ax.set_ylim(0, 1)
+    
+    # Colors
+    header_bg = '#1a1a2e'
+    header_text = 'white'
+    row_colors = ['#ffffff', '#f8f9fa']
+    gold = '#ffd700'
+    silver = '#c0c0c0'
+    bronze = '#cd7f32'
+    pts_col = '#17a2b8'
+    kk_col = '#28a745'
+    
+    # Title
+    title_y = 0.95
+    ax.text(0.5, title_y, title, ha='center', va='top', fontsize=16, fontweight='bold', color='#1a1a2e')
+    if subtitle:
+        ax.text(0.5, title_y - 0.05, subtitle, ha='center', va='top', fontsize=10, color='#6c757d')
+    
+    # Table dimensions
+    table_top = title_y - 0.12
+    row_height = 0.8 / (n_rows + 1)
+    col_width = 0.95 / n_cols
+    left_margin = 0.025
+    
+    # Draw header
+    for j, col in enumerate(df.columns):
+        x = left_margin + j * col_width
+        # Header background
+        rect = plt.Rectangle((x, table_top - row_height), col_width, row_height, 
+                            facecolor=header_bg, edgecolor='#2a2a4e', linewidth=0.5)
+        ax.add_patch(rect)
+        # Header text
+        ax.text(x + col_width/2, table_top - row_height/2, str(col), 
+               ha='center', va='center', fontsize=9, fontweight='bold', color=header_text)
+    
+    # Draw data rows
+    for i, (_, row) in enumerate(df.iterrows()):
+        y = table_top - (i + 2) * row_height
+        
+        # Determine row background
+        if i == 0:
+            row_bg = gold
+            text_color = '#333'
+        elif i == 1:
+            row_bg = silver
+            text_color = '#333'
+        elif i == 2:
+            row_bg = bronze
+            text_color = 'white'
+        else:
+            row_bg = row_colors[i % 2]
+            text_color = '#333'
+        
+        for j, (col, val) in enumerate(row.items()):
+            x = left_margin + j * col_width
+            
+            # Special coloring for specific columns
+            if col in ['Total', 'PTS', 'Stage Pts', 'Running Total'] and i > 2:
+                cell_bg = pts_col
+                cell_text = 'white'
+            elif col == 'KK' and i > 2:
+                cell_bg = kk_col
+                cell_text = 'white'
+            else:
+                cell_bg = row_bg
+                cell_text = text_color
+            
+            # Cell background
+            rect = plt.Rectangle((x, y), col_width, row_height, 
+                                facecolor=cell_bg, edgecolor='#e0e0e0', linewidth=0.5)
+            ax.add_patch(rect)
+            
+            # Cell text
+            fontweight = 'bold' if col in ['Rank', 'Name', 'Total', 'KK', 'Stage Pts'] else 'normal'
+            ax.text(x + col_width/2, y + row_height/2, str(val), 
+                   ha='center', va='center', fontsize=8, fontweight=fontweight, color=cell_text)
+    
+    # Footer
+    footer_y = table_top - (n_rows + 1) * row_height - 0.03
+    ax.text(0.5, footer_y, f"Nikkang KK EPL Prediction League • {datetime.now().strftime('%d %b %Y')}", 
+           ha='center', va='top', fontsize=8, color='#6c757d', style='italic')
+    
+    plt.tight_layout()
+    
+    # Save to bytes
+    buf = io.BytesIO()
+    plt.savefig(buf, format='png', dpi=150, bbox_inches='tight', 
+                facecolor='white', edgecolor='none', pad_inches=0.1)
+    buf.seek(0)
+    plt.close(fig)
+    
+    return buf.getvalue()
 
 st.set_page_config(page_title="Leaderboard - Nikkang KK", page_icon="🏆", layout="wide")
 
@@ -382,6 +493,25 @@ with tab1:
         } for p in lb])
         st.dataframe(df, use_container_width=True, hide_index=True)
         st.caption("🔒 = Manual (Locked) | 🔄 = Auto-calculated")
+        
+        # Download as PNG button
+        col_dl1, col_dl2, col_dl3 = st.columns([1, 1, 2])
+        with col_dl1:
+            # Generate PNG for download (simplified columns for cleaner image)
+            df_png = pd.DataFrame([{
+                'Rank': p['rank'], 'Name': p['name'],
+                'S1': p['s1_pts'], 'S2': p['s2_pts'],
+                'S3': p['s3_pts'], 'S4': p['s4_pts'],
+                'Total': p['total_pts'], 'KK': p['total_kk']
+            } for p in lb])
+            png_bytes = generate_leaderboard_png(df_png, "🏆 Season Leaderboard", "Nikkang KK EPL Prediction League 2025-26")
+            st.download_button(
+                label="📥 Download as PNG",
+                data=png_bytes,
+                file_name=f"nikkang_season_leaderboard_{datetime.now().strftime('%Y%m%d')}.png",
+                mime="image/png",
+                key="download_season_png"
+            )
 
 def display_stage_tab(stage_num, info):
     is_locked = stage_scores.get(f"{info['key']}_locked", False)
@@ -421,7 +551,21 @@ def display_stage_tab(stage_num, info):
             row['Carry Forward'] = carry
             row['Running Total'] = carry + p[f's{stage_num}_pts']
         data.append(row)
-    st.dataframe(pd.DataFrame(data), use_container_width=True, hide_index=True)
+    
+    stage_df = pd.DataFrame(data)
+    st.dataframe(stage_df, use_container_width=True, hide_index=True)
+    
+    # Download as PNG button for stage
+    col_dl1, col_dl2, col_dl3 = st.columns([1, 1, 2])
+    with col_dl1:
+        png_bytes = generate_leaderboard_png(stage_df, f"📊 {info['name']} Leaderboard", info['label'])
+        st.download_button(
+            label="📥 Download as PNG",
+            data=png_bytes,
+            file_name=f"nikkang_{info['key']}_{datetime.now().strftime('%Y%m%d')}.png",
+            mime="image/png",
+            key=f"download_{info['key']}_png"
+        )
 
 with tab2:
     display_stage_tab(1, STAGES[1])
