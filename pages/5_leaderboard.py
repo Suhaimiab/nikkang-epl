@@ -385,8 +385,18 @@ def get_full_leaderboard():
         })
     
     leaderboard.sort(key=lambda x: (-x['total_pts'], -x['total_kk']))
+    
+    # Assign ranks - same rank for tied points AND KK
+    prev_pts, prev_kk, prev_rank = None, None, 0
     for i, e in enumerate(leaderboard, 1):
-        e['rank'] = i
+        if e['total_pts'] == prev_pts and e['total_kk'] == prev_kk:
+            e['rank'] = prev_rank  # Joint position
+        else:
+            e['rank'] = i
+            prev_rank = i
+        prev_pts = e['total_pts']
+        prev_kk = e['total_kk']
+    
     return leaderboard
 
 current_stage = get_current_stage()
@@ -433,23 +443,48 @@ with tab1:
     if not lb:
         st.warning("No participants found")
     else:
-        # Top 3 by Points
-        if len(lb) >= 3:
+        # Check for joint season leaders (same points AND KK)
+        if len(lb) >= 1 and lb[0]['total_pts'] > 0:
+            max_pts = lb[0]['total_pts']
+            max_kk = lb[0]['total_kk']
+            season_leaders = [p for p in lb if p['total_pts'] == max_pts and p['total_kk'] == max_kk]
+            
+            if len(season_leaders) > 1:
+                leader_names = ", ".join([l['name'] for l in season_leaders])
+                st.markdown(f"""
+                <div style="background:linear-gradient(135deg,#ffd700 0%,#ffed4a 100%);color:#1a1a2e;padding:1rem;border-radius:10px;text-align:center;margin:1rem 0;font-weight:bold;font-size:1.1rem;">
+                    🏆 JOINT SEASON LEADERS: {leader_names} 🏆
+                </div>
+                """, unsafe_allow_html=True)
+        
+        # Top 3 by Points - using actual ranks
+        with_pts = [p for p in lb if p['total_pts'] > 0]
+        if len(with_pts) >= 3:
             st.markdown("#### 🥇🥈🥉 Top 3 - Points Leaders")
+            
+            # Get top 3 unique ranks (may have ties)
+            top3 = with_pts[:3]
             cols = st.columns(3)
-            for col_idx, lb_idx in enumerate([1, 0, 2]):
-                p = lb[lb_idx]
-                medals = ["🥈", "🥇", "🥉"]
-                classes = ["rank-2", "rank-1", "rank-3"]
-                with cols[col_idx]:
-                    st.markdown(f"""
-                    <div class="leader-card {classes[col_idx]}">
-                        <div style="font-size: 2rem;">{medals[col_idx]}</div>
-                        <div style="font-size: 1.2rem; font-weight: bold;">{p['name']}</div>
-                        <div style="font-size: 1.5rem; font-weight: bold;">{p['total_pts']} pts</div>
-                        <div class="kk-badge">KK: {p['total_kk']}</div>
-                    </div>
-                    """, unsafe_allow_html=True)
+            
+            # Display order: 2nd, 1st, 3rd (center is winner)
+            display_order = [1, 0, 2]
+            medals = ["🥈", "🥇", "🥉"]
+            classes = ["rank-2", "rank-1", "rank-3"]
+            
+            for col_idx, lb_idx in enumerate(display_order):
+                if lb_idx < len(top3):
+                    p = top3[lb_idx]
+                    with cols[col_idx]:
+                        # Show actual rank (may be joint)
+                        rank_text = f"#{p['rank']}" if p['rank'] > 1 else ""
+                        st.markdown(f"""
+                        <div class="leader-card {classes[col_idx]}">
+                            <div style="font-size: 2rem;">{medals[col_idx]}</div>
+                            <div style="font-size: 1.2rem; font-weight: bold;">{p['name']}</div>
+                            <div style="font-size: 1.5rem; font-weight: bold;">{p['total_pts']} pts</div>
+                            <div class="kk-badge">KK: {p['total_kk']}</div>
+                        </div>
+                        """, unsafe_allow_html=True)
             st.markdown("---")
         
         # Top 3 by KK (Exact Scores)
@@ -521,20 +556,46 @@ def display_stage_tab(stage_num, info):
     lb = get_full_leaderboard()
     stage_lb = sorted(lb, key=lambda x: (-x[f's{stage_num}_pts'], -x[f's{stage_num}_kk']))
     
+    # Assign ranks - same rank for tied points AND KK
+    prev_pts, prev_kk, prev_rank = None, None, 0
     for i, e in enumerate(stage_lb, 1):
-        e['stage_rank'] = i
+        curr_pts = e[f's{stage_num}_pts']
+        curr_kk = e[f's{stage_num}_kk']
+        if curr_pts == prev_pts and curr_kk == prev_kk:
+            e['stage_rank'] = prev_rank  # Joint position
+        else:
+            e['stage_rank'] = i
+            prev_rank = i
+        prev_pts = curr_pts
+        prev_kk = curr_kk
     
-    # Top 3
+    # Top 3 - find stage winner(s)
     with_pts = [p for p in stage_lb if p[f's{stage_num}_pts'] > 0]
     if with_pts:
+        # Find winner(s) - joint winners if same points AND KK
+        max_pts = with_pts[0][f's{stage_num}_pts']
+        max_kk = with_pts[0][f's{stage_num}_kk']
+        winners = [p for p in with_pts if p[f's{stage_num}_pts'] == max_pts and p[f's{stage_num}_kk'] == max_kk]
+        
+        if len(winners) > 1:
+            winner_names = ", ".join([w['name'] for w in winners])
+            st.markdown(f"""
+            <div style="background:linear-gradient(135deg,#ffd700 0%,#ffed4a 100%);color:#1a1a2e;padding:1rem;border-radius:10px;text-align:center;margin:1rem 0;font-weight:bold;">
+                🏆 JOINT STAGE WINNERS: {winner_names} 🏆
+            </div>
+            """, unsafe_allow_html=True)
+        
         st.markdown("#### 🏆 Stage Leaders")
         top3 = with_pts[:min(3, len(with_pts))]
         cols = st.columns(len(top3))
         for i, p in enumerate(top3):
             with cols[i]:
+                rank_display = p['stage_rank']
+                medal = '🥇' if rank_display == 1 else ('🥈' if rank_display == 2 else '🥉')
+                rank_class = 'rank-1' if rank_display == 1 else ('rank-2' if rank_display == 2 else 'rank-3')
                 st.markdown(f"""
-                <div class="leader-card {'rank-1' if i==0 else ('rank-2' if i==1 else 'rank-3')}">
-                    <div style="font-size: 1.5rem;">{'🥇' if i==0 else ('🥈' if i==1 else '🥉')}</div>
+                <div class="leader-card {rank_class}">
+                    <div style="font-size: 1.5rem;">{medal}</div>
                     <div style="font-weight: bold;">{p['name']}</div>
                     <div style="font-size: 1.3rem; font-weight: bold;">{p[f's{stage_num}_pts']} pts</div>
                     <div class="kk-badge">KK: {p[f's{stage_num}_kk']}</div>

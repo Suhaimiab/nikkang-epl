@@ -202,7 +202,7 @@ def display_stage_entry(stage_num, stage_info):
             })
         
         df = pd.DataFrame(table_data)
-        df = df.sort_values('Points', ascending=False)
+        df = df.sort_values(['Points', 'KK Count'], ascending=[False, False])
         st.dataframe(df, use_container_width=True, hide_index=True)
     else:
         st.info("No scores entered yet")
@@ -324,7 +324,7 @@ with tab5:
             summary_data.append(row)
         
         df = pd.DataFrame(summary_data)
-        df = df.sort_values('Total Pts', ascending=False)
+        df = df.sort_values(['Total Pts', 'Total KK'], ascending=[False, False])
         
         # Display summary
         display_cols = ['Name', 'S1', 'S2', 'S3', 'S4', 'Total Pts', 'Total KK']

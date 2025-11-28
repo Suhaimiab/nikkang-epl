@@ -584,22 +584,42 @@ for p in participants:
     
     table_data.append(row)
 
-# Sort by total points (descending), then by KK count
+# Sort by total points (descending), then by KK count (descending)
 table_data.sort(key=lambda x: (-x['total_points'], -x['kk_count']))
 
-# Add rank
+# Add rank - handle ties properly
+prev_pts, prev_kk, prev_rank = None, None, 0
 for idx, row in enumerate(table_data):
-    row['rank'] = idx + 1
+    if row['total_points'] == prev_pts and row['kk_count'] == prev_kk:
+        # Same points AND KK = same rank (joint position)
+        row['rank'] = prev_rank
+    else:
+        row['rank'] = idx + 1
+        prev_rank = idx + 1
+    prev_pts = row['total_points']
+    prev_kk = row['kk_count']
 
-# Find champion(s)
+# Find champion(s) - must have same points AND same KK to be joint winners
+champions = []
 if table_data:
     max_points = table_data[0]['total_points']
-    champions = [r['name'] for r in table_data if r['total_points'] == max_points]
+    max_kk_at_top = table_data[0]['kk_count']
+    
+    for r in table_data:
+        if r['total_points'] == max_points and r['kk_count'] == max_kk_at_top:
+            champions.append(r['name'])
+        elif r['total_points'] < max_points:
+            break  # No need to check further
 
 # Display champion banner
 if table_data and champions:
-    champ_text = ", ".join(champions)
-    st.markdown(f'<div style="background:linear-gradient(135deg,#ffd700 0%,#ffed4a 100%);color:#1a1a2e;padding:1rem;border-radius:10px;text-align:center;margin:1rem 0;font-weight:bold;font-size:1.2rem;">🏆 GAMEWEEK {selected_week} CHAMPION(S): {champ_text} 🏆</div>', unsafe_allow_html=True)
+    if len(champions) == 1:
+        champ_text = champions[0]
+        banner_text = f"🏆 GAMEWEEK {selected_week} CHAMPION: {champ_text} 🏆"
+    else:
+        champ_text = ", ".join(champions)
+        banner_text = f"🏆 GAMEWEEK {selected_week} JOINT CHAMPIONS: {champ_text} 🏆"
+    st.markdown(f'<div style="background:linear-gradient(135deg,#ffd700 0%,#ffed4a 100%);color:#1a1a2e;padding:1rem;border-radius:10px;text-align:center;margin:1rem 0;font-weight:bold;font-size:1.2rem;">{banner_text}</div>', unsafe_allow_html=True)
 
 # Legend
 st.markdown('<div style="display:flex;gap:1rem;flex-wrap:wrap;margin:1rem 0;padding:1rem;background:#f8f9fa;border-radius:8px;"><div style="display:flex;align-items:center;gap:0.5rem;font-size:0.85rem;"><div style="width:20px;height:20px;border-radius:4px;background:#28a745;"></div><span>Exact Score (KK) = 6 pts</span></div><div style="display:flex;align-items:center;gap:0.5rem;font-size:0.85rem;"><div style="width:20px;height:20px;border-radius:4px;background:#ffc107;"></div><span>Correct Result = 3 pts</span></div><div style="display:flex;align-items:center;gap:0.5rem;font-size:0.85rem;"><div style="width:20px;height:20px;border-radius:4px;background:#dc3545;"></div><span>Wrong = 0 pts</span></div><div style="display:flex;align-items:center;gap:0.5rem;font-size:0.85rem;"><div style="width:20px;height:20px;border-radius:4px;background:#9b59b6;"></div><span>GOTW = 10/5 pts</span></div></div>', unsafe_allow_html=True)
