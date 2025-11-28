@@ -28,14 +28,14 @@ st.set_page_config(
     layout="wide"
 )
 
-def generate_weekly_results_png(table_data, week_matches, week_results, selected_week, gotw_index, get_team_abbrev_func):
-    """Generate a styled PNG image of weekly results"""
+def generate_weekly_results_png(table_data, week_matches, week_results, selected_week, gotw_index, get_team_abbrev_func, champions=None, champ_pts=0, champ_kk=0):
+    """Generate a styled PNG image of weekly results with actual scores and winner info"""
     n_participants = len(table_data)
     n_matches = len(week_matches)
     
-    # Calculate figure size
+    # Calculate figure size - add extra height for results row and winner banner
     fig_width = max(14, 2.5 + n_matches * 1.0)
-    fig_height = max(5, n_participants * 0.5 + 2.5)
+    fig_height = max(6, n_participants * 0.5 + 4.0)
     
     fig, ax = plt.subplots(figsize=(fig_width, fig_height))
     ax.axis('off')
@@ -51,18 +51,34 @@ def generate_weekly_results_png(table_data, week_matches, week_results, selected
     gold = '#ffd700'
     silver = '#c0c0c0'
     bronze = '#cd7f32'
+    result_bg = '#2c3e50'
     
     # Title
     ax.text(0.5, 0.97, f"📊 Gameweek {selected_week} Results", ha='center', va='top', fontsize=14, fontweight='bold', color='#1a1a2e')
     ax.text(0.5, 0.93, "Nikkang KK EPL Prediction League", ha='center', va='top', fontsize=9, color='#6c757d')
     
-    # Table dimensions
-    table_top = 0.88
+    # Winner banner (if champions provided)
+    banner_height = 0
+    if champions:
+        banner_height = 0.05
+        if len(champions) == 1:
+            champ_text = f"🏆 CHAMPION: {champions[0]} ({champ_pts} pts, {champ_kk} KK)"
+        else:
+            champ_text = f"🏆 JOINT CHAMPIONS: {' & '.join(champions)} ({champ_pts} pts, {champ_kk} KK)"
+        
+        # Draw gold banner
+        banner_y = 0.86
+        rect = plt.Rectangle((0.1, banner_y), 0.8, 0.04, facecolor=gold, edgecolor='#b8860b', linewidth=1, zorder=5)
+        ax.add_patch(rect)
+        ax.text(0.5, banner_y + 0.02, champ_text, ha='center', va='center', fontsize=8, fontweight='bold', color='#1a1a2e', zorder=6)
+    
+    # Table dimensions - account for banner
+    table_top = 0.84 - banner_height
     n_cols = 2 + n_matches + 2  # Rank, Name, Matches..., PTS, KK
-    row_height = 0.75 / (n_participants + 2)
-    col_widths = [0.04, 0.12] + [0.07] * n_matches + [0.06, 0.05]  # Adjust column widths
+    row_height = 0.68 / (n_participants + 3)  # +3 for header, results row, spacing
+    col_widths = [0.04, 0.12] + [0.07] * n_matches + [0.06, 0.05]
     total_width = sum(col_widths)
-    col_widths = [w / total_width * 0.96 for w in col_widths]  # Normalize to 96% of width
+    col_widths = [w / total_width * 0.96 for w in col_widths]
     left_margin = 0.02
     
     # Get x positions
@@ -70,7 +86,7 @@ def generate_weekly_results_png(table_data, week_matches, week_results, selected
     for w in col_widths[:-1]:
         x_positions.append(x_positions[-1] + w)
     
-    # Draw header row
+    # Draw header row (Team matchups)
     headers = ['#', 'Name']
     for idx, match in enumerate(week_matches):
         home = get_team_abbrev_func(match.get('home', 'TBC'))
@@ -88,9 +104,46 @@ def generate_weekly_results_png(table_data, week_matches, week_results, selected
         ax.text(x + w/2, table_top - row_height/2, header, 
                ha='center', va='center', fontsize=6, fontweight='bold', color='white')
     
-    # Draw data rows
+    # Draw ACTUAL RESULTS row (new row showing what actually happened)
+    results_y = table_top - 2 * row_height
+    
+    # Results row label
+    rect = plt.Rectangle((x_positions[0], results_y), col_widths[0] + col_widths[1], row_height, 
+                        facecolor=result_bg, edgecolor='#1a252f', linewidth=0.5)
+    ax.add_patch(rect)
+    ax.text(x_positions[0] + (col_widths[0] + col_widths[1])/2, results_y + row_height/2, "RESULT", 
+           ha='center', va='center', fontsize=6, fontweight='bold', color='#ffd700')
+    
+    # Actual scores for each match
+    for j in range(n_matches):
+        col_idx = 2 + j
+        x = x_positions[col_idx]
+        w = col_widths[col_idx]
+        
+        # Get actual result
+        if j < len(week_results) and week_results[j]:
+            res = week_results[j]
+            res_home = res.get('home', res.get('home_score', '-'))
+            res_away = res.get('away', res.get('away_score', '-'))
+            result_text = f"{res_home}-{res_away}"
+        else:
+            result_text = "-"
+        
+        rect = plt.Rectangle((x, results_y), w, row_height, 
+                            facecolor=result_bg, edgecolor='#1a252f', linewidth=0.5)
+        ax.add_patch(rect)
+        ax.text(x + w/2, results_y + row_height/2, result_text, 
+               ha='center', va='center', fontsize=7, fontweight='bold', color='#ffd700')
+    
+    # Empty cells for PTS and KK columns in results row
+    for col_idx in [2 + n_matches, 2 + n_matches + 1]:
+        rect = plt.Rectangle((x_positions[col_idx], results_y), col_widths[col_idx], row_height, 
+                            facecolor=result_bg, edgecolor='#1a252f', linewidth=0.5)
+        ax.add_patch(rect)
+    
+    # Draw participant data rows
     for i, row in enumerate(table_data):
-        y = table_top - (i + 2) * row_height
+        y = table_top - (i + 3) * row_height  # +3 to account for header and results row
         
         # Rank cell
         if row['rank'] == 1:
@@ -157,19 +210,19 @@ def generate_weekly_results_png(table_data, week_matches, week_results, selected
                ha='center', va='center', fontsize=7, fontweight='bold', color='white')
     
     # Legend
-    legend_y = table_top - (n_participants + 3) * row_height
+    legend_y = table_top - (n_participants + 4) * row_height
     legend_items = [
-        (green, 'Exact (KK)'),
-        (yellow, 'Correct'),
-        (red, 'Wrong'),
-        (purple, 'GOTW')
+        (green, 'Exact (KK) = 6pts'),
+        (yellow, 'Correct = 3pts'),
+        (red, 'Wrong = 0pts'),
+        (purple, 'GOTW = 10/5pts')
     ]
-    legend_x = 0.2
+    legend_x = 0.15
     for color, label in legend_items:
         rect = plt.Rectangle((legend_x, legend_y), 0.02, 0.02, facecolor=color, edgecolor='#333', linewidth=0.5)
         ax.add_patch(rect)
         ax.text(legend_x + 0.025, legend_y + 0.01, label, ha='left', va='center', fontsize=6, color='#333')
-        legend_x += 0.15
+        legend_x += 0.18
     
     # Footer
     ax.text(0.5, 0.02, f"Generated: {datetime.now().strftime('%d %b %Y %H:%M')}", 
@@ -698,7 +751,13 @@ st.markdown(html_table, unsafe_allow_html=True)
 col_dl1, col_dl2, col_dl3 = st.columns([1, 1, 2])
 with col_dl1:
     if table_data:
-        png_bytes = generate_weekly_results_png(table_data, week_matches, week_results, selected_week, gotw_index, get_team_abbrev)
+        # Get champion points and KK for the PNG
+        champ_pts = table_data[0]['total_points'] if table_data else 0
+        champ_kk = table_data[0]['kk_count'] if table_data else 0
+        png_bytes = generate_weekly_results_png(
+            table_data, week_matches, week_results, selected_week, gotw_index, get_team_abbrev,
+            champions=champions, champ_pts=champ_pts, champ_kk=champ_kk
+        )
         st.download_button(
             label="📥 Download as PNG",
             data=png_bytes,
