@@ -79,15 +79,25 @@ if not matches:
     st.info(f"No matches scheduled for Week {week} yet. Check back later!")
     st.stop()
 
-# Load existing predictions
+# Load existing predictions FOR THIS WEEK ONLY
 existing_predictions = dm.get_participant_predictions(participant_id, week)
+
+# Check if predictions actually exist for THIS week (not carried from previous)
+has_predictions_for_week = existing_predictions and len(existing_predictions) > 0 and any(
+    p.get('home', 0) != 0 or p.get('away', 0) != 0 for p in existing_predictions
+)
 
 st.subheader(f"Match Predictions - Week {week}")
 
+if has_predictions_for_week:
+    st.success(f"✅ You have saved predictions for Week {week}")
+else:
+    st.info(f"📝 Enter your predictions for Week {week} below")
+
 st.info("💡 **Tip:** GOTW (Game of the Week) matches are worth extra points!")
 
-# Create form for predictions
-with st.form("predictions_form"):
+# Create form for predictions - unique key per week to reset form
+with st.form(f"predictions_form_week_{week}"):
     predictions = []
     
     # Display matches in 2 columns
@@ -98,8 +108,15 @@ with st.form("predictions_form"):
             is_gotw = match.get('gotw', False)
             gotw_class = "gotw" if is_gotw else ""
             
-            # Get existing prediction if available
-            existing = existing_predictions[idx] if idx < len(existing_predictions) else {'home': 0, 'away': 0}
+            # Only use existing prediction if it exists for THIS week
+            if has_predictions_for_week and idx < len(existing_predictions):
+                existing = existing_predictions[idx]
+                default_home = int(existing.get('home', 0))
+                default_away = int(existing.get('away', 0))
+            else:
+                # Start with blank form (0-0) for new week
+                default_home = 0
+                default_away = 0
             
             st.markdown(f"""
             <div class="match-card {gotw_class}">
@@ -126,8 +143,8 @@ with st.form("predictions_form"):
                     f"Home {idx}",
                     min_value=0,
                     max_value=15,
-                    value=int(existing.get('home', 0)),
-                    key=f"home_{idx}",
+                    value=default_home,
+                    key=f"home_w{week}_{idx}",
                     label_visibility="collapsed"
                 )
             
@@ -139,8 +156,8 @@ with st.form("predictions_form"):
                     f"Away {idx}",
                     min_value=0,
                     max_value=15,
-                    value=int(existing.get('away', 0)),
-                    key=f"away_{idx}",
+                    value=default_away,
+                    key=f"away_w{week}_{idx}",
                     label_visibility="collapsed"
                 )
             
