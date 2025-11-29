@@ -372,6 +372,16 @@ def display_logo_sidebar():
         st.sidebar.image("nikkang_logo.png", use_container_width=True)
         st.sidebar.markdown("---")
     
+    # Add Guide link to sidebar
+    st.sidebar.markdown("### 📚 Quick Links")
+    if st.sidebar.button("📖 How to Play (Guide)", use_container_width=True, key="sidebar_guide"):
+        st.switch_page("pages/16_Guide.py")
+    if st.sidebar.button("🎯 Make Predictions", use_container_width=True, key="sidebar_predict"):
+        st.switch_page("pages/3_predictions.py")
+    if st.sidebar.button("📊 Leaderboard", use_container_width=True, key="sidebar_leaderboard"):
+        st.switch_page("pages/5_leaderboard.py")
+    st.sidebar.markdown("---")
+    
 def display_logo_main():
     """Display logo in main page"""
     col1, col2, col3 = st.columns([1, 2, 1])
@@ -388,6 +398,17 @@ display_logo_main()
 st.markdown('<div class="main-header">', unsafe_allow_html=True)
 st.markdown('<h1>🏠 Nikkang KK EPL Prediction League</h1>', unsafe_allow_html=True)
 st.markdown('</div>', unsafe_allow_html=True)
+
+# New player guide banner
+col_guide1, col_guide2, col_guide3 = st.columns([2, 3, 2])
+with col_guide2:
+    st.markdown("""
+    <div style="background:linear-gradient(135deg,#e3f2fd 0%,#bbdefb 100%);border:1px solid #2196f3;border-radius:10px;padding:0.8rem;text-align:center;margin-bottom:1rem;">
+        <span style="font-size:1rem;">🆕 <strong>New here?</strong> Learn how to play and win!</span>
+    </div>
+    """, unsafe_allow_html=True)
+    if st.button("📖 View Guide - How to Play", use_container_width=True, type="primary", key="top_guide_btn"):
+        st.switch_page("pages/16_Guide.py")
 
 # Get current data
 current_week, latest_week, weeks_completed = get_current_week_and_results()
@@ -634,7 +655,7 @@ with col4:
         <p>How to play</p>
     </div>
     """, unsafe_allow_html=True)
-    if st.button("View Guide", use_container_width=True):
+    if st.button("View Guide", use_container_width=True, key="quick_action_guide"):
         st.switch_page("pages/16_Guide.py")
 
 st.markdown("---")
