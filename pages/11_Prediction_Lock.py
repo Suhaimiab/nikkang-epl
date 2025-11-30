@@ -87,9 +87,10 @@ def save_settings(settings):
 settings = load_settings()
 
 # Tabs
-tab1, tab2, tab3, tab4 = st.tabs([
+tab1, tab2, tab3, tab4, tab5 = st.tabs([
     "🔒 Lock/Unlock",
     "👀 View All Predictions",
+    "✏️ Edit Predictions",
     "📊 Prediction Stats",
     "⚙️ Settings"
 ])
@@ -402,9 +403,188 @@ with tab2:
             st.success("✅ All participants have submitted predictions for all matches!")
 
 # ============================================================================
-# TAB 3: PREDICTION STATS
+# TAB 3: EDIT PREDICTIONS (ADMIN)
 # ============================================================================
 with tab3:
+    st.markdown("### ✏️ Admin: Edit Predictions")
+    st.info("⚠️ **Admin Only:** Add or amend predictions for any participant, including past weeks.")
+    
+    # Load data
+    participants = dm.get_all_participants()
+    weeks = dm.get_weeks()
+    
+    if not participants:
+        st.warning("No participants registered yet")
+    elif not weeks:
+        st.warning("No matches set up yet")
+    else:
+        # Select participant
+        st.markdown("#### 👤 Select Participant")
+        
+        # Build participant list with nicknames
+        participant_options = {}
+        for p in participants:
+            nickname = p.get('display_name') or p.get('nickname') or p.get('name', 'Unknown')
+            pid = p.get('id', '')
+            participant_options[f"{nickname}"] = pid
+        
+        selected_participant_name = st.selectbox(
+            "Participant:",
+            options=list(participant_options.keys()),
+            key="edit_participant"
+        )
+        
+        selected_participant_id = participant_options.get(selected_participant_name, '')
+        
+        # Select week
+        st.markdown("#### 📅 Select Week")
+        
+        selected_week = st.selectbox(
+            "Week:",
+            options=weeks,
+            format_func=lambda x: f"Week {x}" + (" ⚠️ LOCKED" if x in settings.get("locked_weeks", []) else ""),
+            key="edit_week"
+        )
+        
+        # Show lock warning
+        if selected_week in settings.get("locked_weeks", []):
+            st.warning(f"⚠️ Week {selected_week} is locked for participants, but you can still edit as admin.")
+        
+        # Get matches for selected week
+        matches = dm.get_week_matches(selected_week)
+        
+        if not matches:
+            st.warning(f"No matches found for Week {selected_week}")
+        else:
+            st.markdown("#### 🎯 Edit Predictions")
+            st.caption(f"Editing predictions for **{selected_participant_name}** - Week {selected_week}")
+            
+            # Load existing predictions
+            existing_preds = dm.get_participant_predictions(selected_participant_id, selected_week)
+            
+            # Show current predictions status
+            if existing_preds and len(existing_preds) > 0:
+                has_preds = any(p.get('home', 0) != 0 or p.get('away', 0) != 0 for p in existing_preds)
+                if has_preds:
+                    st.success(f"✅ {selected_participant_name} has existing predictions for Week {selected_week}")
+                else:
+                    st.info(f"📝 {selected_participant_name} has no predictions for Week {selected_week}")
+            else:
+                st.info(f"📝 {selected_participant_name} has no predictions for Week {selected_week}")
+                existing_preds = []
+            
+            # Create form for editing
+            with st.form(f"admin_edit_predictions_{selected_week}_{selected_participant_id}"):
+                predictions = []
+                
+                for idx, match in enumerate(matches):
+                    is_gotw = match.get('gotw', False)
+                    
+                    # Get existing prediction for this match
+                    if idx < len(existing_preds):
+                        default_home = int(existing_preds[idx].get('home', 0))
+                        default_away = int(existing_preds[idx].get('away', 0))
+                    else:
+                        default_home = 0
+                        default_away = 0
+                    
+                    # Match display
+                    gotw_badge = " ⭐ GOTW" if is_gotw else ""
+                    st.markdown(f"**Match {idx + 1}:** {match.get('home', '?')} vs {match.get('away', '?')}{gotw_badge}")
+                    
+                    col1, col2, col3 = st.columns([2, 1, 2])
+                    
+                    with col1:
+                        home_score = st.number_input(
+                            f"{match.get('home', 'Home')}",
+                            min_value=0,
+                            max_value=15,
+                            value=default_home,
+                            key=f"admin_home_{selected_week}_{selected_participant_id}_{idx}"
+                        )
+                    
+                    with col2:
+                        st.markdown("<div style='text-align:center; padding-top:30px;'>-</div>", unsafe_allow_html=True)
+                    
+                    with col3:
+                        away_score = st.number_input(
+                            f"{match.get('away', 'Away')}",
+                            min_value=0,
+                            max_value=15,
+                            value=default_away,
+                            key=f"admin_away_{selected_week}_{selected_participant_id}_{idx}"
+                        )
+                    
+                    predictions.append({'home': home_score, 'away': away_score})
+                    st.markdown("---")
+                
+                # Admin note
+                admin_note = st.text_input(
+                    "Admin Note (optional):",
+                    placeholder="Reason for edit (e.g., 'Late submission via WhatsApp')",
+                    key="admin_note"
+                )
+                
+                # Submit buttons
+                col1, col2 = st.columns(2)
+                
+                with col1:
+                    save_btn = st.form_submit_button("💾 Save Predictions", use_container_width=True, type="primary")
+                
+                with col2:
+                    clear_btn = st.form_submit_button("🗑️ Clear All Predictions", use_container_width=True)
+                
+                if save_btn:
+                    # Save predictions
+                    dm.save_participant_predictions(selected_participant_id, selected_week, predictions)
+                    
+                    # Log the admin action
+                    log_msg = f"Admin edited predictions for {selected_participant_name} - Week {selected_week}"
+                    if admin_note:
+                        log_msg += f" | Note: {admin_note}"
+                    
+                    st.success(f"✅ Predictions saved for {selected_participant_name} - Week {selected_week}")
+                    
+                    # Show summary
+                    st.markdown("**Saved Predictions:**")
+                    for idx, (match, pred) in enumerate(zip(matches, predictions)):
+                        gotw = "⭐" if match.get('gotw', False) else ""
+                        st.text(f"{idx+1}. {match.get('home', '?')} {pred['home']} - {pred['away']} {match.get('away', '?')} {gotw}")
+                
+                if clear_btn:
+                    # Clear predictions (save empty list)
+                    dm.save_participant_predictions(selected_participant_id, selected_week, [])
+                    st.warning(f"🗑️ Predictions cleared for {selected_participant_name} - Week {selected_week}")
+                    st.rerun()
+        
+        # Bulk actions
+        st.markdown("---")
+        st.markdown("#### ⚡ Bulk Actions")
+        
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            if st.button("📋 View All Predictions for This Participant", use_container_width=True):
+                all_preds = dm.load_predictions()
+                participant_preds = all_preds.get(selected_participant_id, {})
+                
+                if participant_preds:
+                    st.markdown(f"**All predictions for {selected_participant_name}:**")
+                    for week_key, preds in sorted(participant_preds.items(), key=lambda x: int(x[0]) if x[0].isdigit() else 0):
+                        if preds:
+                            st.markdown(f"**Week {week_key}:** {len(preds)} predictions")
+                else:
+                    st.info(f"No predictions found for {selected_participant_name}")
+        
+        with col2:
+            if st.button("📊 Recalculate Points", use_container_width=True):
+                dm.recalculate_all_points()
+                st.success("✅ All points recalculated!")
+
+# ============================================================================
+# TAB 4: PREDICTION STATS
+# ============================================================================
+with tab4:
     st.markdown("### 📊 Prediction Statistics")
     
     participants = dm.get_all_participants()
@@ -484,9 +664,9 @@ with tab3:
         st.dataframe(activity_df, use_container_width=True, hide_index=True)
 
 # ============================================================================
-# TAB 4: SETTINGS
+# TAB 5: SETTINGS
 # ============================================================================
-with tab4:
+with tab5:
     st.markdown("### ⚙️ Prediction Settings")
     
     # ==========================================================================
