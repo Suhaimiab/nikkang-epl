@@ -246,6 +246,10 @@ with tab2:
     all_predictions = dm.load_predictions()
     results = dm.load_results()
     
+    # Get predictions for this specific week
+    # Format: {"11": {"USER_ID": [{"home": 2, "away": 1}, ...], ...}}
+    week_predictions = all_predictions.get(str(view_week), {})
+    
     if not matches:
         st.warning(f"No matches found for Week {view_week}")
     elif not participants:
@@ -262,22 +266,28 @@ with tab2:
         
         for p in participants:
             uid = p.get('id', '')
-            user_preds = all_predictions.get(uid, {})
+            # Get predictions for this user for this week (list of predictions)
+            user_week_preds = week_predictions.get(uid, [])
             
             row = {
                 'Participant': p.get('display_name') or p.get('name', 'Unknown'),
-                'ID': uid
+                'ID': uid[:8] if len(uid) > 8 else uid  # Truncate ID for display
             }
             
-            for match in matches:
-                mid = match.get('id', '')
+            for idx, match in enumerate(matches):
                 home = match.get('home', match.get('home_team', ''))
                 away = match.get('away', match.get('away_team', ''))
                 match_label = f"{home} vs {away}"
                 
-                pred = user_preds.get(mid, {})
-                if pred:
-                    row[match_label] = f"{pred.get('home_score', '?')}-{pred.get('away_score', '?')}"
+                # Get prediction by index (matches are in order)
+                if idx < len(user_week_preds):
+                    pred = user_week_preds[idx]
+                    if isinstance(pred, dict):
+                        pred_home = pred.get('home', pred.get('home_score', '?'))
+                        pred_away = pred.get('away', pred.get('away_score', '?'))
+                        row[match_label] = f"{pred_home}-{pred_away}"
+                    else:
+                        row[match_label] = "❌"
                 else:
                     row[match_label] = "❌"
             
@@ -302,8 +312,7 @@ with tab2:
         # Detailed view by match
         st.markdown("#### 🔍 Detailed View by Match")
         
-        for match in matches:
-            mid = match.get('id', '')
+        for idx, match in enumerate(matches):
             home = match.get('home', match.get('home_team', ''))
             away = match.get('away', match.get('away_team', ''))
             is_gotw = match.get('gotw', False) or match.get('game_of_week', False)
@@ -311,9 +320,10 @@ with tab2:
             gotw_badge = " ⭐ GOTW" if is_gotw else ""
             
             # Get result if available
-            result = results.get(mid, {})
-            if result:
-                result_str = f" | Result: {result.get('home_score', '?')}-{result.get('away_score', '?')}"
+            week_results = results.get(str(view_week), [])
+            if idx < len(week_results) and week_results[idx]:
+                res = week_results[idx]
+                result_str = f" | Result: {res.get('home', res.get('home_score', '?'))}-{res.get('away', res.get('away_score', '?'))}"
             else:
                 result_str = ""
             
@@ -322,29 +332,41 @@ with tab2:
                 
                 for p in participants:
                     uid = p.get('id', '')
-                    user_preds = all_predictions.get(uid, {})
-                    pred = user_preds.get(mid, {})
+                    # Get this user's predictions for this week
+                    user_week_preds = week_predictions.get(uid, [])
                     
-                    if pred:
-                        pred_str = f"{pred.get('home_score', '?')}-{pred.get('away_score', '?')}"
-                        pred_time = pred.get('predicted_at', 'Unknown')
-                        
-                        # Calculate points if result available
-                        if result:
-                            pts = dm.calculate_points(
-                                pred.get('home_score', -1),
-                                pred.get('away_score', -1),
-                                result.get('home_score', -2),
-                                result.get('away_score', -2),
-                                is_gotw
-                            )
-                            points_str = f"{pts} pts"
+                    # Get prediction for this match by index
+                    if idx < len(user_week_preds):
+                        pred = user_week_preds[idx]
+                        if isinstance(pred, dict):
+                            pred_home = pred.get('home', pred.get('home_score', '?'))
+                            pred_away = pred.get('away', pred.get('away_score', '?'))
+                            pred_str = f"{pred_home}-{pred_away}"
+                            pred_time = pred.get('predicted_at', 'Submitted')
+                            
+                            # Calculate points if result available
+                            if idx < len(week_results) and week_results[idx]:
+                                res = week_results[idx]
+                                res_home = res.get('home', res.get('home_score', -2))
+                                res_away = res.get('away', res.get('away_score', -2))
+                                pts = dm.calculate_points(
+                                    pred_home if isinstance(pred_home, int) else -1,
+                                    pred_away if isinstance(pred_away, int) else -1,
+                                    res_home if isinstance(res_home, int) else -2,
+                                    res_away if isinstance(res_away, int) else -2,
+                                    is_gotw
+                                )
+                                points_str = f"{pts} pts"
+                            else:
+                                points_str = "-"
                         else:
+                            pred_str = "No prediction"
+                            pred_time = "-"
                             points_str = "-"
                     else:
                         pred_str = "No prediction"
                         pred_time = "-"
-                        points_str = "0 pts" if result else "-"
+                        points_str = "-"
                     
                     match_preds.append({
                         'Participant': p.get('display_name') or p.get('name', 'Unknown'),
@@ -364,11 +386,13 @@ with tab2:
         col1, col2, col3 = st.columns(3)
         
         total_possible = len(matches) * len(participants)
-        total_made = sum(
-            1 for p in participants
-            for m in matches
-            if all_predictions.get(p.get('id', ''), {}).get(m.get('id', ''))
-        )
+        # Count predictions made for this week
+        total_made = 0
+        for p in participants:
+            uid = p.get('id', '')
+            user_week_preds = week_predictions.get(uid, [])
+            # Count valid predictions (non-empty dicts)
+            total_made += sum(1 for pred in user_week_preds if isinstance(pred, dict) and (pred.get('home') is not None or pred.get('home_score') is not None))
         
         with col1:
             st.metric("Total Possible", total_possible)
@@ -386,8 +410,10 @@ with tab2:
         missing = []
         for p in participants:
             uid = p.get('id', '')
-            user_preds = all_predictions.get(uid, {})
-            missing_count = sum(1 for m in matches if m.get('id', '') not in user_preds)
+            user_week_preds = week_predictions.get(uid, [])
+            # Count how many matches don't have predictions
+            preds_made = len([pred for pred in user_week_preds if isinstance(pred, dict) and (pred.get('home') is not None or pred.get('home_score') is not None)])
+            missing_count = len(matches) - preds_made
             
             if missing_count > 0:
                 missing.append({

@@ -601,24 +601,27 @@ for p in participants:
         try:
             pred_h = int(pred_home) if pred_home != '-' else -1
             pred_a = int(pred_away) if pred_away != '-' else -1
-            act_h = int(actual_home) if actual_home != '-' else -2
-            act_a = int(actual_away) if actual_away != '-' else -2
+            act_h = int(actual_home) if actual_home != '-' else None
+            act_a = int(actual_away) if actual_away != '-' else None
             
-            if pred_h == act_h and pred_a == act_a:
-                # Exact score
-                is_exact = True
-                points = 10 if is_gotw else 6
-                row['kk_count'] += 1
-                if is_gotw:
-                    row['gotw_kk'] = 1
-            else:
-                # Check correct result
-                pred_result = 'H' if pred_h > pred_a else ('A' if pred_a > pred_h else 'D')
-                act_result = 'H' if act_h > act_a else ('A' if act_a > act_h else 'D')
-                
-                if pred_result == act_result:
-                    is_correct = True
-                    points = 5 if is_gotw else 3
+            # Only calculate points if we have both prediction AND result
+            if act_h is not None and act_a is not None and pred_h >= 0 and pred_a >= 0:
+                if pred_h == act_h and pred_a == act_a:
+                    # Exact score
+                    is_exact = True
+                    points = 10 if is_gotw else 6
+                    row['kk_count'] += 1
+                    if is_gotw:
+                        row['gotw_kk'] = 1
+                else:
+                    # Check correct result
+                    pred_result = 'H' if pred_h > pred_a else ('A' if pred_a > pred_h else 'D')
+                    act_result = 'H' if act_h > act_a else ('A' if act_a > act_h else 'D')
+                    
+                    if pred_result == act_result:
+                        is_correct = True
+                        points = 5 if is_gotw else 3
+            # If no result yet, points stays 0
         except:
             pass
         

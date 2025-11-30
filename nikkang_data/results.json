@@ -286,5 +286,67 @@
     "away_score": 1,
     "entered_at": "2025-11-29T01:52:14.416629",
     "source": "API"
+  },
+  "13": [
+    {
+      "home": 3,
+      "away": 2
+    },
+    {
+      "home": 3,
+      "away": 1
+    },
+    {
+      "home": 3,
+      "away": 2
+    },
+    {
+      "home": 1,
+      "away": 4
+    },
+    {
+      "home": 1,
+      "away": 2
+    },
+    {
+      "home": 1,
+      "away": 2
+    }
+  ],
+  "13_0": {
+    "home_score": 3,
+    "away_score": 2,
+    "entered_at": "2025-11-30T18:39:45.177444",
+    "source": "API"
+  },
+  "13_1": {
+    "home_score": 3,
+    "away_score": 1,
+    "entered_at": "2025-11-30T18:39:45.177444",
+    "source": "API"
+  },
+  "13_2": {
+    "home_score": 3,
+    "away_score": 2,
+    "entered_at": "2025-11-30T18:39:45.177444",
+    "source": "API"
+  },
+  "13_3": {
+    "home_score": 1,
+    "away_score": 4,
+    "entered_at": "2025-11-30T18:39:45.177444",
+    "source": "API"
+  },
+  "13_4": {
+    "home_score": 1,
+    "away_score": 2,
+    "entered_at": "2025-11-30T18:39:45.177444",
+    "source": "API"
+  },
+  "13_5": {
+    "home_score": 1,
+    "away_score": 2,
+    "entered_at": "2025-11-30T18:39:45.177444",
+    "source": "API"
   }
 }
