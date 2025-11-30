@@ -1,5 +1,10 @@
 """
 Predictions Page - Weekly Match Predictions
+
+FIXES APPLIED:
+1. Match sequence now consistent on mobile and web (single column layout)
+2. Removed 2-column layout that caused order mismatch on mobile
+3. Added responsive design that works on all devices
 """
 
 import streamlit as st
@@ -100,70 +105,74 @@ st.info("💡 **Tip:** GOTW (Game of the Week) matches are worth extra points!")
 with st.form(f"predictions_form_week_{week}"):
     predictions = []
     
-    # Display matches in 2 columns
-    cols = st.columns(2)
+    # ==========================================================================
+    # FIX: Use single column layout for consistent sequence on mobile and web
+    # Previously used st.columns(2) which caused order mismatch on mobile
+    # ==========================================================================
     
     for idx, match in enumerate(matches):
-        with cols[idx % 2]:
-            is_gotw = match.get('gotw', False)
-            gotw_class = "gotw" if is_gotw else ""
-            
-            # Only use existing prediction if it exists for THIS week
-            if has_predictions_for_week and idx < len(existing_predictions):
-                existing = existing_predictions[idx]
-                default_home = int(existing.get('home', 0))
-                default_away = int(existing.get('away', 0))
-            else:
-                # Start with blank form (0-0) for new week
-                default_home = 0
-                default_away = 0
-            
+        is_gotw = match.get('gotw', False)
+        
+        # Only use existing prediction if it exists for THIS week
+        if has_predictions_for_week and idx < len(existing_predictions):
+            existing = existing_predictions[idx]
+            default_home = int(existing.get('home', 0))
+            default_away = int(existing.get('away', 0))
+        else:
+            # Start with blank form (0-0) for new week
+            default_home = 0
+            default_away = 0
+        
+        # Match card with GOTW styling
+        if is_gotw:
             st.markdown(f"""
-            <div class="match-card {gotw_class}">
-                <strong>Match {idx + 1}:</strong> {match['home']} vs {match['away']}
-                {' ⭐ <strong style="color: #ff9800;">GOTW</strong>' if is_gotw else ''}
+            <div style="background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%); 
+                        color: white; padding: 12px; border-radius: 8px; margin-bottom: 8px;
+                        box-shadow: 0 2px 8px rgba(255, 152, 0, 0.3);">
+                <strong>Match {idx + 1}:</strong> {match['home']} vs {match['away']} 
+                ⭐ <strong>GAME OF THE WEEK</strong>
             </div>
             """, unsafe_allow_html=True)
-            
-            col_a, col_b, col_c = st.columns([2, 1, 2])
-            
-            with col_a:
-                st.caption(f"**{match['home']}**")
-            
-            with col_b:
-                st.caption("**Score**")
-            
-            with col_c:
-                st.caption(f"**{match['away']}**")
-            
-            col_a, col_b, col_c = st.columns([2, 1, 2])
-            
-            with col_a:
-                home_score = st.number_input(
-                    f"Home {idx}",
-                    min_value=0,
-                    max_value=15,
-                    value=default_home,
-                    key=f"home_w{week}_{idx}",
-                    label_visibility="collapsed"
-                )
-            
-            with col_b:
-                st.markdown("<div style='text-align: center; padding-top: 8px;'>-</div>", unsafe_allow_html=True)
-            
-            with col_c:
-                away_score = st.number_input(
-                    f"Away {idx}",
-                    min_value=0,
-                    max_value=15,
-                    value=default_away,
-                    key=f"away_w{week}_{idx}",
-                    label_visibility="collapsed"
-                )
-            
-            predictions.append({'home': home_score, 'away': away_score})
-            
-            st.markdown("<br>", unsafe_allow_html=True)
+        else:
+            st.markdown(f"""
+            <div style="background: #f8f9fa; padding: 12px; border-radius: 8px; 
+                        margin-bottom: 8px; border-left: 4px solid #667eea;">
+                <strong>Match {idx + 1}:</strong> {match['home']} vs {match['away']}
+            </div>
+            """, unsafe_allow_html=True)
+        
+        # Score input row - 3 columns for Home / - / Away
+        col_home, col_dash, col_away = st.columns([2, 1, 2])
+        
+        with col_home:
+            st.caption(f"**{match['home']}**")
+            home_score = st.number_input(
+                f"Home {idx}",
+                min_value=0,
+                max_value=15,
+                value=default_home,
+                key=f"home_w{week}_{idx}",
+                label_visibility="collapsed"
+            )
+        
+        with col_dash:
+            st.markdown("<div style='text-align: center; padding-top: 28px; font-size: 1.5rem; font-weight: bold;'>-</div>", unsafe_allow_html=True)
+        
+        with col_away:
+            st.caption(f"**{match['away']}**")
+            away_score = st.number_input(
+                f"Away {idx}",
+                min_value=0,
+                max_value=15,
+                value=default_away,
+                key=f"away_w{week}_{idx}",
+                label_visibility="collapsed"
+            )
+        
+        predictions.append({'home': home_score, 'away': away_score})
+        
+        # Add spacing between matches
+        st.markdown("<div style='margin-bottom: 20px;'></div>", unsafe_allow_html=True)
     
     st.markdown("---")
     
@@ -190,12 +199,14 @@ with st.form(f"predictions_form_week_{week}"):
             st.subheader("📋 Your Predictions Summary")
             
             for idx, (match, pred) in enumerate(zip(matches, predictions)):
+                is_gotw = match.get('gotw', False)
+                gotw_badge = " ⭐" if is_gotw else ""
+                
                 col1, col2 = st.columns([3, 1])
                 with col1:
-                    st.text(f"{idx + 1}. {match['home']} vs {match['away']}")
+                    st.text(f"{idx + 1}. {match['home']} vs {match['away']}{gotw_badge}")
                 with col2:
-                    st.markdown(f"<div class='score-display'>{pred['home']} - {pred['away']}</div>", 
-                              unsafe_allow_html=True)
+                    st.markdown(f"**{pred['home']} - {pred['away']}**")
 
 # Show my link button
 st.markdown("---")
@@ -205,13 +216,13 @@ col1, col2 = st.columns(2)
 with col1:
     if st.button("📋 Copy My Prediction Link", use_container_width=True):
         from utils.whatsapp import generate_participant_link
-        link = generate_participant_link(participant_id, week, base_url="http://localhost:8501")
+        link = generate_participant_link(participant_id, week, base_url="https://nikkang-epl.streamlit.app")
         st.code(link, language=None)
         st.caption("Share this link to access your predictions directly!")
 
 with col2:
     if st.button("🏆 View Leaderboard", use_container_width=True):
-        st.switch_page("pages/5_leaderboard.py")
+        st.switch_page("pages/5_Leaderboard.py")
 
 # Show deadline info
 st.markdown("---")
