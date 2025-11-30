@@ -629,7 +629,14 @@ with tab4:
             st.metric("Total Participants", len(participants))
         
         with col2:
-            total_preds = sum(len(p) for p in all_predictions.values())
+            # Count total predictions across all weeks
+            # Format: {"11": {"USER_ID": [...], ...}, "12": {...}}
+            total_preds = 0
+            for week_key, week_data in all_predictions.items():
+                if week_key.isdigit() and isinstance(week_data, dict):
+                    for uid, user_preds in week_data.items():
+                        if isinstance(user_preds, list):
+                            total_preds += len([p for p in user_preds if isinstance(p, dict) and p.get('home') is not None])
             st.metric("Total Predictions", total_preds)
         
         with col3:
@@ -647,23 +654,30 @@ with tab4:
         week_stats = []
         for week in weeks:
             matches = dm.get_matches_by_week(week)
-            match_ids = [m.get('id', '') for m in matches]
+            week_str = str(week)
+            week_predictions = all_predictions.get(week_str, {})
             
             participants_predicted = 0
             total_predictions = 0
             
-            for uid, user_preds in all_predictions.items():
-                week_preds = [mid for mid in match_ids if mid in user_preds]
-                if week_preds:
-                    participants_predicted += 1
-                    total_predictions += len(week_preds)
+            # Count participants who have predictions for this week
+            for uid, user_preds in week_predictions.items():
+                if isinstance(user_preds, list) and len(user_preds) > 0:
+                    # Count valid predictions
+                    valid_preds = len([p for p in user_preds if isinstance(p, dict) and p.get('home') is not None])
+                    if valid_preds > 0:
+                        participants_predicted += 1
+                        total_predictions += valid_preds
+            
+            total_possible = len(matches) * len(participants) if matches and participants else 1
+            completion_pct = (total_predictions / total_possible * 100) if total_possible > 0 else 0
             
             week_stats.append({
                 'Week': f"Week {week}",
                 'Matches': len(matches),
                 'Participants': participants_predicted,
                 'Predictions': total_predictions,
-                'Completion': f"{(total_predictions / (len(matches) * len(participants)) * 100):.0f}%" if matches and participants else "0%"
+                'Completion': f"{completion_pct:.0f}%"
             })
         
         week_df = pd.DataFrame(week_stats)
@@ -677,11 +691,18 @@ with tab4:
         activity = []
         for p in participants:
             uid = p.get('id', '')
-            user_preds = all_predictions.get(uid, {})
+            
+            # Count predictions across all weeks for this user
+            user_total_preds = 0
+            for week_key, week_data in all_predictions.items():
+                if week_key.isdigit() and isinstance(week_data, dict):
+                    user_week_preds = week_data.get(uid, [])
+                    if isinstance(user_week_preds, list):
+                        user_total_preds += len([p for p in user_week_preds if isinstance(p, dict) and p.get('home') is not None])
             
             activity.append({
                 'Participant': p.get('display_name') or p.get('name', 'Unknown'),
-                'Predictions': len(user_preds),
+                'Predictions': user_total_preds,
                 'Status': p.get('status', 'active')
             })
         
