@@ -495,7 +495,7 @@ _Nikkang KK Admin Team_"""
         
         # Preview with sample data
         with st.expander("👁️ Preview Message"):
-            preview = reminder_template.replace("{name}", "John Doe").replace("{prediction_url}", f"{base_url}/Predictions")
+            preview = reminder_template.replace("{name}", "John Doe").replace("{prediction_url}", f"{base_url}/Predictions?player=john_doe")
             st.code(preview, language=None)
         
         # Generate notifications
@@ -517,13 +517,16 @@ _Nikkang KK Admin Team_"""
                         results = []
                         
                         for participant in selected_participants:
-                            # Correct URL format for Streamlit Cloud
-                            # Note: Query params don't work well in Streamlit Cloud
-                            # Using the Predictions page URL with instructions to select name
-                            prediction_url = f"{base_url}/Predictions"
+                            # Use participant's nickname (display_name) for URL
+                            # Falls back to name if no nickname set
+                            p_name = participant.get('name', 'Participant')
+                            nickname = participant.get('display_name') or participant.get('nickname') or p_name
+                            # Make URL-friendly (lowercase, underscores, no special chars)
+                            url_nickname = nickname.lower().replace(' ', '_').replace("'", "").replace("-", "_")
+                            prediction_url = f"{base_url}/Predictions?player={url_nickname}"
                             
                             # Replace placeholders
-                            message = reminder_template.replace("{name}", participant.get('name', 'Participant'))
+                            message = reminder_template.replace("{name}", nickname)
                             message = message.replace("{prediction_url}", prediction_url)
                             
                             url = notifier.send_whatsapp_url(
@@ -532,7 +535,7 @@ _Nikkang KK Admin Team_"""
                             )
                             
                             results.append({
-                                'Name': participant.get('name', 'Unknown'),
+                                'Name': nickname,
                                 'Phone': participant.get('phone', 'Not provided'),
                                 'WhatsApp Link': url
                             })
@@ -628,12 +631,15 @@ _Nikkang KK Admin Team_"""
                             p_id = participant.get('id', 'unknown')
                             p_email = participant.get('email', 'email@example.com')
                             p_team = participant.get('team', 'Not selected')
-                            registration_url = f"{base_url}/Predictions"
+                            # Use participant's nickname (display_name) for URL
+                            nickname = participant.get('display_name') or participant.get('nickname') or p_name
+                            url_nickname = nickname.lower().replace(' ', '_').replace("'", "").replace("-", "_")
+                            registration_url = f"{base_url}/Predictions?player={url_nickname}"
                             
                             # Standard welcome message with participant details
                             message = f"""👋 *Welcome to Nikkang KK EPL Prediction League!*
 
-Hi {p_name}! 🎉
+Hi {nickname}! 🎉
 
 Thanks for joining our Premier League prediction competition!
 

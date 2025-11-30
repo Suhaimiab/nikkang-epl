@@ -5,6 +5,7 @@ FIXES APPLIED:
 1. Match sequence now consistent on mobile and web (single column layout)
 2. Removed 2-column layout that caused order mismatch on mobile
 3. Added responsive design that works on all devices
+4. Added nickname-based URL parameter (?player=nickname) for direct access
 """
 
 import streamlit as st
@@ -18,14 +19,48 @@ dm = DataManager()
 
 st.title("⚽ Weekly Predictions")
 
+# =============================================================================
+# CHECK FOR PLAYER NICKNAME IN URL QUERY PARAMETER
+# =============================================================================
+# Get player nickname from URL (e.g., ?player=john_doe)
+query_params = st.query_params
+player_nickname = query_params.get("player", None)
+
 # Check if accessed via personal link
 active_participant = st.session_state.get('active_participant')
 
+# If player nickname provided in URL, try to find and set participant
+if player_nickname and not active_participant:
+    participants = dm.load_participants()
+    
+    if participants:
+        # Convert URL nickname to match participant's display_name or name
+        # URL format: lowercase with underscores (e.g., "johnny" or "john_doe")
+        for pid, p in participants.items():
+            # Get the nickname (display_name) or fall back to name
+            p_nickname = p.get('display_name') or p.get('nickname') or p.get('name', '')
+            # Make URL-friendly version for comparison
+            url_version = p_nickname.lower().replace(' ', '_').replace("'", "").replace("-", "_")
+            
+            if url_version == player_nickname.lower():
+                # Found the participant! Set as active
+                st.session_state['active_participant'] = {
+                    'id': pid,
+                    'name': p.get('name', ''),
+                    'display_name': p_nickname,
+                    'email': p.get('email', ''),
+                    'team': p.get('team', 'Not selected'),
+                    'selected_week': dm.get_current_week()
+                }
+                active_participant = st.session_state['active_participant']
+                break
+
 if active_participant:
+    display_name = active_participant.get('display_name') or active_participant.get('name', 'Player')
     st.markdown(f"""
     <div class="info-box success">
-        <h3>👤 Welcome back, {active_participant['name']}!</h3>
-        <p>📧 {active_participant['email']}</p>
+        <h3>👤 Welcome back, {display_name}!</h3>
+        <p>📧 {active_participant.get('email', '')}</p>
         <p>⚽ Favorite Team: {active_participant.get('team', 'Not selected')}</p>
     </div>
     """, unsafe_allow_html=True)
@@ -33,9 +68,9 @@ if active_participant:
     participant_id = active_participant['id']
     default_week = active_participant.get('selected_week', dm.get_current_week())
 else:
-    st.info("👉 Select your name below to start predicting")
+    st.info("👉 Select your nickname below to start predicting")
     
-    # Name selector
+    # Nickname selector
     participants = dm.load_participants()
     
     if not participants:
@@ -44,15 +79,27 @@ else:
             st.switch_page("pages/2_register.py")
         st.stop()
     
-    participant_names = {p['name']: pid for pid, p in participants.items()}
-    selected_name = st.selectbox("Your Name", [""] + list(participant_names.keys()))
+    # Build nickname -> participant_id mapping
+    # Use display_name (nickname) if available, otherwise fall back to name
+    participant_nicknames = {}
+    for pid, p in participants.items():
+        nickname = p.get('display_name') or p.get('nickname') or p.get('name', 'Unknown')
+        participant_nicknames[nickname] = pid
     
-    if not selected_name:
-        st.warning("Please select your name to continue")
+    # Sort nicknames alphabetically for easier selection
+    sorted_nicknames = sorted(participant_nicknames.keys())
+    
+    selected_nickname = st.selectbox("Your Nickname", [""] + sorted_nicknames)
+    
+    if not selected_nickname:
+        st.warning("Please select your nickname to continue")
         st.stop()
     
-    participant_id = participant_names[selected_name]
+    participant_id = participant_nicknames[selected_nickname]
     default_week = dm.get_current_week()
+    
+    # Store in session for display purposes
+    st.session_state['current_nickname'] = selected_nickname
 
 st.markdown("---")
 
@@ -215,10 +262,24 @@ col1, col2 = st.columns(2)
 
 with col1:
     if st.button("📋 Copy My Prediction Link", use_container_width=True):
-        from utils.whatsapp import generate_participant_link
-        link = generate_participant_link(participant_id, week, base_url="https://nikkang-epl.streamlit.app")
+        # Get participant's nickname for the link
+        if active_participant:
+            nickname = active_participant.get('display_name') or active_participant.get('name', '')
+        elif 'current_nickname' in st.session_state:
+            # Use nickname from dropdown selection
+            nickname = st.session_state['current_nickname']
+        else:
+            # Get nickname from participants dict
+            participants = dm.load_participants()
+            p_data = participants.get(participant_id, {})
+            nickname = p_data.get('display_name') or p_data.get('nickname') or p_data.get('name', '')
+        
+        # Create URL-friendly nickname
+        url_nickname = nickname.lower().replace(' ', '_').replace("'", "").replace("-", "_")
+        link = f"https://nikkang-epl.streamlit.app/Predictions?player={url_nickname}"
+        
         st.code(link, language=None)
-        st.caption("Share this link to access your predictions directly!")
+        st.caption(f"Share this link to access predictions as **{nickname}**!")
 
 with col2:
     if st.button("🏆 View Leaderboard", use_container_width=True):
