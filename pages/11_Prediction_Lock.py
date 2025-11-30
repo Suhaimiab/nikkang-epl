@@ -67,6 +67,7 @@ def load_settings():
         except:
             pass
     return {
+        "current_week": 1,
         "locked_weeks": [],
         "global_lock": False,
         "deadline_message": "Predictions close at kickoff!"
@@ -488,6 +489,36 @@ with tab3:
 with tab4:
     st.markdown("### ⚙️ Prediction Settings")
     
+    # ==========================================================================
+    # CURRENT WEEK SETTING - NEW
+    # ==========================================================================
+    st.markdown("#### 📅 Current Gameweek")
+    st.info("Set the current gameweek for the competition. This affects which week is shown by default on the Predictions page.")
+    
+    col1, col2 = st.columns([2, 1])
+    
+    with col1:
+        current_week = settings.get("current_week", 1)
+        new_week = st.number_input(
+            "Current Week:",
+            min_value=1,
+            max_value=38,
+            value=current_week,
+            help="Set the current gameweek (1-38)"
+        )
+    
+    with col2:
+        st.markdown("<br>", unsafe_allow_html=True)
+        if st.button("💾 Save Current Week", use_container_width=True, type="primary"):
+            settings["current_week"] = new_week
+            save_settings(settings)
+            st.success(f"✅ Current week set to **Week {new_week}**!")
+            st.rerun()
+    
+    st.caption(f"📌 Currently set to: **Week {current_week}**")
+    
+    st.markdown("---")
+    
     # Deadline message
     st.markdown("#### 📝 Deadline Message")
     
@@ -508,8 +539,9 @@ with tab4:
     st.markdown("#### 📋 Current Status Summary")
     
     status_data = {
-        "Setting": ["Global Lock", "Locked Weeks", "Deadline Message"],
+        "Setting": ["Current Week", "Global Lock", "Locked Weeks", "Deadline Message"],
         "Value": [
+            f"Week {settings.get('current_week', 1)}",
             "🔴 Enabled" if settings.get("global_lock") else "🟢 Disabled",
             ", ".join([str(w) for w in settings.get("locked_weeks", [])]) or "None",
             settings.get("deadline_message", "Not set")[:50] + "..."

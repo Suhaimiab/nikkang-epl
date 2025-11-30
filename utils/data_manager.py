@@ -129,8 +129,36 @@ class DataManager:
         return self.get_weeks()
     
     def get_current_week(self):
+        """Get current week from settings.json"""
+        settings_file = Path(DATA_DIR) / "settings.json"
+        if settings_file.exists():
+            try:
+                with open(settings_file, 'r') as f:
+                    settings = json.load(f)
+                return settings.get("current_week", 1)
+            except:
+                pass
+        # Fallback to first week with matches
         weeks = self.get_weeks()
         return weeks[0] if weeks else 1
+    
+    def set_current_week(self, week):
+        """Set current week in settings.json"""
+        settings_file = Path(DATA_DIR) / "settings.json"
+        settings = {}
+        if settings_file.exists():
+            try:
+                with open(settings_file, 'r') as f:
+                    settings = json.load(f)
+            except:
+                pass
+        settings["current_week"] = week
+        try:
+            with open(settings_file, 'w') as f:
+                json.dump(settings, f, indent=2)
+            return True
+        except:
+            return False
     
     def get_game_of_week(self, week):
         for m in self.get_matches_by_week(week):
@@ -581,6 +609,7 @@ def update_match(mid, **kw): return DataManager().update_match(mid, **kw)
 def get_weeks(): return DataManager().get_weeks()
 def get_all_weeks(): return DataManager().get_all_weeks()
 def get_current_week(): return DataManager().get_current_week()
+def set_current_week(week): return DataManager().set_current_week(week)
 def get_game_of_week(w): return DataManager().get_game_of_week(w)
 def set_game_of_week(mid, g=True): return DataManager().set_game_of_week(mid, g)
 def get_prediction(uid, mid): return DataManager().get_prediction(uid, mid)
