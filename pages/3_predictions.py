@@ -68,38 +68,117 @@ if active_participant:
     participant_id = active_participant['id']
     default_week = active_participant.get('selected_week', dm.get_current_week())
 else:
-    st.info("👉 Select your nickname below to start predicting")
+    st.info("👉 Login below to start predicting")
     
-    # Nickname selector
+    # ==========================================================================
+    # LOGIN WITH NICKNAME + LAST 4 DIGITS OF PHONE
+    # ==========================================================================
     participants = dm.load_participants()
     
     if not participants:
         st.warning("⚠️ No participants registered yet. Please register first!")
         if st.button("Go to Registration"):
-            st.switch_page("pages/2_register.py")
+            st.switch_page("pages/2_Register.py")
         st.stop()
     
-    # Build nickname -> participant_id mapping
-    # Use display_name (nickname) if available, otherwise fall back to name
-    participant_nicknames = {}
+    # Build nickname -> participant data mapping
+    participant_data = {}
     for pid, p in participants.items():
         nickname = p.get('display_name') or p.get('nickname') or p.get('name', 'Unknown')
-        participant_nicknames[nickname] = pid
+        participant_data[nickname.lower()] = {
+            'id': pid,
+            'nickname': nickname,
+            'phone': p.get('phone', ''),
+            'name': p.get('name', ''),
+            'email': p.get('email', ''),
+            'team': p.get('team', 'Not selected')
+        }
     
-    # Sort nicknames alphabetically for easier selection
-    sorted_nicknames = sorted(participant_nicknames.keys())
+    # Login form
+    st.markdown("### 🔐 Login")
     
-    selected_nickname = st.selectbox("Your Nickname", [""] + sorted_nicknames)
+    col1, col2 = st.columns(2)
     
-    if not selected_nickname:
-        st.warning("Please select your nickname to continue")
+    with col1:
+        input_nickname = st.text_input(
+            "Your Nickname",
+            placeholder="Enter your nickname",
+            help="The nickname you registered with (not case-sensitive)"
+        )
+    
+    with col2:
+        input_phone_last4 = st.text_input(
+            "Last 4 Digits of Phone",
+            placeholder="e.g. 1234",
+            max_chars=4,
+            help="Last 4 digits of your registered phone number"
+        )
+    
+    # Login button
+    if st.button("🔓 Login", use_container_width=True, type="primary"):
+        if not input_nickname or not input_nickname.strip():
+            st.error("❌ Please enter your nickname")
+            st.stop()
+        
+        if not input_phone_last4 or len(input_phone_last4.strip()) != 4:
+            st.error("❌ Please enter exactly 4 digits of your phone number")
+            st.stop()
+        
+        # Clean inputs - case-insensitive nickname, strip whitespace
+        nickname_lower = input_nickname.strip().lower()
+        phone_input = input_phone_last4.strip()
+        
+        # Find participant by nickname (case-insensitive)
+        if nickname_lower not in participant_data:
+            # Show helpful message with similar nicknames
+            similar = [v['nickname'] for k, v in participant_data.items() if nickname_lower in k or k in nickname_lower]
+            if similar:
+                st.error(f"❌ Nickname not found. Did you mean: **{', '.join(similar)}**?")
+            else:
+                st.error("❌ Nickname not found. Please check your nickname or register first.")
+            st.stop()
+        
+        p_data = participant_data[nickname_lower]
+        
+        # Get last 4 digits of registered phone (clean all non-digits)
+        registered_phone = ''.join(filter(str.isdigit, p_data['phone']))
+        registered_last4 = registered_phone[-4:] if len(registered_phone) >= 4 else registered_phone
+        
+        # Verify phone last 4 digits
+        if phone_input != registered_last4:
+            st.error("❌ Phone number doesn't match. Please try again.")
+            st.stop()
+        
+        # Login successful! Store in session
+        st.session_state['logged_in_participant'] = {
+            'id': p_data['id'],
+            'nickname': p_data['nickname'],
+            'name': p_data['name'],
+            'email': p_data['email'],
+            'team': p_data['team']
+        }
+        st.success(f"✅ Welcome, {p_data['nickname']}!")
+        st.rerun()
+    
+    # Check if already logged in via session
+    if 'logged_in_participant' not in st.session_state:
+        st.markdown("---")
+        st.caption("💡 Use your registered nickname and phone number to login")
         st.stop()
     
-    participant_id = participant_nicknames[selected_nickname]
+    # Get logged in participant
+    logged_in = st.session_state['logged_in_participant']
+    participant_id = logged_in['id']
     default_week = dm.get_current_week()
     
-    # Store in session for display purposes
-    st.session_state['current_nickname'] = selected_nickname
+    # Show logged in user info
+    st.success(f"👤 Logged in as: **{logged_in['nickname']}**")
+    
+    # Logout button in sidebar
+    with st.sidebar:
+        if st.button("🚪 Logout", use_container_width=True):
+            del st.session_state['logged_in_participant']
+            st.rerun()
 
 st.markdown("---")
 
@@ -265,9 +344,9 @@ with col1:
         # Get participant's nickname for the link
         if active_participant:
             nickname = active_participant.get('display_name') or active_participant.get('name', '')
-        elif 'current_nickname' in st.session_state:
-            # Use nickname from dropdown selection
-            nickname = st.session_state['current_nickname']
+        elif 'logged_in_participant' in st.session_state:
+            # Use nickname from login
+            nickname = st.session_state['logged_in_participant'].get('nickname', '')
         else:
             # Get nickname from participants dict
             participants = dm.load_participants()
