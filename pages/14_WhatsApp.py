@@ -421,7 +421,7 @@ Hi everyone! 👋
 (Check your WhatsApp DM for your link)
 
 📱 *Predictions Page:*
-{base_url}/Predictions
+{base_url}/3_Predictions
 
 Good luck to all! 🍀
 
@@ -495,7 +495,7 @@ _Nikkang KK Admin Team_"""
         
         # Preview with sample data
         with st.expander("👁️ Preview Message"):
-            preview = reminder_template.replace("{name}", "John Doe").replace("{prediction_url}", f"{base_url}/Predictions?player=john_doe")
+            preview = reminder_template.replace("{name}", "John Doe").replace("{prediction_url}", f"{base_url}/3_Predictions?player=john_doe")
             st.code(preview, language=None)
         
         # Generate notifications
@@ -523,7 +523,7 @@ _Nikkang KK Admin Team_"""
                             nickname = participant.get('display_name') or participant.get('nickname') or p_name
                             # Make URL-friendly (lowercase, underscores, no special chars)
                             url_nickname = nickname.lower().replace(' ', '_').replace("'", "").replace("-", "_")
-                            prediction_url = f"{base_url}/Predictions?player={url_nickname}"
+                            prediction_url = f"{base_url}/3_Predictions?player={url_nickname}"
                             
                             # Replace placeholders
                             message = reminder_template.replace("{name}", nickname)
@@ -574,7 +574,7 @@ with tab2:
             sample_participant = next((p for p in participants if p.get('name') == new_participants[0]), None)
             
             if sample_participant:
-                sample_url = f"{base_url}/Predictions"
+                sample_url = f"{base_url}/3_Predictions"
                 sample_team = sample_participant.get('team', 'Not selected')
                 sample_email = sample_participant.get('email', 'email@example.com')
                 
@@ -606,8 +606,8 @@ Thanks for joining our Premier League prediction competition!
 • KK Master (Most exact scores)
 
 📱 *Quick Links:*
-• Make Predictions: {base_url}/Predictions
-• View Leaderboard: {base_url}/Leaderboard
+• Make Predictions: {base_url}/3_Predictions
+• View Leaderboard: {base_url}/5_Leaderboard
 • Check Results: {base_url}/Results
 
 Good luck this season! May the best predictor win! ⚽🔥
@@ -634,7 +634,7 @@ _Nikkang KK Admin Team_"""
                             # Use participant's nickname (display_name) for URL
                             nickname = participant.get('display_name') or participant.get('nickname') or p_name
                             url_nickname = nickname.lower().replace(' ', '_').replace("'", "").replace("-", "_")
-                            registration_url = f"{base_url}/Predictions?player={url_nickname}"
+                            registration_url = f"{base_url}/3_Predictions?player={url_nickname}"
                             
                             # Standard welcome message with participant details
                             message = f"""👋 *Welcome to Nikkang KK EPL Prediction League!*
@@ -664,8 +664,8 @@ Thanks for joining our Premier League prediction competition!
 • KK Master (Most exact scores)
 
 📱 *Quick Links:*
-• Make Predictions: {base_url}/Predictions
-• View Leaderboard: {base_url}/Leaderboard
+• Make Predictions: {base_url}/3_Predictions
+• View Leaderboard: {base_url}/5_Leaderboard
 • Check Results: {base_url}/Results
 
 Good luck this season! May the best predictor win! ⚽🔥
@@ -730,7 +730,7 @@ The results for Week {results_week} (Stage {current_stage}) are in! 🎉
 Check your personal DM for your detailed breakdown!
 
 View full leaderboard:
-{base_url}/Leaderboard
+{base_url}/5_Leaderboard
 
 _Nikkang KK Admin Team_"""
         
@@ -930,7 +930,7 @@ _Nikkang KK Admin Team_"""
     {"🎉 Great week! Keep it up!" if weekly_points >= 15 else "💪 Keep pushing for higher scores!"}
 
     🔗 View full leaderboard:
-    {base_url}/Leaderboard
+    {base_url}/5_Leaderboard
 
     _Nikkang KK Admin Team_"""
                         
@@ -1017,7 +1017,7 @@ Amazing performance this week with *{winner_points} points*!
 Keep up the great predictions everyone! 💪
 
 View leaderboard:
-{base_url}/Leaderboard
+{base_url}/5_Leaderboard
 
 _Nikkang KK Admin Team_"""
             
@@ -1039,7 +1039,7 @@ You're the champion of Week {week_winner} with *{winner_points} points*!
 Amazing predictions! Keep it up! 💪
 
 Check the leaderboard:
-{base_url}/Leaderboard
+{base_url}/5_Leaderboard
 
 _Nikkang KK Admin Team_"""
             
@@ -1097,7 +1097,7 @@ That's the Kemut Keliling (KK) spirit! 🔥
 Keep those predictions sharp everyone! 💪
 
 View leaderboard:
-{base_url}/Leaderboard
+{base_url}/5_Leaderboard
 
 _Nikkang KK Admin Team_"""
             
@@ -1121,7 +1121,7 @@ That's the Kemut Keliling (KK) spirit! Your prediction skills are on fire! 🔥
 Keep those exact scores coming! 💪
 
 Check your ranking:
-{base_url}/Leaderboard
+{base_url}/5_Leaderboard
 
 _Nikkang KK Admin Team_"""
             

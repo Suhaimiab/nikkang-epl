@@ -355,7 +355,8 @@ with col1:
         
         # Create URL-friendly nickname
         url_nickname = nickname.lower().replace(' ', '_').replace("'", "").replace("-", "_")
-        link = f"https://nikkang-epl.streamlit.app/Predictions?player={url_nickname}"
+        # Use correct Streamlit Cloud page name (matches filename without .py)
+        link = f"https://nikkang-epl.streamlit.app/3_Predictions?player={url_nickname}"
         
         st.code(link, language=None)
         st.caption(f"Share this link to access predictions as **{nickname}**!")

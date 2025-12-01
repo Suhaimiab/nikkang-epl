@@ -1,5 +1,5 @@
 """
-API Integration - Import EPL Fixtures & Results
+Results Management - Import EPL Fixtures & Results
 Fetch matches and results from football-data.org API
 """
 
@@ -29,8 +29,8 @@ from utils.data_manager import DataManager
 
 # Page config
 st.set_page_config(
-    page_title="API Integration - Nikkang KK",
-    page_icon="🔌",
+    page_title="Results Management - Nikkang KK",
+    page_icon="📊",
     layout="wide"
 )
 
@@ -57,7 +57,7 @@ if Path("nikkang_logo.png").exists():
 # Header
 st.markdown("""
 <div style="text-align: center; padding: 1.5rem 0;">
-    <h1 style="color: #667eea; font-size: 2.5rem; margin: 0;">🔌 API Integration</h1>
+    <h1 style="color: #667eea; font-size: 2.5rem; margin: 0;">📊 Results Management</h1>
     <p style="color: #6c757d; font-size: 1.2rem; margin: 0.5rem 0 0 0;">
         Import Fixtures & Results from Football Data API
     </p>
