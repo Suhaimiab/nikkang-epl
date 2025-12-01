@@ -679,3 +679,64 @@ def get_deadline_message():
         except:
             pass
     return "Predictions close at kickoff!"
+
+# =============================================================================
+# MANUAL SCORES FUNCTIONS
+# =============================================================================
+MANUAL_SCORES_FILE = "nikkang_data/manual_scores.json"
+
+def load_manual_scores():
+    """Load manually entered scores for historical weeks"""
+    try:
+        if os.path.exists(MANUAL_SCORES_FILE):
+            with open(MANUAL_SCORES_FILE, 'r') as f:
+                return json.load(f)
+    except:
+        pass
+    return {}
+
+def save_manual_scores(data):
+    """Save manual scores to file"""
+    try:
+        os.makedirs(os.path.dirname(MANUAL_SCORES_FILE), exist_ok=True)
+        with open(MANUAL_SCORES_FILE, 'w') as f:
+            json.dump(data, f, indent=2)
+        return True
+    except:
+        return False
+
+def get_participant_manual_scores(user_id, week=None):
+    """Get manual scores for a participant, optionally for specific week"""
+    manual_scores = load_manual_scores()
+    
+    if week is not None:
+        week_key = str(week)
+        week_data = manual_scores.get(week_key, {})
+        return week_data.get(user_id, {'points': 0, 'kk': 0})
+    
+    # Return all weeks for this participant
+    result = {}
+    for week_key, week_data in manual_scores.items():
+        if user_id in week_data:
+            result[week_key] = week_data[user_id]
+    return result
+
+def get_total_manual_scores(user_id, weeks=None):
+    """Get total manual scores for a participant across specified weeks"""
+    manual_scores = load_manual_scores()
+    
+    total_points = 0
+    total_kk = 0
+    
+    for week_key, week_data in manual_scores.items():
+        # If weeks specified, only count those
+        if weeks is not None:
+            if int(week_key) not in weeks:
+                continue
+        
+        if user_id in week_data:
+            total_points += week_data[user_id].get('points', 0)
+            total_kk += week_data[user_id].get('kk', 0)
+    
+    return {'points': total_points, 'kk': total_kk}
+
