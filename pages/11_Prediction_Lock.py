@@ -9,6 +9,10 @@ from pathlib import Path
 from datetime import datetime
 import sys
 import json
+import io
+import matplotlib.pyplot as plt
+import matplotlib
+matplotlib.use('Agg')
 
 # Add utils to path
 sys.path.append(str(Path(__file__).parent.parent))
@@ -298,13 +302,116 @@ with tab2:
         # Style the dataframe
         st.dataframe(df, use_container_width=True, hide_index=True)
         
-        # Download option
-        csv = df.to_csv(index=False)
+        # Generate PNG for download
+        def generate_prediction_matrix_png(df, week, matches):
+            """Generate a styled PNG of the prediction matrix"""
+            n_rows = len(df)
+            n_cols = len(df.columns)
+            
+            # Calculate figure size
+            fig_width = max(14, n_cols * 1.2)
+            fig_height = max(6, n_rows * 0.4 + 2)
+            
+            fig, ax = plt.subplots(figsize=(fig_width, fig_height))
+            ax.axis('off')
+            
+            # Colors
+            header_bg = '#1a1a2e'
+            green = '#28a745'
+            red = '#dc3545'
+            white = '#ffffff'
+            gray = '#f8f9fa'
+            
+            # Title
+            ax.text(0.5, 0.98, f"📊 Prediction Matrix - Gameweek {week}", 
+                   ha='center', va='top', fontsize=14, fontweight='bold', 
+                   transform=ax.transAxes)
+            ax.text(0.5, 0.94, f"Nikkang KK EPL Prediction League • {len(df)} Participants • {len(matches)} Matches",
+                   ha='center', va='top', fontsize=9, color='#6c757d',
+                   transform=ax.transAxes)
+            
+            # Create table
+            cell_height = 0.85 / (n_rows + 1)
+            col_widths = [0.12, 0.08] + [0.08] * (n_cols - 2)
+            total_width = sum(col_widths)
+            col_widths = [w / total_width * 0.96 for w in col_widths]
+            left_margin = 0.02
+            table_top = 0.88
+            
+            # Get x positions
+            x_positions = [left_margin]
+            for w in col_widths[:-1]:
+                x_positions.append(x_positions[-1] + w)
+            
+            # Draw header
+            for j, col in enumerate(df.columns):
+                x = x_positions[j]
+                w = col_widths[j]
+                rect = plt.Rectangle((x, table_top - cell_height), w, cell_height,
+                                    facecolor=header_bg, edgecolor='#2a2a4e', linewidth=0.5)
+                ax.add_patch(rect)
+                
+                # Truncate long column names
+                col_text = str(col)[:12] if len(str(col)) > 12 else str(col)
+                ax.text(x + w/2, table_top - cell_height/2, col_text,
+                       ha='center', va='center', fontsize=5, fontweight='bold', color='white')
+            
+            # Draw data rows
+            for i, (idx, row) in enumerate(df.iterrows()):
+                y = table_top - (i + 2) * cell_height
+                
+                for j, col in enumerate(df.columns):
+                    x = x_positions[j]
+                    w = col_widths[j]
+                    value = str(row[col])
+                    
+                    # Determine cell color
+                    if value == "❌":
+                        cell_bg = red
+                        text_color = 'white'
+                    elif '-' in value and value != "❌":
+                        cell_bg = green
+                        text_color = 'white'
+                    else:
+                        cell_bg = gray if i % 2 == 0 else white
+                        text_color = '#333'
+                    
+                    rect = plt.Rectangle((x, y), w, cell_height,
+                                        facecolor=cell_bg, edgecolor='#e0e0e0', linewidth=0.5)
+                    ax.add_patch(rect)
+                    
+                    # Truncate text
+                    display_text = value[:10] if len(value) > 10 else value
+                    ax.text(x + w/2, y + cell_height/2, display_text,
+                           ha='center', va='center', fontsize=5, color=text_color)
+            
+            # Footer
+            ax.text(0.5, 0.02, f"Generated: {datetime.now().strftime('%d %b %Y %H:%M')}",
+                   ha='center', va='bottom', fontsize=7, color='#6c757d',
+                   transform=ax.transAxes)
+            
+            # Legend
+            ax.text(0.02, 0.02, "🟢 Has Prediction  🔴 No Prediction",
+                   ha='left', va='bottom', fontsize=7, color='#6c757d',
+                   transform=ax.transAxes)
+            
+            plt.tight_layout()
+            
+            # Save to bytes
+            buf = io.BytesIO()
+            plt.savefig(buf, format='png', dpi=150, bbox_inches='tight',
+                       facecolor='white', edgecolor='none')
+            plt.close(fig)
+            buf.seek(0)
+            return buf.getvalue()
+        
+        # Download as PNG
+        png_bytes = generate_prediction_matrix_png(df, view_week, matches)
         st.download_button(
-            "📥 Download as CSV",
-            data=csv,
-            file_name=f"predictions_week_{view_week}.csv",
-            mime="text/csv"
+            "📥 Download as PNG",
+            data=png_bytes,
+            file_name=f"predictions_week_{view_week}_{datetime.now().strftime('%Y%m%d')}.png",
+            mime="image/png"
         )
         
         st.markdown("---")
