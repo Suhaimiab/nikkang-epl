@@ -392,10 +392,13 @@ tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
 with tab1:
     st.markdown("### 📋 Send Prediction Reminders")
     
+    # Get current week from settings
+    current_week = dm.get_current_week()
+    
     col1, col2 = st.columns(2)
     
     with col1:
-        week_number = st.number_input("Week Number:", min_value=1, max_value=38, value=1)
+        week_number = st.number_input("Week Number:", min_value=1, max_value=38, value=current_week)
     
     with col2:
         deadline = st.text_input("Deadline:", value="Saturday, 10:00 PM")
@@ -421,7 +424,7 @@ Hi everyone! 👋
 (Check your WhatsApp DM for your link)
 
 📱 *Predictions Page:*
-{base_url}/3_Predictions
+{base_url}
 
 Good luck to all! 🍀
 
@@ -495,7 +498,7 @@ _Nikkang KK Admin Team_"""
         
         # Preview with sample data
         with st.expander("👁️ Preview Message"):
-            preview = reminder_template.replace("{name}", "John Doe").replace("{prediction_url}", f"{base_url}/3_Predictions?player=john_doe")
+            preview = reminder_template.replace("{name}", "John Doe").replace("{prediction_url}", f"{base_url}?user_id=ABC123")
             st.code(preview, language=None)
         
         # Generate notifications
@@ -517,16 +520,10 @@ _Nikkang KK Admin Team_"""
                         results = []
                         
                         for participant in selected_participants:
-                            # Use participant's nickname (display_name) for URL
-                            # Falls back to name if no nickname set
-                            p_name = participant.get('name', 'Participant')
-                            nickname = participant.get('display_name') or participant.get('nickname') or p_name
-                            # Make URL-friendly (lowercase, underscores, no special chars)
-                            url_nickname = nickname.lower().replace(' ', '_').replace("'", "").replace("-", "_")
-                            prediction_url = f"{base_url}/3_Predictions?player={url_nickname}"
+                            prediction_url = f"{base_url}?user_id={participant.get('id', 'unknown')}"
                             
                             # Replace placeholders
-                            message = reminder_template.replace("{name}", nickname)
+                            message = reminder_template.replace("{name}", participant.get('name', 'Participant'))
                             message = message.replace("{prediction_url}", prediction_url)
                             
                             url = notifier.send_whatsapp_url(
@@ -535,7 +532,7 @@ _Nikkang KK Admin Team_"""
                             )
                             
                             results.append({
-                                'Name': nickname,
+                                'Name': participant.get('name', 'Unknown'),
                                 'Phone': participant.get('phone', 'Not provided'),
                                 'WhatsApp Link': url
                             })
@@ -574,7 +571,7 @@ with tab2:
             sample_participant = next((p for p in participants if p.get('name') == new_participants[0]), None)
             
             if sample_participant:
-                sample_url = f"{base_url}/3_Predictions"
+                sample_url = f"{base_url}?user_id={sample_participant.get('id', 'ABC123')}"
                 sample_team = sample_participant.get('team', 'Not selected')
                 sample_email = sample_participant.get('email', 'email@example.com')
                 
@@ -606,9 +603,9 @@ Thanks for joining our Premier League prediction competition!
 • KK Master (Most exact scores)
 
 📱 *Quick Links:*
-• Make Predictions: {base_url}/3_Predictions
-• View Leaderboard: {base_url}/5_Leaderboard
-• Check Results: {base_url}/Results
+• Make Predictions: {base_url}
+• View Leaderboard: {base_url}
+• Check Results: {base_url}/4_Results
 
 Good luck this season! May the best predictor win! ⚽🔥
 
@@ -631,15 +628,12 @@ _Nikkang KK Admin Team_"""
                             p_id = participant.get('id', 'unknown')
                             p_email = participant.get('email', 'email@example.com')
                             p_team = participant.get('team', 'Not selected')
-                            # Use participant's nickname (display_name) for URL
-                            nickname = participant.get('display_name') or participant.get('nickname') or p_name
-                            url_nickname = nickname.lower().replace(' ', '_').replace("'", "").replace("-", "_")
-                            registration_url = f"{base_url}/3_Predictions?player={url_nickname}"
+                            registration_url = f"{base_url}?user_id={p_id}"
                             
                             # Standard welcome message with participant details
                             message = f"""👋 *Welcome to Nikkang KK EPL Prediction League!*
 
-Hi {nickname}! 🎉
+Hi {p_name}! 🎉
 
 Thanks for joining our Premier League prediction competition!
 
@@ -664,9 +658,9 @@ Thanks for joining our Premier League prediction competition!
 • KK Master (Most exact scores)
 
 📱 *Quick Links:*
-• Make Predictions: {base_url}/3_Predictions
-• View Leaderboard: {base_url}/5_Leaderboard
-• Check Results: {base_url}/Results
+• Make Predictions: {base_url}
+• View Leaderboard: {base_url}
+• Check Results: {base_url}/4_Results
 
 Good luck this season! May the best predictor win! ⚽🔥
 
@@ -695,7 +689,9 @@ with tab3:
     st.markdown("### 📊 Weekly Results Notifications")
     st.info("📌 Automated message with complete scoring breakdown from leaderboard")
     
-    results_week = st.number_input("Week Number:", min_value=1, max_value=38, value=1, key="results_week")
+    # Get current week from settings
+    current_week_results = dm.get_current_week()
+    results_week = st.number_input("Week Number:", min_value=1, max_value=38, value=current_week_results, key="results_week")
     
     # Determine which stage this week belongs to
     if results_week <= 10:
@@ -730,7 +726,7 @@ The results for Week {results_week} (Stage {current_stage}) are in! 🎉
 Check your personal DM for your detailed breakdown!
 
 View full leaderboard:
-{base_url}/5_Leaderboard
+{base_url}
 
 _Nikkang KK Admin Team_"""
         
@@ -930,7 +926,7 @@ _Nikkang KK Admin Team_"""
     {"🎉 Great week! Keep it up!" if weekly_points >= 15 else "💪 Keep pushing for higher scores!"}
 
     🔗 View full leaderboard:
-    {base_url}/5_Leaderboard
+    {base_url}
 
     _Nikkang KK Admin Team_"""
                         
@@ -992,7 +988,9 @@ with tab4:
     st.markdown("### 🏆 Congratulate Weekly Winners")
     st.info("📌 Standard message - automatically personalized for the winner")
     
-    week_winner = st.number_input("Week Number:", min_value=1, max_value=38, value=1, key="winner_week")
+    # Get current week from settings
+    current_week_winner = dm.get_current_week()
+    week_winner = st.number_input("Week Number:", min_value=1, max_value=38, value=current_week_winner, key="winner_week")
     
     if participants:
         winner_name = st.selectbox(
@@ -1017,7 +1015,7 @@ Amazing performance this week with *{winner_points} points*!
 Keep up the great predictions everyone! 💪
 
 View leaderboard:
-{base_url}/5_Leaderboard
+{base_url}
 
 _Nikkang KK Admin Team_"""
             
@@ -1039,7 +1037,7 @@ You're the champion of Week {week_winner} with *{winner_points} points*!
 Amazing predictions! Keep it up! 💪
 
 Check the leaderboard:
-{base_url}/5_Leaderboard
+{base_url}
 
 _Nikkang KK Admin Team_"""
             
@@ -1069,7 +1067,9 @@ with tab5:
     st.markdown("### 🎯 Congratulate KK Champions")
     st.info("📌 Standard message for Kemut Keliling (Exact Score) achievements")
     
-    kk_week = st.number_input("Week Number:", min_value=1, max_value=38, value=1, key="kk_week")
+    # Get current week from settings
+    current_week_kk = dm.get_current_week()
+    kk_week = st.number_input("Week Number:", min_value=1, max_value=38, value=current_week_kk, key="kk_week")
     
     if participants:
         kk_champion = st.selectbox(
@@ -1097,7 +1097,7 @@ That's the Kemut Keliling (KK) spirit! 🔥
 Keep those predictions sharp everyone! 💪
 
 View leaderboard:
-{base_url}/5_Leaderboard
+{base_url}
 
 _Nikkang KK Admin Team_"""
             
@@ -1121,7 +1121,7 @@ That's the Kemut Keliling (KK) spirit! Your prediction skills are on fire! 🔥
 Keep those exact scores coming! 💪
 
 Check your ranking:
-{base_url}/5_Leaderboard
+{base_url}
 
 _Nikkang KK Admin Team_"""
             
