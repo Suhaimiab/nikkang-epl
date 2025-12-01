@@ -1,6 +1,7 @@
 """
 Leaderboard Page - With Stages
 Stage 1: Manual (locked) | Stage 2-4: Automated
+Stage 2 can include manual scores for weeks 11-13
 Shows points, KK count (Kemut Keliling), and season tally
 """
 
@@ -18,7 +19,7 @@ matplotlib.use('Agg')  # Use non-interactive backend
 
 sys.path.append(str(Path(__file__).parent.parent))
 
-from utils.data_manager import DataManager
+from utils.data_manager import DataManager, load_manual_scores, get_participant_manual_scores
 
 def generate_leaderboard_png(df, title="Leaderboard", subtitle=""):
     """Generate a styled PNG image from a DataFrame"""
@@ -232,6 +233,9 @@ def get_stage_scores(participant_id, stage_num):
     results = dm.load_results()
     matches_data = dm.load_matches()
     
+    # Load manual scores for historical weeks
+    manual_scores_data = load_manual_scores()
+    
     total_points = 0
     kk_count = 0
     
@@ -239,6 +243,18 @@ def get_stage_scores(participant_id, stage_num):
     for week in stage_info['weeks']:
         week_str = str(week)
         
+        # =================================================================
+        # CHECK FOR MANUAL SCORES FIRST (for weeks like 11, 12, 13)
+        # =================================================================
+        if week_str in manual_scores_data and participant_id in manual_scores_data[week_str]:
+            manual_week = manual_scores_data[week_str][participant_id]
+            total_points += manual_week.get('points', 0)
+            kk_count += manual_week.get('kk', 0)
+            continue  # Skip auto-calculation for this week
+        
+        # =================================================================
+        # AUTO-CALCULATE FROM PREDICTIONS (for weeks with system data)
+        # =================================================================
         # Get matches for this week
         week_matches = matches_data.get(week_str, [])
         if not isinstance(week_matches, list):
