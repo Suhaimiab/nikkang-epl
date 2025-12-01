@@ -769,6 +769,19 @@ with col_dl1:
             key="download_weekly_png"
         )
 
+with col_dl2:
+    if st.button("🏠 Back to Home", use_container_width=True):
+        st.switch_page("app.py")
+
+with col_dl3:
+    col_nav1, col_nav2 = st.columns(2)
+    with col_nav1:
+        if st.button("⚽ Predictions", use_container_width=True):
+            st.switch_page("pages/3_Predictions.py")
+    with col_nav2:
+        if st.button("🏆 Leaderboard", use_container_width=True):
+            st.switch_page("pages/5_Leaderboard.py")
+
 # Summary stats
 st.markdown("---")
 st.markdown("### 📈 Gameweek Statistics")

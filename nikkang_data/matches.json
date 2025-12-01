@@ -160,6 +160,51 @@
       "home": "Bournemouth",
       "away": "Everton",
       "gotw": false
+    },
+    {
+      "home": "Fulham",
+      "away": "Man City",
+      "gotw": false
+    },
+    {
+      "home": "Newcastle",
+      "away": "Tottenham",
+      "gotw": true
+    },
+    {
+      "home": "Brighton Hove",
+      "away": "Aston Villa",
+      "gotw": false
+    },
+    {
+      "home": "Arsenal",
+      "away": "Brentford",
+      "gotw": false
+    },
+    {
+      "home": "Burnley",
+      "away": "Crystal Palace",
+      "gotw": false
+    },
+    {
+      "home": "Wolverhampton",
+      "away": "Nottingham",
+      "gotw": false
+    },
+    {
+      "home": "Liverpool",
+      "away": "Sunderland",
+      "gotw": false
+    },
+    {
+      "home": "Leeds United",
+      "away": "Chelsea",
+      "gotw": false
+    },
+    {
+      "home": "Man United",
+      "away": "West Ham",
+      "gotw": false
     }
   ]
 }

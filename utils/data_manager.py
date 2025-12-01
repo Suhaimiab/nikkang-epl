@@ -171,8 +171,11 @@ class DataManager:
         wk = str(week)
         if wk not in matches:
             matches[wk] = []
+        match_index = len(matches[wk])
         matches[wk].append({'home': home, 'away': away, 'gotw': gotw})
-        return self.save_matches(matches), "Added"
+        match_id = f"{wk}_{match_index}"
+        success = self.save_matches(matches)
+        return success, "Added" if success else "Failed", match_id
     
     def update_match(self, match_id, **kw):
         try:
