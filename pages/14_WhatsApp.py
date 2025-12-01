@@ -420,11 +420,10 @@ Hi everyone! 👋
 
 ⏰ *Deadline:* {deadline}
 
-📝 Submit your predictions using your personal link
-(Check your WhatsApp DM for your link)
-
 📱 *Predictions Page:*
 {base_url}
+
+Please proceed to Prediction Page. Enter your nickname and last 4 digits of your phone number.
 
 Good luck to all! 🍀
 
