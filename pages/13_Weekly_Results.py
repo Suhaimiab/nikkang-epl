@@ -53,8 +53,8 @@ def generate_weekly_results_png(table_data, week_matches, week_results, selected
     bronze = '#cd7f32'
     result_bg = '#2c3e50'
     
-    # Title
-    ax.text(0.5, 0.97, f"📊 Gameweek {selected_week} Results", ha='center', va='top', fontsize=14, fontweight='bold', color='#1a1a2e')
+    # Title (no emojis - matplotlib font doesn't support them)
+    ax.text(0.5, 0.97, f"Gameweek {selected_week} Results", ha='center', va='top', fontsize=14, fontweight='bold', color='#1a1a2e')
     ax.text(0.5, 0.93, "Nikkang KK EPL Prediction League", ha='center', va='top', fontsize=9, color='#6c757d')
     
     # Winner banner (if champions provided)
@@ -62,9 +62,9 @@ def generate_weekly_results_png(table_data, week_matches, week_results, selected
     if champions:
         banner_height = 0.05
         if len(champions) == 1:
-            champ_text = f"🏆 CHAMPION: {champions[0]} ({champ_pts} pts, {champ_kk} KK)"
+            champ_text = f"CHAMPION: {champions[0]} ({champ_pts} pts, {champ_kk} KK)"
         else:
-            champ_text = f"🏆 JOINT CHAMPIONS: {' & '.join(champions)} ({champ_pts} pts, {champ_kk} KK)"
+            champ_text = f"JOINT CHAMPIONS: {' & '.join(champions)} ({champ_pts} pts, {champ_kk} KK)"
         
         # Draw gold banner
         banner_y = 0.86
@@ -91,7 +91,7 @@ def generate_weekly_results_png(table_data, week_matches, week_results, selected
     for idx, match in enumerate(week_matches):
         home = get_team_abbrev_func(match.get('home', 'TBC'))
         away = get_team_abbrev_func(match.get('away', 'TBC'))
-        gotw_mark = "⭐" if idx == gotw_index else ""
+        gotw_mark = "*" if idx == gotw_index else ""
         headers.append(f"{home}v{away}{gotw_mark}")
     headers.extend(['PTS', 'KK'])
     
@@ -400,7 +400,7 @@ st.markdown("""
 
 # Logo in sidebar
 if Path("nikkang_logo.png").exists():
-    st.sidebar.image("nikkang_logo.png", use_container_width=True)
+    st.sidebar.image("nikkang_logo.png", width='stretch')
     st.sidebar.markdown("---")
 
 # Initialize data manager
@@ -601,27 +601,24 @@ for p in participants:
         try:
             pred_h = int(pred_home) if pred_home != '-' else -1
             pred_a = int(pred_away) if pred_away != '-' else -1
-            act_h = int(actual_home) if actual_home != '-' else None
-            act_a = int(actual_away) if actual_away != '-' else None
+            act_h = int(actual_home) if actual_home != '-' else -2
+            act_a = int(actual_away) if actual_away != '-' else -2
             
-            # Only calculate points if we have both prediction AND result
-            if act_h is not None and act_a is not None and pred_h >= 0 and pred_a >= 0:
-                if pred_h == act_h and pred_a == act_a:
-                    # Exact score
-                    is_exact = True
-                    points = 10 if is_gotw else 6
-                    row['kk_count'] += 1
-                    if is_gotw:
-                        row['gotw_kk'] = 1
-                else:
-                    # Check correct result
-                    pred_result = 'H' if pred_h > pred_a else ('A' if pred_a > pred_h else 'D')
-                    act_result = 'H' if act_h > act_a else ('A' if act_a > act_h else 'D')
-                    
-                    if pred_result == act_result:
-                        is_correct = True
-                        points = 5 if is_gotw else 3
-            # If no result yet, points stays 0
+            if pred_h == act_h and pred_a == act_a:
+                # Exact score
+                is_exact = True
+                points = 10 if is_gotw else 6
+                row['kk_count'] += 1
+                if is_gotw:
+                    row['gotw_kk'] = 1
+            else:
+                # Check correct result
+                pred_result = 'H' if pred_h > pred_a else ('A' if pred_a > pred_h else 'D')
+                act_result = 'H' if act_h > act_a else ('A' if act_a > act_h else 'D')
+                
+                if pred_result == act_result:
+                    is_correct = True
+                    points = 5 if is_gotw else 3
         except:
             pass
         
@@ -768,19 +765,6 @@ with col_dl1:
             mime="image/png",
             key="download_weekly_png"
         )
-
-with col_dl2:
-    if st.button("🏠 Back to Home", use_container_width=True):
-        st.switch_page("app.py")
-
-with col_dl3:
-    col_nav1, col_nav2 = st.columns(2)
-    with col_nav1:
-        if st.button("⚽ Predictions", use_container_width=True):
-            st.switch_page("pages/3_Predictions.py")
-    with col_nav2:
-        if st.button("🏆 Leaderboard", use_container_width=True):
-            st.switch_page("pages/5_Leaderboard.py")
 
 # Summary stats
 st.markdown("---")
