@@ -115,7 +115,7 @@ else:
         )
     
     # Login button
-    if st.button("🔓 Login", use_container_width=True, type="primary"):
+    if st.button("🔓 Login", width="stretch", type="primary"):
         if not input_nickname or not input_nickname.strip():
             st.error("❌ Please enter your nickname")
             st.stop()
@@ -176,7 +176,7 @@ else:
     
     # Logout button in sidebar
     with st.sidebar:
-        if st.button("🚪 Logout", use_container_width=True):
+        if st.button("🚪 Logout", width="stretch"):
             del st.session_state['logged_in_participant']
             st.rerun()
 
@@ -210,8 +210,17 @@ if not matches:
     st.info(f"No matches scheduled for Week {week} yet. Check back later!")
     st.stop()
 
-# Load existing predictions FOR THIS WEEK ONLY
-existing_predictions = dm.get_participant_predictions(participant_id, week)
+# Add refresh button for mobile sync issues
+col_refresh, col_spacer = st.columns([1, 3])
+with col_refresh:
+    if st.button("🔄 Refresh Data", width="stretch"):
+        # Clear any cached data by creating fresh DataManager instance
+        st.cache_data.clear()
+        st.rerun()
+
+# Force fresh load of predictions (no caching)
+dm_fresh = DataManager()  # Fresh instance to avoid any stale data
+existing_predictions = dm_fresh.get_participant_predictions(participant_id, week)
 
 # Check if predictions actually exist for THIS week (not carried from previous)
 has_predictions_for_week = existing_predictions and len(existing_predictions) > 0 and any(
@@ -222,6 +231,8 @@ st.subheader(f"Match Predictions - Week {week}")
 
 if has_predictions_for_week:
     st.success(f"✅ You have saved predictions for Week {week}")
+    # Show last updated info
+    st.caption(f"📱 Tap 'Refresh Data' if predictions don't appear")
 else:
     st.info(f"📝 Enter your predictions for Week {week} below")
 
@@ -306,7 +317,7 @@ with st.form(f"predictions_form_week_{week}"):
     col1, col2, col3 = st.columns([1, 2, 1])
     
     with col2:
-        submitted = st.form_submit_button("💾 Save Predictions", use_container_width=True)
+        submitted = st.form_submit_button("💾 Save Predictions", width="stretch")
     
     if submitted:
         # Validate all predictions are filled
@@ -340,7 +351,7 @@ st.markdown("---")
 col1, col2 = st.columns(2)
 
 with col1:
-    if st.button("📋 Copy My Prediction Link", use_container_width=True):
+    if st.button("📋 Copy My Prediction Link", width="stretch"):
         # Get participant's nickname for the link
         if active_participant:
             nickname = active_participant.get('display_name') or active_participant.get('name', '')
@@ -356,13 +367,13 @@ with col1:
         # Create URL-friendly nickname
         url_nickname = nickname.lower().replace(' ', '_').replace("'", "").replace("-", "_")
         # Use correct Streamlit Cloud page name (matches filename without .py)
-        link = f"https://nikkang-epl.streamlit.app/3_Predictions?player={url_nickname}"
+        link = f"https://nikkang-epl.streamlit.app?player={url_nickname}"
         
         st.code(link, language=None)
         st.caption(f"Share this link to access predictions as **{nickname}**!")
 
 with col2:
-    if st.button("🏆 View Leaderboard", use_container_width=True):
+    if st.button("🏆 View Leaderboard", width="stretch"):
         st.switch_page("pages/5_Leaderboard.py")
 
 # Show deadline info
