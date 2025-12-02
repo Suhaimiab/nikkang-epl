@@ -305,5 +305,19 @@
     "predictions": {},
     "total_points": 0,
     "team": "Man United"
+  },
+  "51FB2X18": {
+    "id": "51FB2X18",
+    "name": "sync test",
+    "display_name": "sync test",
+    "email": "test@test.com",
+    "phone": "+96898033633",
+    "team": "",
+    "status": "active",
+    "registration_date": "2025-12-02 10:25:24",
+    "link": "?user_id=51FB2X18",
+    "notes": "",
+    "predictions": {},
+    "total_points": 0
   }
 }
