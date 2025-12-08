@@ -71,7 +71,7 @@
   "CZW9R5D7": {
     "id": "CZW9R5D7",
     "name": "Ahmad Shahril Ikram",
-    "display_name": "Bollang",
+    "display_name": "Bollan",
     "email": "ashahikram@gmail.com",
     "phone": "+60123075780",
     "status": "active",
@@ -305,19 +305,5 @@
     "predictions": {},
     "total_points": 0,
     "team": "Man United"
-  },
-  "51FB2X18": {
-    "id": "51FB2X18",
-    "name": "sync test",
-    "display_name": "sync test",
-    "email": "test@test.com",
-    "phone": "+96898033633",
-    "team": "",
-    "status": "active",
-    "registration_date": "2025-12-02 10:25:24",
-    "link": "?user_id=51FB2X18",
-    "notes": "",
-    "predictions": {},
-    "total_points": 0
   }
 }

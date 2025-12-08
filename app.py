@@ -277,7 +277,7 @@ def main():
         - **6 points** for exact score (KK)
         - **3 points** for correct result
         - **GOTW Bonus Bonanza** (10/5)
-        - **4 Stages** throughout the season
+        - **4 Rounds** throughout the season
         - **KK Champions** - Most Kemut Keliling wins!
         """)
     

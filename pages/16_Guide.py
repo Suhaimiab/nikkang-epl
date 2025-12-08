@@ -123,16 +123,16 @@ if guide_type == "👤 Participant Guide":
     st.markdown("### 📅 Season Structure")
     
     st.markdown("""
-    The season is divided into **4 Stages**:
+    The season is divided into **4 Rounds**:
     
     | Stage | Weeks | Description |
     |-------|-------|-------------|
-    | **Stage 1** | Week 1-10 | Opening stage |
-    | **Stage 2** | Week 11-20 | Mid-season stage |
-    | **Stage 3** | Week 21-30 | Second half stage |
-    | **Stage 4** | Week 31-38 | Finale stage (includes Week 38 double points!) |
+    | **Round 1** | Week 1-10 | Opening stage |
+    | **Round 2** | Week 11-20 | Mid-season stage |
+    | **Round 3** | Week 21-30 | Second half stage |
+    | **Round 4** | Week 31-38 | Finale stage (includes Week 38 double points!) |
     
-    **Points carry forward** from previous stages to the next!
+    **Points carry forward** from previous rounds to the next!
     """)
     
     st.markdown("---")
@@ -154,7 +154,7 @@ if guide_type == "👤 Participant Guide":
     st.markdown("""
     **Awards:**
     - 🏆 **Weekly Champion** - Highest points each gameweek
-    - 🏆 **Stage Winner** - Highest points at end of each stage
+    - 🏆 **Round Winner** - Highest points at end of each round
     - 🏆 **Season Champion** - Highest total points at end of season
     - 🎯 **KK Master** - Most exact score predictions
     """)
@@ -199,9 +199,9 @@ if guide_type == "👤 Participant Guide":
     - Download as PNG to share
     
     **Leaderboard Page:**
-    - Season standings with stage breakdown
+    - Season standings with round breakdown
     - Top 3 by points and by KK count
-    - Stage-by-stage performance
+    - Round-by-round performance
     """)
     
     st.markdown("---")
@@ -281,7 +281,7 @@ else:
         ("9️⃣ Fixtures", "Import fixtures from API, set GOTW matches"),
         ("🔟 Results Management", "Import/enter match results, repair tools"),
         ("1️⃣1️⃣ Recalculate Points", "Recalculate all scores from predictions vs results"),
-        ("1️⃣2️⃣ Stage Scores", "Lock stage scores, enter manual adjustments"),
+        ("1️⃣2️⃣ Round Scores", "Lock round scores, enter manual adjustments"),
         ("1️⃣4️⃣ WhatsApp", "Generate WhatsApp messages for reminders/updates"),
         ("1️⃣5️⃣ Repair Results", "Fix mismatched results, clear and re-enter week data"),
     ]
@@ -315,13 +315,13 @@ else:
     
     st.markdown("---")
     
-    # Stage Management
-    st.markdown("### 📊 Stage Management")
+    # Round Management
+    st.markdown("### 📊 Round Management")
     
     st.markdown("""
-    **At End of Each Stage:**
-    1. Go to **Stage Scores** page
-    2. Review calculated scores for the stage
+    **At End of Each Round:**
+    1. Go to **Round Scores** page
+    2. Review calculated scores for the round
     3. Make any manual adjustments if needed
     4. Click **"Save & Lock Stage"** to finalize
     
@@ -345,7 +345,7 @@ else:
     | **Prediction Reminder** | Before gameweek deadline |
     | **Results Update** | After results are entered |
     | **Weekly Standings** | After weekly points calculated |
-    | **Stage Summary** | At end of each stage |
+    | **Stage Summary** | At end of each round |
     """)
     
     st.markdown("---")
@@ -393,7 +393,7 @@ else:
     1. **Always verify** imported data before saving
     2. **Backup** by downloading data periodically
     3. **Run Recalculate** after any results changes
-    4. **Lock stages** promptly after they complete
+    4. **Lock rounds** promptly after they complete
     5. **Send reminders** 24 hours before deadline
     6. **Check Weekly Results** page after entering results to verify accuracy
     """)

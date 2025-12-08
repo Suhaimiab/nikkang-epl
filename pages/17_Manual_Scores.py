@@ -355,7 +355,7 @@ with st.sidebar:
     1. **Enter scores** for weeks 11-13 (or any historical week)
     2. **Points & KK** are stored separately from system-calculated scores
     3. **Leaderboard** will combine:
-       - Stage 1 locked scores
+       - Round 1 locked scores
        - Manual scores (weeks 11-13)
        - System-calculated scores (week 14+)
     """)
@@ -365,5 +365,5 @@ with st.sidebar:
     st.markdown("""
     - Manual scores override system calculations for those weeks
     - Use this for weeks where predictions weren't tracked
-    - Always verify totals before locking stages
+    - Always verify totals before locking rounds
     """)

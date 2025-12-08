@@ -1,6 +1,6 @@
 """
-Stage Scores Management - Admin Page
-Enter manual scores for completed stages (Stage 1)
+Round Scores Management - Admin Page
+Enter manual scores for completed rounds (Round 1)
 """
 
 import streamlit as st
@@ -15,7 +15,7 @@ sys.path.append(str(Path(__file__).parent.parent))
 from utils.data_manager import DataManager
 from utils.auth import check_password
 
-st.set_page_config(page_title="Stage Scores - Nikkang KK", page_icon="📊", layout="wide")
+st.set_page_config(page_title="Round Scores - Nikkang KK", page_icon="📊", layout="wide")
 
 try:
     from utils.branding import inject_custom_css
@@ -32,40 +32,40 @@ if Path("nikkang_logo.png").exists():
 
 st.markdown("""
 <div style="text-align: center; padding: 1.5rem 0;">
-    <h1 style="color: #667eea;">📊 Stage Scores Management</h1>
-    <p style="color: #6c757d;">Enter manual scores for completed stages</p>
+    <h1 style="color: #667eea;">📊 Round Scores Management</h1>
+    <p style="color: #6c757d;">Enter manual scores for completed rounds</p>
 </div>
 """, unsafe_allow_html=True)
 
 dm = DataManager()
 
-# Stage scores file
-STAGE_SCORES_FILE = Path("nikkang_data/stage_scores.json")
+# Round scores file
+ROUND_SCORES_FILE = Path("nikkang_data/round_scores.json")
 
-def load_stage_scores():
+def load_round_scores():
     """Load manual stage scores"""
-    if STAGE_SCORES_FILE.exists():
+    if ROUND_SCORES_FILE.exists():
         try:
-            with open(STAGE_SCORES_FILE, 'r') as f:
+            with open(ROUND_SCORES_FILE, 'r') as f:
                 return json.load(f)
         except:
             pass
     return {
-        "stage_1": {},
-        "stage_2": {},
-        "stage_3": {},
-        "stage_4": {},
-        "stage_1_locked": False,
-        "stage_2_locked": False,
-        "stage_3_locked": False,
-        "stage_4_locked": False
+        "round_1": {},
+        "round_2": {},
+        "round_3": {},
+        "round_4": {},
+        "round_1_locked": False,
+        "round_2_locked": False,
+        "round_3_locked": False,
+        "round_4_locked": False
     }
 
-def save_stage_scores(data):
+def save_round_scores(data):
     """Save manual stage scores"""
     try:
-        STAGE_SCORES_FILE.parent.mkdir(parents=True, exist_ok=True)
-        with open(STAGE_SCORES_FILE, 'w') as f:
+        ROUND_SCORES_FILE.parent.mkdir(parents=True, exist_ok=True)
+        with open(ROUND_SCORES_FILE, 'w') as f:
             json.dump(data, f, indent=2)
         return True
     except Exception as e:
@@ -73,53 +73,53 @@ def save_stage_scores(data):
         return False
 
 # Load current scores
-stage_scores = load_stage_scores()
+round_scores = load_round_scores()
 
-# Stage definitions
-STAGES = {
-    1: {"name": "Stage 1", "weeks": "Week 1-10", "key": "stage_1"},
-    2: {"name": "Stage 2", "weeks": "Week 11-20", "key": "stage_2"},
-    3: {"name": "Stage 3", "weeks": "Week 21-30", "key": "stage_3"},
-    4: {"name": "Stage 4", "weeks": "Week 31-38", "key": "stage_4"},
+# Round definitions
+ROUNDS = {
+    1: {"name": "Round 1", "weeks": "Week 1-10", "key": "round_1"},
+    2: {"name": "Round 2", "weeks": "Week 11-20", "key": "round_2"},
+    3: {"name": "Round 3", "weeks": "Week 21-30", "key": "round_3"},
+    4: {"name": "Round 4", "weeks": "Week 31-38", "key": "round_4"},
 }
 
 st.info("""
 **How it works:**
-- Enter final scores for completed stages (e.g., Stage 1)
-- Lock the stage when confirmed
-- Leaderboard will use manual scores for locked stages
-- Unlocked stages use automated calculation from predictions
+- Enter final scores for completed rounds (e.g., Round 1)
+- Lock the round when confirmed
+- Leaderboard will use manual scores for locked rounds
+- Unlocked rounds use automated calculation from predictions
 """)
 
-# Tabs for each stage
+# Tabs for each round
 tab1, tab2, tab3, tab4, tab5 = st.tabs([
-    "📊 Stage 1 (Wk 1-10)",
-    "📊 Stage 2 (Wk 11-20)",
-    "📊 Stage 3 (Wk 21-30)",
-    "📊 Stage 4 (Wk 31-38)",
+    "📊 Round 1 (Wk 1-10)",
+    "📊 Round 2 (Wk 11-20)",
+    "📊 Round 3 (Wk 21-30)",
+    "📊 Round 4 (Wk 31-38)",
     "📋 Summary"
 ])
 
-def display_stage_entry(stage_num, stage_info):
+def display_round_entry(round_num, round_info):
     """Display entry form for a stage"""
-    stage_key = stage_info['key']
-    is_locked = stage_scores.get(f"{stage_key}_locked", False)
-    current_scores = stage_scores.get(stage_key, {})
+    round_key = round_info['key']
+    is_locked = round_scores.get(f"{round_key}_locked", False)
+    current_scores = round_scores.get(round_key, {})
     
-    st.markdown(f"### {stage_info['name']} ({stage_info['weeks']})")
+    st.markdown(f"### {round_info['name']} ({round_info['weeks']})")
     
     # Lock status
     if is_locked:
-        st.success(f"🔒 **{stage_info['name']} is LOCKED** - Scores are finalized")
+        st.success(f"🔒 **{round_info['name']} is LOCKED** - Scores are finalized")
         
         col1, col2 = st.columns([3, 1])
         with col2:
-            if st.button(f"🔓 Unlock {stage_info['name']}", key=f"unlock_{stage_num}"):
-                stage_scores[f"{stage_key}_locked"] = False
-                save_stage_scores(stage_scores)
+            if st.button(f"🔓 Unlock {round_info['name']}", key=f"unlock_{round_num}"):
+                round_scores[f"{round_key}_locked"] = False
+                save_round_scores(round_scores)
                 st.rerun()
     else:
-        st.warning(f"🔓 **{stage_info['name']} is UNLOCKED** - Using automated calculation")
+        st.warning(f"🔓 **{round_info['name']} is UNLOCKED** - Using automated calculation")
         
         st.markdown("---")
         st.markdown("#### Enter Final Scores")
@@ -131,7 +131,7 @@ def display_stage_entry(stage_num, stage_info):
             return
         
         # Entry form
-        with st.form(f"stage_{stage_num}_form"):
+        with st.form(f"stage_{round_num}_form"):
             st.markdown("Enter **Points** and **KK Count** for each participant:")
             
             entries = {}
@@ -151,7 +151,7 @@ def display_stage_entry(stage_num, stage_info):
                         "Points",
                         min_value=0,
                         value=existing.get('points', 0),
-                        key=f"pts_{stage_num}_{uid}",
+                        key=f"pts_{round_num}_{uid}",
                         label_visibility="collapsed"
                     )
                 
@@ -160,7 +160,7 @@ def display_stage_entry(stage_num, stage_info):
                         "KK",
                         min_value=0,
                         value=existing.get('kk_count', 0),
-                        key=f"kk_{stage_num}_{uid}",
+                        key=f"kk_{round_num}_{uid}",
                         label_visibility="collapsed"
                     )
                 
@@ -177,15 +177,15 @@ def display_stage_entry(stage_num, stage_info):
                 lock_btn = st.form_submit_button("🔒 Save & Lock Stage", use_container_width=True, type="primary")
             
             if save_btn or lock_btn:
-                stage_scores[stage_key] = entries
+                round_scores[round_key] = entries
                 
                 if lock_btn:
-                    stage_scores[f"{stage_key}_locked"] = True
-                    st.success(f"✅ {stage_info['name']} scores saved and LOCKED!")
+                    round_scores[f"{round_key}_locked"] = True
+                    st.success(f"✅ {round_info['name']} scores saved and LOCKED!")
                 else:
-                    st.success(f"✅ {stage_info['name']} scores saved (not locked)")
+                    st.success(f"✅ {round_info['name']} scores saved (not locked)")
                 
-                save_stage_scores(stage_scores)
+                save_round_scores(round_scores)
                 st.rerun()
     
     # Display current scores
@@ -211,7 +211,7 @@ def display_stage_entry(stage_num, stage_info):
     st.markdown("---")
     st.markdown("#### 🔄 Import from Automated Calculation")
     
-    if st.button(f"📥 Import calculated scores for {stage_info['name']}", key=f"import_{stage_num}"):
+    if st.button(f"📥 Import calculated scores for {round_info['name']}", key=f"import_{round_num}"):
         # Calculate scores from predictions
         participants = dm.get_all_participants()
         predictions = dm.load_predictions()
@@ -219,11 +219,11 @@ def display_stage_entry(stage_num, stage_info):
         all_matches = dm.get_all_matches()
         
         # Get week range for this stage
-        if stage_num == 1:
+        if round_num == 1:
             weeks = list(range(1, 11))
-        elif stage_num == 2:
+        elif round_num == 2:
             weeks = list(range(11, 21))
-        elif stage_num == 3:
+        elif round_num == 3:
             weeks = list(range(21, 31))
         else:
             weeks = list(range(31, 39))
@@ -266,25 +266,25 @@ def display_stage_entry(stage_num, stage_info):
             
             imported[uid] = {'points': total_pts, 'kk_count': kk_count, 'name': name}
         
-        stage_scores[stage_key] = imported
-        save_stage_scores(stage_scores)
+        round_scores[round_key] = imported
+        save_round_scores(round_scores)
         st.success(f"✅ Imported {len(imported)} participant scores!")
         st.rerun()
 
 with tab1:
-    display_stage_entry(1, STAGES[1])
+    display_round_entry(1, ROUNDS[1])
 
 with tab2:
-    display_stage_entry(2, STAGES[2])
+    display_round_entry(2, ROUNDS[2])
 
 with tab3:
-    display_stage_entry(3, STAGES[3])
+    display_round_entry(3, ROUNDS[3])
 
 with tab4:
-    display_stage_entry(4, STAGES[4])
+    display_round_entry(4, ROUNDS[4])
 
 with tab5:
-    st.markdown("### 📋 All Stages Summary")
+    st.markdown("### 📋 All Rounds Summary")
     
     participants = dm.get_all_participants()
     
@@ -302,18 +302,18 @@ with tab5:
             total_pts = 0
             total_kk = 0
             
-            for stage_num, stage_info in STAGES.items():
-                stage_key = stage_info['key']
-                is_locked = stage_scores.get(f"{stage_key}_locked", False)
-                scores = stage_scores.get(stage_key, {}).get(uid, {})
+            for round_num, round_info in STAGES.items():
+                round_key = round_info['key']
+                is_locked = round_scores.get(f"{round_key}_locked", False)
+                scores = round_scores.get(round_key, {}).get(uid, {})
                 
                 pts = scores.get('points', 0)
                 kk = scores.get('kk_count', 0)
                 
                 status = "🔒" if is_locked else "🔓"
-                row[f"S{stage_num} Pts"] = pts
-                row[f"S{stage_num} KK"] = kk
-                row[f"S{stage_num}"] = f"{pts} ({status})"
+                row[f"S{round_num} Pts"] = pts
+                row[f"S{round_num} KK"] = kk
+                row[f"S{round_num}"] = f"{pts} ({status})"
                 
                 total_pts += pts
                 total_kk += kk
@@ -334,16 +334,16 @@ with tab5:
         st.markdown("#### Lock Status")
         
         cols = st.columns(4)
-        for i, (stage_num, stage_info) in enumerate(STAGES.items()):
-            stage_key = stage_info['key']
-            is_locked = stage_scores.get(f"{stage_key}_locked", False)
+        for i, (round_num, round_info) in enumerate(STAGES.items()):
+            round_key = round_info['key']
+            is_locked = round_scores.get(f"{round_key}_locked", False)
             
             with cols[i]:
                 if is_locked:
-                    st.success(f"🔒 {stage_info['name']}: LOCKED")
+                    st.success(f"🔒 {round_info['name']}: LOCKED")
                 else:
-                    st.warning(f"🔓 {stage_info['name']}: Auto")
+                    st.warning(f"🔓 {round_info['name']}: Auto")
 
 # Footer
 st.markdown("---")
-st.caption("Nikkang KK EPL Prediction League - Stage Scores Management")
+st.caption("Nikkang KK EPL Prediction League - Round Scores Management")

@@ -189,7 +189,7 @@ Thanks for joining our Premier League prediction competition!
 • Predict 10 matches each week
 • Choose your Game of the Week
 • Earn points for exact scores & correct results
-• Compete across 4 stages
+• Compete across 4 rounds
 
 Good luck this season! ⚽
 
@@ -593,11 +593,11 @@ Thanks for joining our Premier League prediction competition!
 • Choose your Game of the Week (double points!)
 • Exact Score (KK) = 6 pts (10 for GOTW)
 • Correct Result = 3 pts (5 for GOTW)
-• Competition runs in 4 stages
+• Competition runs in 4 rounds
 
 🏆 *What You Can Win:*
 • Weekly Winner recognition
-• Stage Champion titles
+• Round Champion titles
 • Season Grand Champion
 • KK Master (Most exact scores)
 
@@ -648,11 +648,11 @@ Thanks for joining our Premier League prediction competition!
 • Choose your Game of the Week (double points!)
 • Exact Score (KK) = 6 pts (10 for GOTW)
 • Correct Result = 3 pts (5 for GOTW)
-• Competition runs in 4 stages
+• Competition runs in 4 rounds
 
 🏆 *What You Can Win:*
 • Weekly Winner recognition
-• Stage Champion titles
+• Round Champion titles
 • Season Grand Champion
 • KK Master (Most exact scores)
 
@@ -694,19 +694,19 @@ with tab3:
     
     # Determine which stage this week belongs to
     if results_week <= 10:
-        current_stage = 1
-        stage_weeks = "1-10"
+        current_round = 1
+        round_weeks = "1-10"
     elif results_week <= 20:
-        current_stage = 2
-        stage_weeks = "11-20"
+        current_round = 2
+        round_weeks = "11-20"
     elif results_week <= 30:
-        current_stage = 3
-        stage_weeks = "21-30"
+        current_round = 3
+        round_weeks = "21-30"
     else:
-        current_stage = 4
-        stage_weeks = "31-38"
+        current_round = 4
+        round_weeks = "31-38"
     
-    st.info(f"Week {results_week} is in **Stage {current_stage}** (Weeks {stage_weeks})")
+    st.info(f"Week {results_week} is in **Stage {current_round}** (Weeks {round_weeks})")
     
     # Send option: Individual or Group
     st.markdown("#### 📤 Send To:")
@@ -720,7 +720,7 @@ with tab3:
 
 Hi everyone! 👋
 
-The results for Week {results_week} (Stage {current_stage}) are in! 🎉
+The results for Week {results_week} (Stage {current_round}) are in! 🎉
 
 Check your personal DM for your detailed breakdown!
 
@@ -762,21 +762,21 @@ _Nikkang KK Admin Team_"""
                         import json
                         from pathlib import Path
                         
-                        score_file = Path("nikkang_data/stage_scores.json")
-                        stage_scores = {}
+                        score_file = Path("nikkang_data/round_scores.json")
+                        round_scores = {}
                         if score_file.exists():
                             try:
                                 with open(score_file, 'r') as f:
-                                    stage_scores = json.load(f)
+                                    round_scores = json.load(f)
                             except:
                                 pass
                         
-                        # Define stages
-                        STAGES = {
-                            1: {"weeks": list(range(1, 11)), "key": "stage_1"},
-                            2: {"weeks": list(range(11, 21)), "key": "stage_2"},
-                            3: {"weeks": list(range(21, 31)), "key": "stage_3"},
-                            4: {"weeks": list(range(31, 39)), "key": "stage_4"},
+                        # Define rounds
+                        ROUNDS = {
+                            1: {"weeks": list(range(1, 11)), "key": "round_1"},
+                            2: {"weeks": list(range(11, 21)), "key": "round_2"},
+                            3: {"weeks": list(range(21, 31)), "key": "round_3"},
+                            4: {"weeks": list(range(31, 39)), "key": "round_4"},
                         }
                         
                         notifier = WhatsAppNotifier(method='url')
@@ -821,16 +821,16 @@ _Nikkang KK Admin Team_"""
                             # Calculate stage and season totals
                             season_points = 0
                             season_kk = 0
-                            stage_points = 0
-                            stage_kk = 0
+                            round_points = 0
+                            round_kk = 0
                         
-                            for stage_num in [1, 2, 3, 4]:
-                                stage_info = STAGES[stage_num]
-                                stage_key = stage_info['key']
-                                is_locked = stage_scores.get(f"{stage_key}_locked", False)
+                            for round_num in [1, 2, 3, 4]:
+                                round_info = ROUNDS[round_num]
+                                round_key = round_info['key']
+                                is_locked = round_scores.get(f"{round_key}_locked", False)
                             
                                 if is_locked:
-                                    manual = stage_scores.get(stage_key, {}).get(p_id, {})
+                                    manual = round_scores.get(round_key, {}).get(p_id, {})
                                     pts = manual.get('points', 0)
                                     kk = manual.get('kk_count', 0)
                                 else:
@@ -838,7 +838,7 @@ _Nikkang KK Admin Team_"""
                                     kk = 0
                                     for match in all_matches:
                                         week = match.get('week', 0)
-                                        if week in stage_info['weeks']:
+                                        if week in round_info['weeks']:
                                             mid = match.get('id', '')
                                             if mid in results and mid in user_preds:
                                                 result = results[mid]
@@ -857,9 +857,9 @@ _Nikkang KK Admin Team_"""
                                 season_points += pts
                                 season_kk += kk
                             
-                                if stage_num == current_stage:
-                                    stage_points = pts
-                                    stage_kk = kk
+                                if round_num == current_round:
+                                    round_points = pts
+                                    round_kk = kk
                         
                             # Get ranking
                             all_scores = []
@@ -867,11 +867,11 @@ _Nikkang KK Admin Team_"""
                                 pid = p.get('id', '')
                                 total = 0
                                 for sn in [1, 2, 3, 4]:
-                                    si = STAGES[sn]
+                                    si = ROUNDS[sn]
                                     sk = si['key']
-                                    isl = stage_scores.get(f"{sk}_locked", False)
+                                    isl = round_scores.get(f"{sk}_locked", False)
                                     if isl:
-                                        m = stage_scores.get(sk, {}).get(pid, {})
+                                        m = round_scores.get(sk, {}).get(pid, {})
                                         total += m.get('points', 0)
                                     else:
                                         for m in all_matches:
@@ -907,11 +907,11 @@ _Nikkang KK Admin Team_"""
     ✅ Correct Results: {weekly_correct}/{weekly_matches}
 
     ━━━━━━━━━━━━━━━━━━━━━━
-    📊 *STAGE {current_stage} PROGRESS*
+    📊 *STAGE {current_round} PROGRESS*
     ━━━━━━━━━━━━━━━━━━━━━━
-    (Weeks {stage_weeks})
-    🏆 Stage Points: {stage_points}
-    🎯 Stage KK: {stage_kk}
+    (Weeks {round_weeks})
+    🏆 Round Points: {round_points}
+    🎯 Round KK: {round_kk}
 
     ━━━━━━━━━━━━━━━━━━━━━━
     🏅 *SEASON TOTALS*
@@ -939,7 +939,7 @@ _Nikkang KK Admin Team_"""
                                 'Phone': participant.get('phone', 'Not provided'),
                                 'Week Pts': weekly_points,
                                 'Week KK': weekly_kk,
-                                'Stage Pts': stage_points,
+                                'Round Pts': round_points,
                                 'Season Pts': season_points,
                                 'Rank': rank,
                                 'WhatsApp Link': url
@@ -974,7 +974,7 @@ _Nikkang KK Admin Team_"""
 
 Week {results_week} Points: {sample['Week Pts']}
 Week {results_week} KK: {sample['Week KK']}
-Stage {current_stage} Points: {sample['Stage Pts']}
+Stage {current_round} Points: {sample['Round Pts']}
 Season Points: {sample['Season Pts']}
 Current Rank: #{sample['Rank']}""", language=None)
                     

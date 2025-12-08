@@ -83,8 +83,8 @@ def display_sidebar_navigation():
     if st.sidebar.button("🔒 Pred. Lock", use_container_width=True, key="nav_lock"):
         st.switch_page("pages/11_prediction_management.py")
     
-    if st.sidebar.button("📊 Stage Scores", use_container_width=True, key="nav_stages"):
-        st.switch_page("pages/14_stage_scores.py")
+    if st.sidebar.button("📊 Round Scores", use_container_width=True, key="nav_rounds"):
+        st.switch_page("pages/14_round_scores.py")
     
     if st.sidebar.button("🌐 API", use_container_width=True, key="nav_api"):
         st.switch_page("pages/10_api_integration.py")

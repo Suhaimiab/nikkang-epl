@@ -1,7 +1,7 @@
 """
-Leaderboard Page - With Stages
-Stage 1: Manual (locked) | Stage 2-4: Automated
-Stage 2 can include manual scores for weeks 11-13
+Leaderboard Page - With Rounds
+Round 1: Manual (locked) | Round 2-4: Automated
+Round 2 can include manual scores for weeks 11-13
 Shows points, KK count (Kemut Keliling), and season tally
 """
 
@@ -91,7 +91,7 @@ def generate_leaderboard_png(df, title="Leaderboard", subtitle=""):
             x = left_margin + j * col_width
             
             # Special coloring for specific columns
-            if col in ['Total', 'PTS', 'Stage Pts', 'Running Total'] and i > 2:
+            if col in ['Total', 'PTS', 'Round Pts', 'Running Total'] and i > 2:
                 cell_bg = pts_col
                 cell_text = 'white'
             elif col == 'KK' and i > 2:
@@ -107,7 +107,7 @@ def generate_leaderboard_png(df, title="Leaderboard", subtitle=""):
             ax.add_patch(rect)
             
             # Cell text
-            fontweight = 'bold' if col in ['Rank', 'Name', 'Total', 'KK', 'Stage Pts'] else 'normal'
+            fontweight = 'bold' if col in ['Rank', 'Name', 'Total', 'KK', 'Round Pts'] else 'normal'
             ax.text(x + col_width/2, y + row_height/2, str(val), 
                    ha='center', va='center', fontsize=8, fontweight=fontweight, color=cell_text)
     
@@ -138,7 +138,7 @@ except:
 # Custom CSS
 st.markdown("""
 <style>
-    .stage-card {
+    .round-card {
         background: white;
         border-radius: 12px;
         padding: 1.5rem;
@@ -150,8 +150,8 @@ st.markdown("""
     .stage-2 { border-top: 4px solid #28a745; }
     .stage-3 { border-top: 4px solid #ffc107; }
     .stage-4 { border-top: 4px solid #dc3545; }
-    .stage-locked { background: #f8f9fa; }
-    .stage-active { background: #e8f5e9; }
+    .round-locked { background: #f8f9fa; }
+    .round-active { background: #e8f5e9; }
     .rank-1 { background: linear-gradient(135deg, #ffd700 0%, #ffec8b 100%); }
     .rank-2 { background: linear-gradient(135deg, #c0c0c0 0%, #e8e8e8 100%); }
     .rank-3 { background: linear-gradient(135deg, #cd7f32 0%, #daa06d 100%); }
@@ -171,7 +171,7 @@ st.markdown("""
         font-weight: bold;
         font-size: 0.85rem;
     }
-    .current-stage {
+    .current-round {
         border: 3px solid #28a745;
         animation: pulse 2s infinite;
     }
@@ -196,33 +196,33 @@ st.markdown("""
 
 dm = DataManager()
 
-STAGE_SCORES_FILE = Path("nikkang_data/stage_scores.json")
+ROUND_SCORES_FILE = Path("nikkang_data/round_scores.json")
 
-def load_stage_scores():
-    if STAGE_SCORES_FILE.exists():
+def load_round_scores():
+    if ROUND_SCORES_FILE.exists():
         try:
-            with open(STAGE_SCORES_FILE, 'r') as f:
+            with open(ROUND_SCORES_FILE, 'r') as f:
                 return json.load(f)
         except:
             pass
     return {}
 
-stage_scores = load_stage_scores()
+round_scores = load_round_scores()
 
-STAGES = {
-    1: {"name": "Stage 1", "weeks": list(range(1, 11)), "label": "Week 1-10", "color": "#667eea", "key": "stage_1"},
-    2: {"name": "Stage 2", "weeks": list(range(11, 21)), "label": "Week 11-20", "color": "#28a745", "key": "stage_2"},
-    3: {"name": "Stage 3", "weeks": list(range(21, 31)), "label": "Week 21-30", "color": "#ffc107", "key": "stage_3"},
-    4: {"name": "Stage 4", "weeks": list(range(31, 39)), "label": "Week 31-38", "color": "#dc3545", "key": "stage_4"},
+ROUNDS = {
+    1: {"name": "Round 1", "weeks": list(range(1, 11)), "label": "Week 1-10", "color": "#667eea", "key": "round_1"},
+    2: {"name": "Round 2", "weeks": list(range(11, 21)), "label": "Week 11-20", "color": "#28a745", "key": "round_2"},
+    3: {"name": "Round 3", "weeks": list(range(21, 31)), "label": "Week 21-30", "color": "#ffc107", "key": "round_3"},
+    4: {"name": "Round 4", "weeks": list(range(31, 39)), "label": "Week 31-38", "color": "#dc3545", "key": "round_4"},
 }
 
-def get_stage_scores(participant_id, stage_num):
-    stage_info = STAGES[stage_num]
-    stage_key = stage_info['key']
-    is_locked = stage_scores.get(f"{stage_key}_locked", False)
+def get_round_scores(participant_id, round_num):
+    round_info = ROUNDS[round_num]
+    round_key = round_info['key']
+    is_locked = round_scores.get(f"{round_key}_locked", False)
     
     if is_locked:
-        manual = stage_scores.get(stage_key, {}).get(participant_id, {})
+        manual = round_scores.get(round_key, {}).get(participant_id, {})
         return {'points': manual.get('points', 0), 'kk_count': manual.get('kk_count', 0), 'source': 'manual'}
     
     # Load data - YOUR FORMAT: 
@@ -240,7 +240,7 @@ def get_stage_scores(participant_id, stage_num):
     kk_count = 0
     
     # Iterate through weeks in this stage
-    for week in stage_info['weeks']:
+    for week in round_info['weeks']:
         week_str = str(week)
         
         # =================================================================
@@ -305,20 +305,20 @@ def get_stage_scores(participant_id, stage_num):
     
     return {'points': total_points, 'kk_count': kk_count, 'source': 'auto'}
 
-def get_current_stage():
+def get_current_round():
     """
     Automatically determine current stage based on:
-    1. Locked stages (from admin)
+    1. Locked rounds (from admin)
     2. Matches with results (fallback)
     """
-    # Check locked stages first
-    if stage_scores.get("stage_4_locked", False):
+    # Check locked rounds first
+    if round_scores.get("round_4_locked", False):
         return 5  # Season complete
-    elif stage_scores.get("stage_3_locked", False):
+    elif round_scores.get("round_3_locked", False):
         return 4
-    elif stage_scores.get("stage_2_locked", False):
+    elif round_scores.get("round_2_locked", False):
         return 3
-    elif stage_scores.get("stage_1_locked", False):
+    elif round_scores.get("round_1_locked", False):
         return 2
     
     # Fallback: Detect based on match results
@@ -344,39 +344,39 @@ def get_current_stage():
         elif max_week_with_results >= 1:
             return 1
         else:
-            return 1  # No results yet, start at Stage 1
+            return 1  # No results yet, start at Round 1
     except:
         return 1
 
-def get_completed_stages():
+def get_completed_rounds():
     """
-    Determine which stages are completed based on:
+    Determine which rounds are completed based on:
     1. Locked status (admin confirmed)
     2. All matches in stage have results (auto-detect)
     """
     completed = set()
     
-    # Check locked stages
-    for stage_num in [1, 2, 3, 4]:
-        if stage_scores.get(f"stage_{stage_num}_locked", False):
-            completed.add(stage_num)
+    # Check locked rounds
+    for round_num in [1, 2, 3, 4]:
+        if round_scores.get(f"stage_{round_num}_locked", False):
+            completed.add(round_num)
     
     # Auto-detect based on results (if all matches in a stage have results)
     try:
         results = dm.load_results()
         all_matches = dm.get_all_matches()
         
-        for stage_num, info in STAGES.items():
-            if stage_num in completed:
+        for round_num, info in STAGES.items():
+            if round_num in completed:
                 continue
             
-            stage_weeks = info['weeks']
-            stage_matches = [m for m in all_matches if m.get('week', 0) in stage_weeks]
+            round_weeks = info['weeks']
+            round_matches = [m for m in all_matches if m.get('week', 0) in round_weeks]
             
-            if stage_matches:  # Only check if there are matches
-                all_have_results = all(m.get('id') in results for m in stage_matches)
+            if round_matches:  # Only check if there are matches
+                all_have_results = all(m.get('id') in results for m in round_matches)
                 if all_have_results:
-                    completed.add(stage_num)
+                    completed.add(round_num)
     except:
         pass
     
@@ -388,7 +388,7 @@ def get_full_leaderboard():
     
     for p in participants:
         uid = p.get('id', '')
-        s1, s2, s3, s4 = get_stage_scores(uid, 1), get_stage_scores(uid, 2), get_stage_scores(uid, 3), get_stage_scores(uid, 4)
+        s1, s2, s3, s4 = get_round_scores(uid, 1), get_round_scores(uid, 2), get_round_scores(uid, 3), get_round_scores(uid, 4)
         
         leaderboard.append({
             'id': uid, 'name': p.get('display_name') or p.get('name', 'Unknown'), 'team': p.get('team', '-'),
@@ -415,17 +415,17 @@ def get_full_leaderboard():
     
     return leaderboard
 
-current_stage = get_current_stage()
-completed_stages = get_completed_stages()
+current_round = get_current_round()
+completed_rounds = get_completed_rounds()
 
-# Stage cards
-st.markdown("### 📊 Season Stages")
+# Round cards
+st.markdown("### 📊 Season Rounds")
 cols = st.columns(4)
 
-for i, (stage_num, info) in enumerate(STAGES.items()):
+for i, (round_num, info) in enumerate(STAGES.items()):
     with cols[i]:
-        is_completed = stage_num in completed_stages
-        is_current = stage_num == current_stage and not is_completed
+        is_completed = round_num in completed_rounds
+        is_current = round_num == current_round and not is_completed
         
         if is_completed:
             status = "✅ COMPLETED"
@@ -438,7 +438,7 @@ for i, (stage_num, info) in enumerate(STAGES.items()):
             extra = ""
         
         st.markdown(f"""
-        <div class="stage-card stage-{stage_num} {extra}">
+        <div class="round-card stage-{round_num} {extra}">
             <div style="font-size: 1.2rem; font-weight: bold;">{info['name']}</div>
             <div style="color: #6c757d;">{info['label']}</div>
             <div style="margin-top: 0.5rem; color: {info['color']};">{status}</div>
@@ -448,7 +448,7 @@ for i, (stage_num, info) in enumerate(STAGES.items()):
 st.markdown("---")
 
 # Tabs
-tab1, tab2, tab3, tab4, tab5 = st.tabs(["🏆 Season Total", "📊 Stage 1", "📊 Stage 2", "📊 Stage 3", "📊 Stage 4"])
+tab1, tab2, tab3, tab4, tab5 = st.tabs(["🏆 Season Total", "📊 Round 1", "📊 Round 2", "📊 Round 3", "📊 Round 4"])
 
 with tab1:
     st.markdown("### 🏆 Season Leaderboard")
@@ -531,10 +531,10 @@ with tab1:
             st.markdown("---")
         
         # Table
-        s1_i = "🔒" if stage_scores.get('stage_1_locked') else "🔄"
-        s2_i = "🔒" if stage_scores.get('stage_2_locked') else "🔄"
-        s3_i = "🔒" if stage_scores.get('stage_3_locked') else "🔄"
-        s4_i = "🔒" if stage_scores.get('stage_4_locked') else "🔄"
+        s1_i = "🔒" if round_scores.get('round_1_locked') else "🔄"
+        s2_i = "🔒" if round_scores.get('round_2_locked') else "🔄"
+        s3_i = "🔒" if round_scores.get('round_3_locked') else "🔄"
+        s4_i = "🔒" if round_scores.get('round_4_locked') else "🔄"
         
         df = pd.DataFrame([{
             'Rank': p['rank'], 'Name': p['name'], 'Team': p['team'],
@@ -564,19 +564,19 @@ with tab1:
                 key="download_season_png"
             )
 
-def display_stage_tab(stage_num, info):
-    is_locked = stage_scores.get(f"{info['key']}_locked", False)
+def display_round_tab(round_num, info):
+    is_locked = round_scores.get(f"{info['key']}_locked", False)
     st.success(f"🔒 **{info['name']} COMPLETED**" if is_locked else f"🔄 **{info['name']} IN PROGRESS**")
     st.markdown(f"### {info['name']} ({info['label']})")
     
     lb = get_full_leaderboard()
-    stage_lb = sorted(lb, key=lambda x: (-x[f's{stage_num}_pts'], -x[f's{stage_num}_kk']))
+    stage_lb = sorted(lb, key=lambda x: (-x[f's{round_num}_pts'], -x[f's{round_num}_kk']))
     
     # Assign ranks - same rank for tied points AND KK
     prev_pts, prev_kk, prev_rank = None, None, 0
     for i, e in enumerate(stage_lb, 1):
-        curr_pts = e[f's{stage_num}_pts']
-        curr_kk = e[f's{stage_num}_kk']
+        curr_pts = e[f's{round_num}_pts']
+        curr_kk = e[f's{round_num}_kk']
         if curr_pts == prev_pts and curr_kk == prev_kk:
             e['stage_rank'] = prev_rank  # Joint position
         else:
@@ -585,13 +585,13 @@ def display_stage_tab(stage_num, info):
         prev_pts = curr_pts
         prev_kk = curr_kk
     
-    # Top 3 - find stage winner(s)
-    with_pts = [p for p in stage_lb if p[f's{stage_num}_pts'] > 0]
+    # Top 3 - find round winner(s)
+    with_pts = [p for p in stage_lb if p[f's{round_num}_pts'] > 0]
     if with_pts:
         # Find winner(s) - joint winners if same points AND KK
-        max_pts = with_pts[0][f's{stage_num}_pts']
-        max_kk = with_pts[0][f's{stage_num}_kk']
-        winners = [p for p in with_pts if p[f's{stage_num}_pts'] == max_pts and p[f's{stage_num}_kk'] == max_kk]
+        max_pts = with_pts[0][f's{round_num}_pts']
+        max_kk = with_pts[0][f's{round_num}_kk']
+        winners = [p for p in with_pts if p[f's{round_num}_pts'] == max_pts and p[f's{round_num}_kk'] == max_kk]
         
         if len(winners) > 1:
             winner_names = ", ".join([w['name'] for w in winners])
@@ -601,7 +601,7 @@ def display_stage_tab(stage_num, info):
             </div>
             """, unsafe_allow_html=True)
         
-        st.markdown("#### 🏆 Stage Leaders")
+        st.markdown("#### 🏆 Round Leaders")
         top3 = with_pts[:min(3, len(with_pts))]
         cols = st.columns(len(top3))
         for i, p in enumerate(top3):
@@ -613,8 +613,8 @@ def display_stage_tab(stage_num, info):
                 <div class="leader-card {rank_class}">
                     <div style="font-size: 1.5rem;">{medal}</div>
                     <div style="font-weight: bold;">{p['name']}</div>
-                    <div style="font-size: 1.3rem; font-weight: bold;">{p[f's{stage_num}_pts']} pts</div>
-                    <div class="kk-badge">KK: {p[f's{stage_num}_kk']}</div>
+                    <div style="font-size: 1.3rem; font-weight: bold;">{p[f's{round_num}_pts']} pts</div>
+                    <div class="kk-badge">KK: {p[f's{round_num}_kk']}</div>
                 </div>
                 """, unsafe_allow_html=True)
         st.markdown("---")
@@ -622,11 +622,11 @@ def display_stage_tab(stage_num, info):
     # Table with carry-forward
     data = []
     for p in stage_lb:
-        carry = sum(p[f's{s}_pts'] for s in range(1, stage_num) if stage_scores.get(f"stage_{s}_locked"))
-        row = {'Rank': p['stage_rank'], 'Name': p['name'], 'Stage Pts': p[f's{stage_num}_pts'], 'KK': p[f's{stage_num}_kk']}
-        if stage_num > 1:
+        carry = sum(p[f's{s}_pts'] for s in range(1, round_num) if round_scores.get(f"stage_{s}_locked"))
+        row = {'Rank': p['stage_rank'], 'Name': p['name'], 'Round Pts': p[f's{round_num}_pts'], 'KK': p[f's{round_num}_kk']}
+        if round_num > 1:
             row['Carry Forward'] = carry
-            row['Running Total'] = carry + p[f's{stage_num}_pts']
+            row['Running Total'] = carry + p[f's{round_num}_pts']
         data.append(row)
     
     stage_df = pd.DataFrame(data)
@@ -645,13 +645,13 @@ def display_stage_tab(stage_num, info):
         )
 
 with tab2:
-    display_stage_tab(1, STAGES[1])
+    display_round_tab(1, ROUNDS[1])
 with tab3:
-    display_stage_tab(2, STAGES[2])
+    display_round_tab(2, ROUNDS[2])
 with tab4:
-    display_stage_tab(3, STAGES[3])
+    display_round_tab(3, ROUNDS[3])
 with tab5:
-    display_stage_tab(4, STAGES[4])
+    display_round_tab(4, ROUNDS[4])
 
 # Sidebar
 st.sidebar.markdown("---")

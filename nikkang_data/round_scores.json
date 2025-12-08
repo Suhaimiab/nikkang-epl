@@ -1,5 +1,5 @@
 {
-  "stage_1": {
+  "round_1": {
     "Y8PX0JE4": {
       "points": 175,
       "kk_count": 11,
@@ -111,7 +111,7 @@
       "name": "Azeman Jusoh"
     }
   },
-  "stage_2": {
+  "round_2": {
     "Y8PX0JE4": {
       "points": 0,
       "kk_count": 0,
@@ -223,10 +223,10 @@
       "name": "Azeman Jusoh"
     }
   },
-  "stage_3": {},
-  "stage_4": {},
-  "stage_1_locked": true,
-  "stage_2_locked": false,
-  "stage_3_locked": false,
-  "stage_4_locked": false
+  "round_3": {},
+  "round_4": {},
+  "round_1_locked": true,
+  "round_2_locked": false,
+  "round_3_locked": false,
+  "round_4_locked": false
 }

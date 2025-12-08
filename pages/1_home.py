@@ -1,6 +1,6 @@
 """
 Nikkang KK EPL Prediction Competition - Home Page
-Enhanced with latest season info, current gameweek, and stage breakdown
+Enhanced with latest season info, current gameweek, and round breakdown
 """
 
 import streamlit as st
@@ -86,7 +86,7 @@ st.markdown("""
         box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
     }
     
-    .stage-progress {
+    .round-progress {
         background: white;
         border-radius: 10px;
         padding: 1rem;
@@ -94,7 +94,7 @@ st.markdown("""
         box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
     
-    .stage-badge {
+    .round-badge {
         display: inline-block;
         padding: 0.25rem 0.75rem;
         border-radius: 20px;
@@ -102,19 +102,19 @@ st.markdown("""
         font-size: 0.85rem;
         margin: 0.25rem;
     }
-    .stage-locked { background: #d4edda; color: #155724; }
+    .round-locked { background: #d4edda; color: #155724; }
     .stage-current { background: #fff3cd; color: #856404; }
-    .stage-pending { background: #e9ecef; color: #6c757d; }
+    .round-pending { background: #e9ecef; color: #6c757d; }
 </style>
 """, unsafe_allow_html=True)
 
-# Stage scores file
-STAGE_SCORES_FILE = Path("nikkang_data/stage_scores.json")
+# Round scores file
+ROUND_SCORES_FILE = Path("nikkang_data/round_scores.json")
 
-def load_stage_scores():
-    if STAGE_SCORES_FILE.exists():
+def load_round_scores():
+    if ROUND_SCORES_FILE.exists():
         try:
-            with open(STAGE_SCORES_FILE, 'r') as f:
+            with open(ROUND_SCORES_FILE, 'r') as f:
                 return json.load(f)
         except:
             pass
@@ -238,13 +238,13 @@ def get_leaderboard_data():
         from utils.data_manager import DataManager
         dm = DataManager()
         
-        stage_scores = load_stage_scores()
+        round_scores = load_round_scores()
         participants = dm.get_all_participants()
         predictions = dm.load_predictions()
         results = dm.load_results()
         matches = dm.load_matches()
         
-        STAGES = {
+        ROUNDS = {
             1: list(range(1, 11)),
             2: list(range(11, 21)),
             3: list(range(21, 31)),
@@ -262,27 +262,27 @@ def get_leaderboard_data():
             total_kk = 0
             correct_results = 0
             weeks_played = set()
-            stage_pts = {1: 0, 2: 0, 3: 0, 4: 0}
-            stage_kk = {1: 0, 2: 0, 3: 0, 4: 0}
+            round_pts = {1: 0, 2: 0, 3: 0, 4: 0}
+            round_kk = {1: 0, 2: 0, 3: 0, 4: 0}
             
-            for stage_num in [1, 2, 3, 4]:
-                stage_key = f"stage_{stage_num}"
-                is_locked = stage_scores.get(f"{stage_key}_locked", False)
+            for round_num in [1, 2, 3, 4]:
+                round_key = f"stage_{round_num}"
+                is_locked = round_scores.get(f"{round_key}_locked", False)
                 
                 if is_locked:
                     # Use manual scores
-                    manual = stage_scores.get(stage_key, {}).get(uid, {})
+                    manual = round_scores.get(round_key, {}).get(uid, {})
                     pts = manual.get('points', 0)
                     kk = manual.get('kk_count', 0)
                     total_pts += pts
                     total_kk += kk
-                    stage_pts[stage_num] = pts
-                    stage_kk[stage_num] = kk
+                    round_pts[round_num] = pts
+                    round_kk[round_num] = kk
                 else:
                     # Calculate from predictions
-                    stage_weeks = STAGES[stage_num]
+                    round_weeks = ROUNDS[round_num]
                     
-                    for week in stage_weeks:
+                    for week in round_weeks:
                         week_str = str(week)
                         week_fixtures = matches.get(week_str, [])
                         week_results = results.get(week_str, [])
@@ -320,8 +320,8 @@ def get_leaderboard_data():
                                 pts = 10 if bonus else 6
                                 total_pts += pts
                                 total_kk += 1
-                                stage_pts[stage_num] += pts
-                                stage_kk[stage_num] += 1
+                                round_pts[round_num] += pts
+                                round_kk[round_num] += 1
                             else:
                                 # Check correct result
                                 pred_outcome = 'H' if pred_home > pred_away else ('A' if pred_away > pred_home else 'D')
@@ -330,7 +330,7 @@ def get_leaderboard_data():
                                 if pred_outcome == res_outcome:
                                     pts = 5 if bonus else 3
                                     total_pts += pts
-                                    stage_pts[stage_num] += pts
+                                    round_pts[round_num] += pts
                                     correct_results += 1
             
             leaderboard.append({
@@ -341,10 +341,10 @@ def get_leaderboard_data():
                 'kk_count': total_kk,
                 'correct_results': correct_results,
                 'weeks_played': len(weeks_played),
-                's1_pts': stage_pts[1], 's1_kk': stage_kk[1],
-                's2_pts': stage_pts[2], 's2_kk': stage_kk[2],
-                's3_pts': stage_pts[3], 's3_kk': stage_kk[3],
-                's4_pts': stage_pts[4], 's4_kk': stage_kk[4],
+                's1_pts': round_pts[1], 's1_kk': round_kk[1],
+                's2_pts': round_pts[2], 's2_kk': round_kk[2],
+                's3_pts': round_pts[3], 's3_kk': round_kk[3],
+                's4_pts': round_pts[4], 's4_kk': round_kk[4],
             })
         
         # Sort by points, then KK
@@ -412,10 +412,10 @@ with col_guide2:
 
 # Get current data
 current_week, latest_week, weeks_completed = get_current_week_and_results()
-stage_scores = load_stage_scores()
+round_scores = load_round_scores()
 
 # Determine current stage
-def get_current_stage(week):
+def get_current_round(week):
     if week <= 10:
         return 1
     elif week <= 20:
@@ -425,7 +425,7 @@ def get_current_stage(week):
     else:
         return 4
 
-current_stage = get_current_stage(current_week)
+current_round = get_current_round(current_week)
 
 # =============================================================================
 # CURRENT STATUS SECTION
@@ -441,7 +441,7 @@ with col2:
     st.metric("✅ Weeks Completed", f"{weeks_completed} / 38")
 
 with col3:
-    st.metric("🎯 Current Stage", f"Stage {current_stage}")
+    st.metric("🎯 Current Stage", f"Stage {current_round}")
 
 with col4:
     progress = round((weeks_completed / 38) * 100)
@@ -477,33 +477,33 @@ if latest_week > 0:
 # STAGE PROGRESS
 # =============================================================================
 st.markdown("---")
-st.markdown("### 📅 Stage Progress")
+st.markdown("### 📅 Round Progress")
 
-stages_info = [
-    (1, "Stage 1", "Week 1-10", "#28a745"),
-    (2, "Stage 2", "Week 11-20", "#17a2b8"),
-    (3, "Stage 3", "Week 21-30", "#ffc107"),
-    (4, "Stage 4", "Week 31-38", "#dc3545"),
+rounds_info = [
+    (1, "Round 1", "Week 1-10", "#28a745"),
+    (2, "Round 2", "Week 11-20", "#17a2b8"),
+    (3, "Round 3", "Week 21-30", "#ffc107"),
+    (4, "Round 4", "Week 31-38", "#dc3545"),
 ]
 
 cols = st.columns(4)
 
-for i, (stage_num, name, weeks, color) in enumerate(stages_info):
-    stage_key = f"stage_{stage_num}"
-    is_locked = stage_scores.get(f"{stage_key}_locked", False)
+for i, (round_num, name, weeks, color) in enumerate(rounds_info):
+    round_key = f"stage_{round_num}"
+    is_locked = round_scores.get(f"{round_key}_locked", False)
     
     with cols[i]:
         if is_locked:
-            badge = f'<span class="stage-badge stage-locked">✅ Complete</span>'
-        elif stage_num == current_stage:
-            badge = f'<span class="stage-badge stage-current">🔴 In Progress</span>'
-        elif stage_num < current_stage:
-            badge = f'<span class="stage-badge stage-current">⏳ Pending Lock</span>'
+            badge = f'<span class="round-badge stage-locked">✅ Complete</span>'
+        elif round_num == current_round:
+            badge = f'<span class="round-badge stage-current">🔴 In Progress</span>'
+        elif round_num < current_round:
+            badge = f'<span class="round-badge stage-current">⏳ Pending Lock</span>'
         else:
-            badge = f'<span class="stage-badge stage-pending">⏳ Upcoming</span>'
+            badge = f'<span class="round-badge stage-pending">⏳ Upcoming</span>'
         
         st.markdown(f"""
-        <div class="stage-progress" style="border-left: 4px solid {color};">
+        <div class="round-progress" style="border-left: 4px solid {color};">
             <div style="font-weight: bold; color: {color};">{name}</div>
             <div style="font-size: 0.85rem; color: #6c757d;">{weeks}</div>
             {badge}
@@ -532,7 +532,7 @@ if leaderboard:
             </div>
             """, unsafe_allow_html=True)
     
-    st.markdown("### 🏆 Season Leaders (All Stages Combined)")
+    st.markdown("### 🏆 Season Leaders (All Rounds Combined)")
     st.caption(f"Updated: {datetime.now().strftime('%d %b %Y, %H:%M')}")
     
     top_3 = leaderboard[:min(3, len(leaderboard))]
@@ -541,7 +541,7 @@ if leaderboard:
     
     for i, p in enumerate(top_3):
         with cols[i]:
-            # Show stage breakdown
+            # Show round breakdown
             stage_breakdown = f"S1: {p['s1_pts']} | S2: {p['s2_pts']} | S3: {p['s3_pts']} | S4: {p['s4_pts']}"
             
             st.markdown(f"""
@@ -717,11 +717,11 @@ with st.expander("📖 Scoring System"):
     2. **KK Count** - If points are equal, most exact scores (KK) wins
     3. **Joint Winners** - If both points AND KK are equal, joint winners declared
     
-    ### Stages:
-    - **Stage 1**: Week 1-10
-    - **Stage 2**: Week 11-20
-    - **Stage 3**: Week 21-30
-    - **Stage 4**: Week 31-38 (Finale - Week 38 all matches double points!)
+    ### Rounds:
+    - **Round 1**: Week 1-10
+    - **Round 2**: Week 11-20
+    - **Round 3**: Week 21-30
+    - **Round 4**: Week 31-38 (Finale - Week 38 all matches double points!)
     """)
 
 # Footer

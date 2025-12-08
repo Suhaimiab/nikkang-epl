@@ -4,6 +4,7 @@ Nikkang KK EPL Prediction Competition
 Main admin control panel with statistics and quick actions
 """
 
+from utils.simple_sync import simple_sync_ui
 import streamlit as st
 import pandas as pd
 from datetime import datetime
