@@ -115,7 +115,7 @@ else:
         )
     
     # Login button
-    if st.button("🔓 Login", width="stretch", type="primary"):
+    if st.button("🔓 Login", use_container_width=True, type="primary"):
         if not input_nickname or not input_nickname.strip():
             st.error("❌ Please enter your nickname")
             st.stop()
