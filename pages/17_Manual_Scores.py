@@ -1,369 +1,367 @@
 """
-Manual Score Entry
-Nikkang KK EPL Prediction Competition
-Enter historical scores for weeks where predictions weren't tracked in the system
+Manual Scores Entry - Admin Page
+Enter bonus/penalty points for participants
+SORTED BY NICKNAME
 """
 
 import streamlit as st
 import pandas as pd
-import json
-import os
+from pathlib import Path
 from datetime import datetime
-from utils.auth import require_admin
-from utils.data_manager import DataManager
+import sys
+import json
 
-# Require admin authentication
-if not require_admin("Manual Score Entry"):
+# Add utils to path
+sys.path.append(str(Path(__file__).parent.parent))
+
+from utils.data_manager import DataManager
+from utils.auth import check_password
+
+# Page config
+st.set_page_config(
+    page_title="Manual Scores - Nikkang KK",
+    page_icon="✏️",
+    layout="wide"
+)
+
+# Import branding
+try:
+    from utils.branding import inject_custom_css
+    inject_custom_css()
+except:
+    pass
+
+# Authentication
+if not check_password():
     st.stop()
 
-st.set_page_config(page_title="Manual Scores", page_icon="📝", layout="wide")
+# Logo in sidebar
+if Path("nikkang_logo.png").exists():
+    st.sidebar.markdown('<div style="padding-top: 0.5rem;"></div>', unsafe_allow_html=True)
+    st.sidebar.markdown('<div class="sidebar-logo-container">', unsafe_allow_html=True)
+    st.sidebar.image("nikkang_logo.png", use_container_width=True)
+    st.sidebar.markdown('</div>', unsafe_allow_html=True)
+    st.sidebar.markdown("---")
 
-st.title("📝 Manual Score Entry")
-st.markdown("Enter historical points and KK counts for weeks not tracked in the system")
+# Header
+st.markdown("""
+<div style="text-align: center; padding: 1.5rem 0;">
+    <h1 style="color: #667eea; font-size: 2.5rem; margin: 0;">✏️ Manual Scores</h1>
+    <p style="color: #6c757d; font-size: 1.2rem; margin: 0.5rem 0 0 0;">
+        Enter bonus points or penalties for participants
+    </p>
+</div>
+""", unsafe_allow_html=True)
 
+# Initialize data manager
 dm = DataManager()
 
-# File path for manual scores
-MANUAL_SCORES_FILE = "nikkang_data/manual_scores.json"
+# Manual scores file
+MANUAL_SCORES_FILE = Path("nikkang_data/manual_scores.json")
 
 def load_manual_scores():
-    """Load manual scores from file"""
-    try:
-        if os.path.exists(MANUAL_SCORES_FILE):
+    """Load manual scores from JSON"""
+    if MANUAL_SCORES_FILE.exists():
+        try:
             with open(MANUAL_SCORES_FILE, 'r') as f:
                 return json.load(f)
-    except:
-        pass
+        except:
+            pass
     return {}
 
 def save_manual_scores(data):
-    """Save manual scores to file"""
+    """Save manual scores to JSON"""
     try:
-        os.makedirs(os.path.dirname(MANUAL_SCORES_FILE), exist_ok=True)
+        MANUAL_SCORES_FILE.parent.mkdir(parents=True, exist_ok=True)
         with open(MANUAL_SCORES_FILE, 'w') as f:
             json.dump(data, f, indent=2)
         return True
-    except Exception as e:
-        st.error(f"Error saving: {e}")
+    except:
         return False
 
+def get_participant_manual_total(uid):
+    """Get total manual points for a participant"""
+    scores = load_manual_scores()
+    user_scores = scores.get(uid, {})
+    return sum(entry.get('points', 0) for entry in user_scores.values())
+
 # Load data
-participants = dm.load_participants()
 manual_scores = load_manual_scores()
+participants = dm.get_all_participants()
 
-if not participants:
-    st.warning("No participants registered yet!")
-    st.stop()
+# Sort participants by nickname/display name
+participants_sorted = sorted(
+    participants, 
+    key=lambda p: (p.get('display_name') or p.get('nickname') or p.get('name', '')).lower()
+)
 
-# Convert participants to list
-participant_list = []
-for pid, p in participants.items():
-    participant_list.append({
-        'id': pid,
-        'name': p.get('name', 'Unknown'),
-        'nickname': p.get('display_name') or p.get('nickname') or p.get('name', 'Unknown')
-    })
+st.info("""
+**Manual Scores** are bonus points or penalties you can assign to participants.
 
-# Sort by name
-participant_list.sort(key=lambda x: x['name'])
+**Common uses:**
+- 🎯 Bonus for exact GOTW predictions
+- 🏆 Stage winner bonuses
+- ⚡ Special achievement rewards
+- ⚠️ Penalties (enter negative points)
+- 📝 Administrative adjustments
+
+**Note:** These points are added to the regular prediction points on the leaderboard.
+""")
 
 st.markdown("---")
 
-# Tabs for different entry modes
-tab1, tab2, tab3 = st.tabs(["📊 Enter Scores by Week", "👤 Enter Scores by Participant", "📋 View All Manual Scores"])
+# Tabs
+tab1, tab2, tab3 = st.tabs(["✏️ Enter Scores", "📊 View All Scores", "📋 Summary"])
 
-# =============================================================================
-# TAB 1: Enter by Week
-# =============================================================================
+# ============================================================================
+# TAB 1: ENTER MANUAL SCORES
+# ============================================================================
 with tab1:
-    st.markdown("### Enter Scores for a Specific Week")
+    st.markdown("### ✏️ Enter Manual Scores")
     
-    col1, col2 = st.columns(2)
-    
-    with col1:
-        selected_week = st.selectbox(
-            "Select Week:",
-            range(1, 39),
-            index=10,  # Default to Week 11
-            format_func=lambda x: f"Week {x}",
-            key="week_select"
+    if not participants_sorted:
+        st.warning("No participants registered yet")
+    else:
+        # Select participant
+        st.markdown("#### 👤 Select Participant")
+        
+        # Build sorted participant list
+        participant_options = {}
+        for p in participants_sorted:
+            nickname = p.get('display_name') or p.get('nickname') or p.get('name', 'Unknown')
+            pid = p.get('id', '')
+            participant_options[f"{nickname}"] = pid
+        
+        selected_participant_name = st.selectbox(
+            "Participant (sorted by nickname):",
+            options=list(participant_options.keys()),
+            key="select_participant"
         )
-    
-    with col2:
-        st.info(f"📌 Entering scores for **Week {selected_week}**")
-    
-    week_key = str(selected_week)
-    
-    # Get existing scores for this week
-    week_scores = manual_scores.get(week_key, {})
-    
-    st.markdown("#### Enter Points and KK for Each Participant")
-    
-    # Create a form for batch entry
-    with st.form(f"week_{selected_week}_scores"):
         
-        # Table header
-        cols = st.columns([3, 2, 2])
-        cols[0].markdown("**Participant**")
-        cols[1].markdown("**Points**")
-        cols[2].markdown("**KK Count**")
+        selected_participant_id = participant_options.get(selected_participant_name, '')
         
+        # Show current manual scores for this participant
         st.markdown("---")
+        st.markdown("#### 📝 Current Manual Scores")
         
-        # Entry rows for each participant
-        entries = {}
-        for p in participant_list:
-            pid = p['id']
-            existing = week_scores.get(pid, {})
-            
-            cols = st.columns([3, 2, 2])
-            
-            with cols[0]:
-                st.markdown(f"**{p['nickname']}**")
-                st.caption(p['name'])
-            
-            with cols[1]:
-                points = st.number_input(
-                    f"Points {pid}",
-                    min_value=0,
-                    max_value=100,
-                    value=existing.get('points', 0),
-                    key=f"pts_{week_key}_{pid}",
-                    label_visibility="collapsed"
-                )
-            
-            with cols[2]:
-                kk = st.number_input(
-                    f"KK {pid}",
-                    min_value=0,
-                    max_value=10,
-                    value=existing.get('kk', 0),
-                    key=f"kk_{week_key}_{pid}",
-                    label_visibility="collapsed"
-                )
-            
-            entries[pid] = {'points': points, 'kk': kk}
+        user_scores = manual_scores.get(selected_participant_id, {})
         
-        st.markdown("---")
-        
-        submitted = st.form_submit_button("💾 Save Week Scores", type="primary")
-        
-        if submitted:
-            # Save to manual_scores
-            if week_key not in manual_scores:
-                manual_scores[week_key] = {}
+        if user_scores:
+            current_total = sum(entry.get('points', 0) for entry in user_scores.values())
             
-            # Only save non-zero entries
-            for pid, scores in entries.items():
-                if scores['points'] > 0 or scores['kk'] > 0:
-                    manual_scores[week_key][pid] = scores
-                elif pid in manual_scores[week_key]:
-                    # Remove if set to zero
-                    del manual_scores[week_key][pid]
+            col1, col2 = st.columns([3, 1])
+            with col1:
+                st.markdown(f"**{selected_participant_name}** has {len(user_scores)} manual score entries")
+            with col2:
+                st.metric("Total Manual Points", current_total)
             
-            if save_manual_scores(manual_scores):
-                st.success(f"✅ Saved scores for Week {selected_week}!")
-                st.rerun()
-
-# =============================================================================
-# TAB 2: Enter by Participant
-# =============================================================================
-with tab2:
-    st.markdown("### Enter Scores for a Specific Participant")
-    
-    selected_participant = st.selectbox(
-        "Select Participant:",
-        participant_list,
-        format_func=lambda x: f"{x['nickname']} ({x['name']})",
-        key="participant_select"
-    )
-    
-    if selected_participant:
-        pid = selected_participant['id']
-        
-        st.markdown(f"#### Scores for **{selected_participant['nickname']}**")
-        
-        # Get all weeks with manual scores for this participant
-        participant_scores = {}
-        for week_key, week_data in manual_scores.items():
-            if pid in week_data:
-                participant_scores[week_key] = week_data[pid]
-        
-        # Allow entry for multiple weeks
-        st.markdown("##### Enter scores for weeks 11-13 (or any historical week):")
-        
-        with st.form(f"participant_{pid}_scores"):
-            week_entries = {}
-            
-            # Show weeks 11, 12, 13 by default (common historical weeks)
-            for week_num in [11, 12, 13]:
-                week_key = str(week_num)
-                existing = participant_scores.get(week_key, {})
-                
-                st.markdown(f"**Week {week_num}**")
-                cols = st.columns([2, 2, 4])
-                
-                with cols[0]:
-                    points = st.number_input(
-                        f"Points W{week_num}",
-                        min_value=0,
-                        max_value=100,
-                        value=existing.get('points', 0),
-                        key=f"p_pts_{pid}_{week_key}",
-                        label_visibility="collapsed",
-                        help="Points"
-                    )
-                    st.caption("Points")
-                
-                with cols[1]:
-                    kk = st.number_input(
-                        f"KK W{week_num}",
-                        min_value=0,
-                        max_value=10,
-                        value=existing.get('kk', 0),
-                        key=f"p_kk_{pid}_{week_key}",
-                        label_visibility="collapsed",
-                        help="KK Count"
-                    )
-                    st.caption("KK")
-                
-                week_entries[week_key] = {'points': points, 'kk': kk}
-                st.markdown("---")
-            
-            # Option to add other weeks
-            st.markdown("**Add Other Week (Optional)**")
-            cols = st.columns([1, 2, 2])
-            
-            with cols[0]:
-                other_week = st.number_input("Week", min_value=1, max_value=38, value=1, key=f"other_week_{pid}")
-            with cols[1]:
-                other_points = st.number_input("Points", min_value=0, max_value=100, value=0, key=f"other_pts_{pid}")
-            with cols[2]:
-                other_kk = st.number_input("KK", min_value=0, max_value=10, value=0, key=f"other_kk_{pid}")
-            
-            if other_points > 0 or other_kk > 0:
-                week_entries[str(other_week)] = {'points': other_points, 'kk': other_kk}
-            
-            submitted = st.form_submit_button("💾 Save Participant Scores", type="primary")
-            
-            if submitted:
-                # Save to manual_scores
-                for week_key, scores in week_entries.items():
-                    if week_key not in manual_scores:
-                        manual_scores[week_key] = {}
+            # Show existing entries
+            for entry_id, entry in user_scores.items():
+                with st.expander(f"{entry.get('reason', 'No reason')} - {entry.get('points', 0)} pts"):
+                    st.write(f"**Points:** {entry.get('points', 0)}")
+                    st.write(f"**Reason:** {entry.get('reason', 'N/A')}")
+                    st.write(f"**Date:** {entry.get('date', 'N/A')}")
+                    st.write(f"**Week:** {entry.get('week', 'N/A')}")
                     
-                    if scores['points'] > 0 or scores['kk'] > 0:
-                        manual_scores[week_key][pid] = scores
-                    elif pid in manual_scores.get(week_key, {}):
-                        del manual_scores[week_key][pid]
-                
-                if save_manual_scores(manual_scores):
-                    st.success(f"✅ Saved scores for {selected_participant['nickname']}!")
-                    st.rerun()
+                    if st.button(f"🗑️ Delete This Entry", key=f"delete_{entry_id}"):
+                        del user_scores[entry_id]
+                        manual_scores[selected_participant_id] = user_scores
+                        save_manual_scores(manual_scores)
+                        st.success("Entry deleted!")
+                        st.rerun()
+        else:
+            st.info(f"No manual scores for {selected_participant_name} yet")
+        
+        # Add new entry
+        st.markdown("---")
+        st.markdown("#### ➕ Add New Manual Score")
+        
+        with st.form("add_manual_score"):
+            col1, col2 = st.columns(2)
+            
+            with col1:
+                points = st.number_input(
+                    "Points (positive or negative):",
+                    min_value=-100,
+                    max_value=100,
+                    value=0,
+                    help="Enter positive for bonus, negative for penalty"
+                )
+            
+            with col2:
+                week = st.number_input(
+                    "Week (optional):",
+                    min_value=0,
+                    max_value=38,
+                    value=0,
+                    help="Associate with a specific week, or leave as 0 for general"
+                )
+            
+            reason = st.text_input(
+                "Reason:",
+                placeholder="e.g., 'GOTW bonus', 'Stage 1 winner', 'Late submission penalty'",
+                help="Explain why these points are being added"
+            )
+            
+            st.caption("💡 Tip: Be specific with reasons for transparency")
+            
+            submit = st.form_submit_button("💾 Add Manual Score", use_container_width=True, type="primary")
+            
+            if submit:
+                if not reason:
+                    st.error("Please provide a reason")
+                elif points == 0:
+                    st.warning("Points are 0 - are you sure?")
+                else:
+                    # Generate entry ID
+                    entry_id = f"manual_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+                    
+                    # Create entry
+                    entry = {
+                        'points': points,
+                        'reason': reason,
+                        'week': week if week > 0 else None,
+                        'date': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                        'admin': 'Admin'
+                    }
+                    
+                    # Add to user's scores
+                    if selected_participant_id not in manual_scores:
+                        manual_scores[selected_participant_id] = {}
+                    
+                    manual_scores[selected_participant_id][entry_id] = entry
+                    
+                    # Save
+                    if save_manual_scores(manual_scores):
+                        st.success(f"✅ Added {points} points for {selected_participant_name}")
+                        st.info(f"Reason: {reason}")
+                        st.rerun()
+                    else:
+                        st.error("Failed to save manual scores")
 
-# =============================================================================
-# TAB 3: View All Manual Scores
-# =============================================================================
-with tab3:
-    st.markdown("### All Manual Scores")
+# ============================================================================
+# TAB 2: VIEW ALL SCORES
+# ============================================================================
+with tab2:
+    st.markdown("### 📊 All Manual Scores")
     
     if not manual_scores:
-        st.info("No manual scores entered yet.")
+        st.info("No manual scores entered yet")
     else:
-        # Create summary DataFrame
-        summary_data = []
+        # Build table
+        all_entries = []
         
-        for p in participant_list:
-            pid = p['id']
-            row = {
-                'Nickname': p['nickname'],
-                'Name': p['name']
-            }
+        for uid, user_entries in manual_scores.items():
+            # Find participant
+            participant = next((p for p in participants_sorted if p.get('id') == uid), None)
+            if not participant:
+                continue
             
-            total_points = 0
-            total_kk = 0
+            nickname = participant.get('display_name') or participant.get('nickname') or participant.get('name', 'Unknown')
             
-            # Get scores for each week
-            for week_num in range(1, 39):
-                week_key = str(week_num)
-                if week_key in manual_scores and pid in manual_scores[week_key]:
-                    scores = manual_scores[week_key][pid]
-                    pts = scores.get('points', 0)
-                    kk = scores.get('kk', 0)
-                    row[f'W{week_num}'] = f"{pts}pts/{kk}KK" if pts > 0 or kk > 0 else "-"
-                    total_points += pts
-                    total_kk += kk
-                else:
-                    row[f'W{week_num}'] = "-"
-            
-            row['Total Pts'] = total_points
-            row['Total KK'] = total_kk
-            
-            if total_points > 0 or total_kk > 0:
-                summary_data.append(row)
+            for entry_id, entry in user_entries.items():
+                all_entries.append({
+                    'Participant': nickname,
+                    'Points': entry.get('points', 0),
+                    'Reason': entry.get('reason', 'N/A'),
+                    'Week': entry.get('week') or '-',
+                    'Date': entry.get('date', 'N/A'),
+                    'ID': uid,
+                    'Entry ID': entry_id
+                })
         
-        if summary_data:
-            df = pd.DataFrame(summary_data)
+        if all_entries:
+            df = pd.DataFrame(all_entries)
             
-            # Only show columns with data
-            cols_to_show = ['Nickname', 'Name']
-            for week_num in range(1, 39):
-                col = f'W{week_num}'
-                if col in df.columns and (df[col] != '-').any():
-                    cols_to_show.append(col)
-            cols_to_show.extend(['Total Pts', 'Total KK'])
+            # Sort by participant name, then date
+            df = df.sort_values(['Participant', 'Date'])
             
-            df_display = df[cols_to_show]
-            
-            st.dataframe(df_display, use_container_width=True, hide_index=True)
+            # Display without ID columns
+            display_df = df[['Participant', 'Points', 'Reason', 'Week', 'Date']]
+            st.dataframe(display_df, use_container_width=True, hide_index=True)
             
             # Summary stats
             st.markdown("---")
-            st.markdown("#### Summary")
+            col1, col2, col3 = st.columns(3)
             
-            total_entries = sum(1 for w in manual_scores.values() for _ in w)
-            weeks_with_data = len([w for w in manual_scores if manual_scores[w]])
+            with col1:
+                st.metric("Total Entries", len(all_entries))
+            
+            with col2:
+                total_positive = sum(e['Points'] for e in all_entries if e['Points'] > 0)
+                st.metric("Total Bonuses", f"+{total_positive}")
+            
+            with col3:
+                total_negative = sum(e['Points'] for e in all_entries if e['Points'] < 0)
+                st.metric("Total Penalties", total_negative)
+        else:
+            st.info("No manual scores to display")
+
+# ============================================================================
+# TAB 3: SUMMARY BY PARTICIPANT
+# ============================================================================
+with tab3:
+    st.markdown("### 📋 Summary by Participant")
+    
+    if not participants_sorted:
+        st.warning("No participants registered")
+    elif not manual_scores:
+        st.info("No manual scores entered yet")
+    else:
+        # Build summary
+        summary = []
+        
+        for p in participants_sorted:
+            uid = p.get('id', '')
+            nickname = p.get('display_name') or p.get('nickname') or p.get('name', 'Unknown')
+            
+            user_entries = manual_scores.get(uid, {})
+            
+            if user_entries:
+                total_points = sum(entry.get('points', 0) for entry in user_entries.values())
+                num_entries = len(user_entries)
+                
+                bonuses = sum(entry.get('points', 0) for entry in user_entries.values() if entry.get('points', 0) > 0)
+                penalties = sum(entry.get('points', 0) for entry in user_entries.values() if entry.get('points', 0) < 0)
+                
+                summary.append({
+                    'Participant': nickname,
+                    'Total Points': total_points,
+                    'Entries': num_entries,
+                    'Bonuses': f"+{bonuses}" if bonuses > 0 else "0",
+                    'Penalties': penalties if penalties < 0 else "0"
+                })
+        
+        if summary:
+            df_summary = pd.DataFrame(summary)
+            df_summary = df_summary.sort_values('Participant')  # Already sorted by nickname
+            st.dataframe(df_summary, use_container_width=True, hide_index=True)
+            
+            # Grand totals
+            st.markdown("---")
+            st.markdown("#### 🎯 Grand Totals")
             
             col1, col2, col3 = st.columns(3)
-            col1.metric("Weeks with Manual Scores", weeks_with_data)
-            col2.metric("Total Entries", total_entries)
-            col3.metric("Participants with Scores", len(summary_data))
             
-            # Download option
-            st.markdown("---")
-            st.download_button(
-                "📥 Download Manual Scores (JSON)",
-                data=json.dumps(manual_scores, indent=2),
-                file_name=f"manual_scores_{datetime.now().strftime('%Y%m%d')}.json",
-                mime="application/json"
-            )
+            with col1:
+                total_participants = len(summary)
+                st.metric("Participants with Manual Scores", total_participants)
+            
+            with col2:
+                grand_total = sum(item['Total Points'] for item in summary)
+                st.metric("Net Total Points", grand_total)
+            
+            with col3:
+                total_entries = sum(item['Entries'] for item in summary)
+                st.metric("Total Entries", total_entries)
         else:
-            st.info("No manual scores entered yet.")
+            st.info("No participants have manual scores yet")
 
-# =============================================================================
-# Sidebar: Quick Stats & Help
-# =============================================================================
-with st.sidebar:
-    st.markdown("### 📊 Quick Stats")
-    
-    weeks_with_manual = len([w for w in manual_scores if manual_scores[w]])
-    st.metric("Weeks with Manual Data", weeks_with_manual)
-    
-    st.markdown("---")
-    st.markdown("### ℹ️ How This Works")
-    st.markdown("""
-    1. **Enter scores** for weeks 11-13 (or any historical week)
-    2. **Points & KK** are stored separately from system-calculated scores
-    3. **Leaderboard** will combine:
-       - Round 1 locked scores
-       - Manual scores (weeks 11-13)
-       - System-calculated scores (week 14+)
-    """)
-    
-    st.markdown("---")
-    st.markdown("### ⚠️ Important")
-    st.markdown("""
-    - Manual scores override system calculations for those weeks
-    - Use this for weeks where predictions weren't tracked
-    - Always verify totals before locking rounds
-    """)
+# Footer
+st.markdown("---")
+st.markdown("""
+<div style="text-align: center; padding: 1rem 0; color: #6c757d; font-size: 0.9rem;">
+    <p><strong>Nikkang KK EPL Prediction League</strong> - Manual Scores</p>
+    <p>💡 Remember: Always verify totals before locking rounds</p>
+</div>
+""", unsafe_allow_html=True)
