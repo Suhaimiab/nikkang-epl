@@ -366,7 +366,7 @@ def get_completed_rounds():
         results = dm.load_results()
         all_matches = dm.get_all_matches()
         
-        for round_num, info in STAGES.items():
+        for round_num, info in ROUNDS.items():
             if round_num in completed:
                 continue
             
@@ -422,7 +422,7 @@ completed_rounds = get_completed_rounds()
 st.markdown("### 📊 Season Rounds")
 cols = st.columns(4)
 
-for i, (round_num, info) in enumerate(STAGES.items()):
+for i, (round_num, info) in enumerate(ROUNDS.items()):
     with cols[i]:
         is_completed = round_num in completed_rounds
         is_current = round_num == current_round and not is_completed
