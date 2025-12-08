@@ -1,6 +1,6 @@
 """
-Simple Sync with Code - No File Transfers!
-Uses Supabase as simple JSON storage - much cleaner than zip files
+Simple Sync - Fixed for Your Data Structure
+Works with your custom data_manager format
 """
 
 import streamlit as st
@@ -8,6 +8,7 @@ import json
 from datetime import datetime
 import random
 import string
+import os
 
 try:
     from utils.supabase_manager import SupabaseManager
@@ -16,7 +17,7 @@ except:
     SUPABASE_AVAILABLE = False
 
 class SimpleSyncManager:
-    """Simple sync using codes - no file transfers needed"""
+    """Simple sync using codes - handles your custom data format"""
     
     def __init__(self):
         self.enabled = False
@@ -32,38 +33,35 @@ class SimpleSyncManager:
         return ''.join(random.choices(string.digits, k=6))
     
     def upload_data(self):
-        """Upload all data and get a sync code"""
+        """Upload ALL data files exactly as they are"""
         if not self.enabled:
             return None, "Supabase not available"
         
         try:
-            # Read all data files
-            import os
+            # Read ALL files in nikkang_data folder
             data_package = {}
+            data_dir = 'nikkang_data'
             
-            files = [
-                'nikkang_data/participants.json',
-                'nikkang_data/matches.json',
-                'nikkang_data/predictions.json',
-                'nikkang_data/results.json',
-                'nikkang_data/manual_scores.json',
-                'nikkang_data/stage_scores.json'
-            ]
+            if os.path.exists(data_dir):
+                for filename in os.listdir(data_dir):
+                    if filename.endswith('.json'):
+                        filepath = os.path.join(data_dir, filename)
+                        with open(filepath, 'r', encoding='utf-8') as f:
+                            file_key = filename.replace('.json', '')
+                            data_package[file_key] = json.load(f)
             
-            for filepath in files:
-                if os.path.exists(filepath):
-                    with open(filepath, 'r', encoding='utf-8') as f:
-                        filename = os.path.basename(filepath).replace('.json', '')
-                        data_package[filename] = json.load(f)
-            
-            # Add timestamp
-            data_package['sync_time'] = datetime.now().isoformat()
+            # Add metadata
+            data_package['_sync_metadata'] = {
+                'sync_time': datetime.now().isoformat(),
+                'files_count': len(data_package) - 1
+            }
             
             # Generate code
             sync_code = self.generate_sync_code()
             
-            # Save to Supabase with code as key
-            json_str = json.dumps(data_package)
+            # Save to Supabase
+            json_str = json.dumps(data_package, ensure_ascii=False)
+            
             self.db.supabase.table('app_config').upsert({
                 'key': f'sync_{sync_code}',
                 'value': json_str
@@ -75,7 +73,7 @@ class SimpleSyncManager:
             return None, str(e)
     
     def download_data(self, sync_code):
-        """Download data using sync code"""
+        """Download data and restore exactly as it was"""
         if not self.enabled:
             return False, "Supabase not available"
         
@@ -84,34 +82,37 @@ class SimpleSyncManager:
             response = self.db.supabase.table('app_config').select('value').eq('key', f'sync_{sync_code}').execute()
             
             if not response.data:
-                return False, "Invalid sync code"
+                return False, "Invalid sync code or code expired"
             
             # Parse data
             data_package = json.loads(response.data[0]['value'])
             
-            # Save each file
-            import os
+            # Ensure directory exists
             os.makedirs('nikkang_data', exist_ok=True)
             
+            # Restore each file exactly as it was
             files_restored = 0
-            for filename, data in data_package.items():
-                if filename == 'sync_time':
+            for file_key, file_data in data_package.items():
+                if file_key.startswith('_'):  # Skip metadata
                     continue
                 
-                filepath = f'nikkang_data/{filename}.json'
+                filepath = f'nikkang_data/{file_key}.json'
                 with open(filepath, 'w', encoding='utf-8') as f:
-                    json.dump(data, f, indent=2, ensure_ascii=False)
+                    json.dump(file_data, f, indent=2, ensure_ascii=False)
                 files_restored += 1
             
-            sync_time = data_package.get('sync_time', 'Unknown')
-            return True, f"Restored {files_restored} files from {sync_time}"
+            # Get sync time
+            metadata = data_package.get('_sync_metadata', {})
+            sync_time = metadata.get('sync_time', 'Unknown')
+            
+            return True, f"✅ Restored {files_restored} files from {sync_time[:19]}"
             
         except Exception as e:
-            return False, str(e)
+            return False, f"Error: {str(e)}"
 
 
 def simple_sync_ui():
-    """Clean UI for simple sync"""
+    """UI for simple sync"""
     
     st.markdown("---")
     st.subheader("📱💻 Simple Sync Between Devices")
@@ -125,10 +126,10 @@ def simple_sync_ui():
     
     st.success("✅ Cloud sync available!")
     
-    # Two columns for upload/download
+    # Two columns
     col1, col2 = st.columns(2)
     
-    # UPLOAD - Generate Code
+    # UPLOAD
     with col1:
         st.markdown("### 📤 Push Data to Cloud")
         st.write("Upload your current data and get a sync code")
@@ -140,7 +141,7 @@ def simple_sync_ui():
                 if sync_code:
                     st.success("✅ Data uploaded!")
                     
-                    # Show code in big text
+                    # Show code
                     st.markdown(f"""
                     <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
                                 padding: 30px; border-radius: 15px; text-align: center; margin: 20px 0;">
@@ -153,14 +154,12 @@ def simple_sync_ui():
                     </div>
                     """, unsafe_allow_html=True)
                     
-                    st.info("📱 **On your other device:** Go to Admin → Sync → Enter this code")
-                    
-                    # Store in session for copying
+                    st.info("📱 **On your other device:** Go to Device Sync → Enter this code")
                     st.session_state.last_sync_code = sync_code
                 else:
                     st.error(f"❌ Upload failed: {error}")
     
-    # DOWNLOAD - Enter Code
+    # DOWNLOAD
     with col2:
         st.markdown("### 📥 Pull Data from Cloud")
         st.write("Enter sync code from your other device")
@@ -180,54 +179,68 @@ def simple_sync_ui():
                     success, message = sync_mgr.download_data(sync_code_input)
                     
                     if success:
-                        st.success(f"✅ {message}")
+                        st.success(message)
                         st.balloons()
-                        st.info("🔄 Refresh the page to see updated data")
-                        if st.button("🔄 Refresh Now"):
-                            st.rerun()
+                        st.info("🔄 **Important:** Refresh the page to see updated data")
+                        
+                        col_a, col_b = st.columns(2)
+                        with col_a:
+                            if st.button("🔄 Refresh Page Now", use_container_width=True, type="primary"):
+                                st.rerun()
+                        with col_b:
+                            if st.button("🏠 Go to Home", use_container_width=True):
+                                st.switch_page("pages/1_Home.py")
                     else:
                         st.error(f"❌ {message}")
     
-    # Show last code if exists
+    # Show last code
     if 'last_sync_code' in st.session_state:
         st.markdown("---")
         st.caption(f"💡 Last generated code: **{st.session_state.last_sync_code}**")
     
-    # Quick stats
+    # Current data stats
     st.markdown("---")
-    st.markdown("### 📊 Current Data")
+    st.markdown("### 📊 Current Data on This Device")
     
     try:
-        import os
-        col_a, col_b, col_c = st.columns(3)
+        col_a, col_b, col_c, col_d = st.columns(4)
         
         with col_a:
             if os.path.exists('nikkang_data/participants.json'):
                 with open('nikkang_data/participants.json', 'r') as f:
-                    participants = json.load(f)
-                st.metric("👥 Participants", len(participants))
+                    data = json.load(f)
+                st.metric("👥 Participants", len(data) if isinstance(data, (dict, list)) else 0)
             else:
                 st.metric("👥 Participants", 0)
         
         with col_b:
             if os.path.exists('nikkang_data/matches.json'):
                 with open('nikkang_data/matches.json', 'r') as f:
-                    matches = json.load(f)
-                total = sum(len(v) for v in matches.values() if isinstance(v, list))
-                st.metric("⚽ Matches", total)
+                    data = json.load(f)
+                count = len(data) if isinstance(data, (dict, list)) else 0
+                st.metric("⚽ Matches", count)
             else:
                 st.metric("⚽ Matches", 0)
         
         with col_c:
             if os.path.exists('nikkang_data/predictions.json'):
                 with open('nikkang_data/predictions.json', 'r') as f:
-                    predictions = json.load(f)
-                total = sum(len(v) for v in predictions.values())
-                st.metric("🎯 Predictions", total)
+                    data = json.load(f)
+                count = len(data) if isinstance(data, (dict, list)) else 0
+                st.metric("🎯 Predictions", count)
             else:
                 st.metric("🎯 Predictions", 0)
+        
+        with col_d:
+            if os.path.exists('nikkang_data/results.json'):
+                with open('nikkang_data/results.json', 'r') as f:
+                    data = json.load(f)
+                count = len(data) if isinstance(data, (dict, list)) else 0
+                st.metric("📊 Results", count)
+            else:
+                st.metric("📊 Results", 0)
     except:
-        pass
+        st.warning("Could not read data files")
     
     # Instructions
     with st.expander("📖 How to Use"):
@@ -235,22 +248,27 @@ def simple_sync_ui():
         ### Quick Sync in 3 Steps:
         
         **On Device 1 (Desktop):**
-        1. Click "Generate Sync Code" 
+        1. Click "🚀 Generate Sync Code" 
         2. Note the 6-digit code (e.g., 123456)
         
         **On Device 2 (Mobile):**
-        1. Go to Admin → Sync tab
+        1. Go to Device Sync page
         2. Enter the 6-digit code
-        3. Click "Download Data"
-        4. Refresh page
+        3. Click "⬇️ Download Data"
+        4. Click "🔄 Refresh Page Now"
         
-        **Done!** Both devices synced in 30 seconds! ✅
+        **Done!** Both devices synced! ✅
         
         ---
         
-        ### Tips:
+        ### Important Notes:
+        - Always refresh after downloading
         - Codes expire after 24 hours
-        - Always sync before making changes
-        - No file transfers needed!
-        - Works from anywhere with internet
+        - Syncs ALL data files exactly as they are
+        - No format conversion needed
+        
+        ### Tips:
+        - Sync before making predictions
+        - Sync after entering results
+        - Keep your devices updated regularly
         """)
