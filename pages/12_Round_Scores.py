@@ -302,7 +302,7 @@ with tab5:
             total_pts = 0
             total_kk = 0
             
-            for round_num, round_info in STAGES.items():
+            for round_num, round_info in ROUNDS.items():
                 round_key = round_info['key']
                 is_locked = round_scores.get(f"{round_key}_locked", False)
                 scores = round_scores.get(round_key, {}).get(uid, {})
@@ -334,7 +334,7 @@ with tab5:
         st.markdown("#### Lock Status")
         
         cols = st.columns(4)
-        for i, (round_num, round_info) in enumerate(STAGES.items()):
+        for i, (round_num, round_info) in enumerate(ROUNDS.items()):
             round_key = round_info['key']
             is_locked = round_scores.get(f"{round_key}_locked", False)
             
