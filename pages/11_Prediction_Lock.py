@@ -405,14 +405,75 @@ with tab2:
             buf.seek(0)
             return buf.getvalue()
         
-        # Download as PNG
-        png_bytes = generate_prediction_matrix_png(df, view_week, matches)
-        st.download_button(
-            "📥 Download as PNG",
-            data=png_bytes,
-            file_name=f"predictions_week_{view_week}_{datetime.now().strftime('%Y%m%d')}.png",
-            mime="image/png"
-        )
+        # Download buttons in columns  
+        col1, col2, col3 = st.columns(3)
+        
+        with col1:
+            # Download as PNG
+            png_bytes = generate_prediction_matrix_png(df, view_week, matches)
+            st.download_button(
+                "📥 Download as PNG",
+                data=png_bytes,
+                file_name=f"predictions_week_{view_week}_{datetime.now().strftime('%Y%m%d')}.png",
+                mime="image/png",
+                use_container_width=True
+            )
+        
+        with col2:
+            # Download as CSV
+            csv_buffer = io.StringIO()
+            df.to_csv(csv_buffer, index=False)
+            csv_data = csv_buffer.getvalue()
+            st.download_button(
+                "📥 Download as CSV",
+                data=csv_data,
+                file_name=f"predictions_week_{view_week}_{datetime.now().strftime('%Y%m%d')}.csv",
+                mime="text/csv",
+                use_container_width=True
+            )
+        
+        with col3:
+            # Download as HTML
+            html_table = df.to_html(index=False, escape=False, 
+                                   classes='table table-striped table-bordered',
+                                   border=0)
+            html_doc = f"""
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Prediction Matrix - Week {view_week}</title>
+    <style>
+        body {{ font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }}
+        h1 {{ color: #1a1a2e; text-align: center; }}
+        .container {{ background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }}
+        table {{ width: 100%; border-collapse: collapse; margin-top: 20px; }}
+        th {{ background: #1a1a2e; color: white; padding: 12px 8px; text-align: center; border: 1px solid #2a2a4e; }}
+        td {{ padding: 10px 8px; text-align: center; border: 1px solid #e0e0e0; }}
+        tr:nth-child(even) {{ background: #f8f9fa; }}
+        tr:hover {{ background: #e9ecef; }}
+        .footer {{ text-align: center; margin-top: 20px; color: #6c757d; font-size: 0.9em; }}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 Prediction Matrix - Gameweek {view_week}</h1>
+        <p style="text-align: center; color: #6c757d;">Nikkang KK EPL Prediction League • {len(df)} Participants • {len(matches)} Matches</p>
+        {html_table}
+        <div class="footer">
+            <p>Generated: {datetime.now().strftime('%d %B %Y, %H:%M')}</p>
+        </div>
+    </div>
+</body>
+</html>
+"""
+            st.download_button(
+                "📥 Download as HTML",
+                data=html_doc,
+                file_name=f"predictions_week_{view_week}_{datetime.now().strftime('%Y%m%d')}.html",
+                mime="text/html",
+                use_container_width=True
+            )
         
         st.markdown("---")
         
