@@ -1,0 +1,280 @@
+{
+  "1": [
+    {
+      "home": 1,
+      "away": 1
+    },
+    {
+      "home": 4,
+      "away": 4
+    },
+    {
+      "home": 2,
+      "away": 3
+    },
+    {
+      "home": 2,
+      "away": 1
+    },
+    {
+      "home": 1,
+      "away": 0
+    },
+    {
+      "home": 3,
+      "away": 2
+    },
+    {
+      "home": 0,
+      "away": 1
+    },
+    {
+      "home": 2,
+      "away": 1
+    },
+    {
+      "home": 2,
+      "away": 1
+    },
+    {
+      "home": 4,
+      "away": 0
+    }
+  ],
+  "2": [
+    {
+      "home": 5,
+      "away": 0
+    },
+    {
+      "home": 2,
+      "away": 1
+    },
+    {
+      "home": 2,
+      "away": 1
+    },
+    {
+      "home": 4,
+      "away": 4
+    },
+    {
+      "home": 3,
+      "away": 1
+    },
+    {
+      "home": 3,
+      "away": 0
+    },
+    {
+      "home": 0,
+      "away": 3
+    },
+    {
+      "home": 2,
+      "away": 1
+    },
+    {
+      "home": 4,
+      "away": 1
+    },
+    {
+      "home": 2,
+      "away": 2
+    }
+  ],
+  "16": [
+    {
+      "home": 2,
+      "away": 0
+    },
+    {
+      "home": 2,
+      "away": 0
+    },
+    {
+      "home": 2,
+      "away": 3
+    },
+    {
+      "home": 2,
+      "away": 1
+    },
+    {
+      "home": 1,
+      "away": 0
+    },
+    {
+      "home": 0,
+      "away": 3
+    },
+    {
+      "home": 3,
+      "away": 0
+    },
+    {
+      "home": 2,
+      "away": 3
+    },
+    {
+      "home": 1,
+      "away": 1
+    },
+    {
+      "home": 4,
+      "away": 4
+    }
+  ],
+  "16_0": {
+    "home_score": 2,
+    "away_score": 0,
+    "entered_at": "2025-12-18T15:11:42.368152",
+    "source": "API"
+  },
+  "16_1": {
+    "home_score": 2,
+    "away_score": 0,
+    "entered_at": "2025-12-18T15:11:42.368152",
+    "source": "API"
+  },
+  "16_2": {
+    "home_score": 2,
+    "away_score": 3,
+    "entered_at": "2025-12-18T15:11:42.368152",
+    "source": "API"
+  },
+  "16_3": {
+    "home_score": 2,
+    "away_score": 1,
+    "entered_at": "2025-12-18T15:11:42.368152",
+    "source": "API"
+  },
+  "16_4": {
+    "home_score": 1,
+    "away_score": 0,
+    "entered_at": "2025-12-18T15:11:42.368152",
+    "source": "API"
+  },
+  "16_5": {
+    "home_score": 0,
+    "away_score": 3,
+    "entered_at": "2025-12-18T15:11:42.368152",
+    "source": "API"
+  },
+  "16_6": {
+    "home_score": 3,
+    "away_score": 0,
+    "entered_at": "2025-12-18T15:11:42.368152",
+    "source": "API"
+  },
+  "16_7": {
+    "home_score": 2,
+    "away_score": 3,
+    "entered_at": "2025-12-18T15:11:42.368152",
+    "source": "API"
+  },
+  "16_8": {
+    "home_score": 1,
+    "away_score": 1,
+    "entered_at": "2025-12-18T15:11:42.368152",
+    "source": "API"
+  },
+  "16_9": {
+    "home_score": 4,
+    "away_score": 4,
+    "entered_at": "2025-12-18T15:11:42.368152",
+    "source": "API"
+  },
+  "17": [
+    {
+      "home": 2,
+      "away": 2
+    },
+    {
+      "home": 1,
+      "away": 1
+    },
+    {
+      "home": 0,
+      "away": 0
+    },
+    {
+      "home": 3,
+      "away": 0
+    },
+    {
+      "home": 0,
+      "away": 2
+    },
+    {
+      "home": 1,
+      "away": 2
+    },
+    {
+      "home": 0,
+      "away": 1
+    },
+    {
+      "home": 4,
+      "away": 1
+    },
+    {
+      "home": 2,
+      "away": 1
+    }
+  ],
+  "17_0": {
+    "home_score": 2,
+    "away_score": 2,
+    "entered_at": "2025-12-22T08:47:40.559253",
+    "source": "API"
+  },
+  "17_1": {
+    "home_score": 1,
+    "away_score": 1,
+    "entered_at": "2025-12-22T08:47:40.559253",
+    "source": "API"
+  },
+  "17_2": {
+    "home_score": 0,
+    "away_score": 0,
+    "entered_at": "2025-12-22T08:47:40.559253",
+    "source": "API"
+  },
+  "17_3": {
+    "home_score": 3,
+    "away_score": 0,
+    "entered_at": "2025-12-22T08:47:40.559253",
+    "source": "API"
+  },
+  "17_4": {
+    "home_score": 0,
+    "away_score": 2,
+    "entered_at": "2025-12-22T08:47:40.559253",
+    "source": "API"
+  },
+  "17_5": {
+    "home_score": 1,
+    "away_score": 2,
+    "entered_at": "2025-12-22T08:47:40.559253",
+    "source": "API"
+  },
+  "17_6": {
+    "home_score": 0,
+    "away_score": 1,
+    "entered_at": "2025-12-22T08:47:40.559253",
+    "source": "API"
+  },
+  "17_7": {
+    "home_score": 4,
+    "away_score": 1,
+    "entered_at": "2025-12-22T08:47:40.559253",
+    "source": "API"
+  },
+  "17_8": {
+    "home_score": 2,
+    "away_score": 1,
+    "entered_at": "2025-12-22T08:47:40.559253",
+    "source": "API"
+  }
+}

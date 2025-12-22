@@ -1,0 +1,19 @@
+{
+  "current_week": 17,
+  "locked_weeks": [
+    1,
+    2,
+    3,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17
+  ],
+  "deadlines": {
+    "17": "2025-12-21 00:00"
+  },
+  "registration_locked": true
+}

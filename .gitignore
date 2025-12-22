@@ -1,0 +1,33 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+
+# Streamlit
+.streamlit/secrets.toml
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# DON'T ignore data - we want it in GitHub for persistence!
+# nikkang_data/  <- This line is commented out so data IS trackednikkang_data/*.json 
+nikkang_data/gdrive_credentials.json 
+nikkang_data/*-kk-*.json 
+"nikkang_data/*.json" 
+"!nikkang_data/participants.json" 
+"!nikkang_data/matches.json" 
+"!nikkang_data/predictions.json" 
+"!nikkang_data/results.json" 
+"!nikkang_data/settings.json" 
