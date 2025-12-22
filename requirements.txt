@@ -4,6 +4,4 @@ requests>=2.31.0
 supabase>=2.3.0
 postgrest>=0.13.0
 matplotlib>=3.5.0
-google-auth-oauthlib
-google-auth-httplib2
-google-api-python-clientdropbox 
+dropbox 
