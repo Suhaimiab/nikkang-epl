@@ -137,7 +137,7 @@ if weeks:
                 is_late, time = tracker.save_prediction_with_timestamp(
                     week=selected_week,
                     participant_id=participant_id,
-                    predictions=new_predictions
+                    predictions=predictions
                 )
 
                 if is_late:
