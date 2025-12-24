@@ -261,3 +261,5 @@ def simple_sync_ui():
                 st.caption(f"📄 {file['name']} - {size_kb:.1f} KB - {modified}")
         else:
             st.caption("No files yet. Click 'Sync to Dropbox' to upload.")
+
+            
