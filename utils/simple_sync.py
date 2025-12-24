@@ -30,50 +30,64 @@ class DropboxSync:
         self.authenticate()
     
     def authenticate(self):
-            """Get token from secrets (Refresh Token) or local file"""
-            # 1. Try to load from Streamlit secrets (The Permanent Way)
-            if hasattr(st, 'secrets') and 'dropbox' in st.secrets:
-                try:
-                    secrets = st.secrets["dropbox"]
-                    # Check if we have the new permanent setup
-                    if "refresh_token" in secrets and "app_key" in secrets and "app_secret" in secrets:
-                        self.dbx = dropbox.Dropbox(
-                            app_key=secrets["app_key"],
-                            app_secret=secrets["app_secret"],
-                            oauth2_refresh_token=secrets["refresh_token"]
-                        )
-                        # Test connection
-                        self.dbx.users_get_current_account()
-                        self.configured = True
-                        st.success("✅ Connected to Dropbox (Auto-Refresh Active!)")
-                        return
-                    
-                    # Fallback for old access_token method (Temporary)
-                    elif "access_token" in secrets:
-                        token = secrets["access_token"]
-                        self.dbx = dropbox.Dropbox(token)
-                        self.dbx.users_get_current_account()
-                        self.configured = True
-                        st.success("🔑 Using simple access token")
-                        return
-                except Exception as e:
-                    self.error_message = f"Secrets connection failed: {e}"
-
-            # 2. Try Local File (Desktop/Testing)
-            local_token_file = Path("nikkang_data/dropbox_token.txt")
-            if local_token_file.exists():
-                try:
-                    with open(local_token_file, 'r') as f:
-                        token = f.read().strip()
+        """Get token from secrets (Refresh Token) or local file"""
+        # 1. Try to load from Streamlit secrets (The Permanent Way)
+        if hasattr(st, 'secrets') and 'dropbox' in st.secrets:
+            try:
+                secrets = st.secrets["dropbox"]
+                # Check if we have the new permanent setup
+                if "refresh_token" in secrets and "app_key" in secrets and "app_secret" in secrets:
+                    self.dbx = dropbox.Dropbox(
+                        app_key=secrets["app_key"],
+                        app_secret=secrets["app_secret"],
+                        oauth2_refresh_token=secrets["refresh_token"]
+                    )
+                    # Test connection
+                    self.dbx.users_get_current_account()
+                    self.configured = True
+                    # st.success("✅ Connected to Dropbox (Auto-Refresh Active!)") # Commented out to reduce noise
+                    return
+                
+                # Fallback for old access_token method (Temporary)
+                elif "access_token" in secrets:
+                    token = secrets["access_token"]
                     self.dbx = dropbox.Dropbox(token)
                     self.dbx.users_get_current_account()
                     self.configured = True
-                    st.success("🔑 Using local token")
-                except Exception as e:
-                    self.error_message = f"Local token failed: {e}"
-            else:
-                if not self.error_message:
-                    self.error_message = "No credentials found in secrets or local file"
+                    st.success("🔑 Using simple access token")
+                    return
+            except Exception as e:
+                self.error_message = f"Secrets connection failed: {e}"
+
+        # 2. Try Local File (Desktop/Testing)
+        local_token_file = Path("nikkang_data/dropbox_token.txt")
+        if local_token_file.exists():
+            try:
+                with open(local_token_file, 'r') as f:
+                    token = f.read().strip()
+                self.dbx = dropbox.Dropbox(token)
+                self.dbx.users_get_current_account()
+                self.configured = True
+                st.success("🔑 Using local token")
+            except Exception as e:
+                self.error_message = f"Local token failed: {e}"
+        else:
+            if not self.error_message:
+                self.error_message = "No credentials found in secrets or local file"
+
+    def upload_file(self, file_path, dropbox_path):
+        """Upload file to Dropbox"""
+        try:
+            with open(file_path, 'rb') as f:
+                # Upload with overwrite mode
+                self.dbx.files_upload(
+                    f.read(),
+                    dropbox_path,
+                    mode=dropbox.files.WriteMode.overwrite
+                )
+            return True, f"Uploaded {Path(file_path).name}"
+        except Exception as e:
+            return False, f"Upload failed: {e}"
     
     def download_file(self, dropbox_path, local_path):
         """Download file from Dropbox"""
@@ -192,24 +206,12 @@ def simple_sync_ui():
     """Dropbox sync UI - SIMPLE AND WORKS"""
     
     st.markdown("## 📱💻 Dropbox Sync")
-    st.info("💡 Simple, reliable, works everywhere!")
     
     sync = DropboxSync()
     
     # Check library
     if not DROPBOX_AVAILABLE:
         st.error("❌ Dropbox library not installed")
-        st.markdown("""
-        **Install:**
-        ```bash
-        pip install dropbox
-        ```
-        
-        **Add to requirements.txt:**
-        ```
-        dropbox
-        ```
-        """)
         return
     
     # Check configuration
@@ -217,48 +219,6 @@ def simple_sync_ui():
         st.warning("⚠️ Dropbox not configured")
         if sync.error_message:
             st.error(sync.error_message)
-        
-        st.markdown("""
-        ### 🚀 Setup (5 minutes):
-        
-        **Step 1: Create Dropbox App**
-        1. Go to [Dropbox App Console](https://www.dropbox.com/developers/apps/create)
-        2. **Choose API:** Scoped access
-        3. **Choose access:** App folder
-        4. **Name:** `NikkangKK`
-        5. Click **"Create app"**
-        
-        **Step 2: Generate Token**
-        1. Scroll down to **"Generated access token"**
-        2. Click **"Generate"**
-        3. **Copy the token** (long string starting with `sl.`)
-        
-        **Step 3: Add Token**
-        
-        **For Desktop:**
-        - Create file: `nikkang_data/dropbox_token.txt`
-        - Paste token, save
-        
-        **For Streamlit Cloud:**
-        - Go to app Settings → Secrets
-        - Add:
-        ```toml
-        [dropbox]
-        access_token = "sl.your_token_here"
-        ```
-        
-        **Step 4: Restart**
-        Restart app and sync will work!
-        
-        ---
-        
-        ### ✅ Why Dropbox?
-        - No OAuth popup bullshit
-        - No service accounts
-        - One token works everywhere
-        - 2GB free storage
-        - **ACTUALLY WORKS!**
-        """)
         return
     
     # Connected!
@@ -301,36 +261,3 @@ def simple_sync_ui():
                 st.caption(f"📄 {file['name']} - {size_kb:.1f} KB - {modified}")
         else:
             st.caption("No files yet. Click 'Sync to Dropbox' to upload.")
-    
-    # Instructions
-    with st.expander("📱 How It Works"):
-        st.markdown("""
-        **Desktop → Mobile:**
-        1. Desktop: Make changes
-        2. Desktop: Click "Sync to Dropbox"
-        3. Mobile: Click "Sync from Dropbox"
-        4. Mobile: Refresh page
-        
-        **Mobile → Desktop:**
-        1. Mobile: Make changes
-        2. Mobile: Click "Sync to Dropbox"
-        3. Desktop: Click "Sync from Dropbox"
-        4. Desktop: Refresh page
-        
-        **Benefits:**
-        - ✅ Works on BOTH platforms
-        - ✅ No complex setup
-        - ✅ Free 2GB storage
-        - ✅ Reliable and fast
-        - ✅ One token, everywhere
-        """)
-    
-    # Check Dropbox folder
-    with st.expander("🔍 View in Dropbox"):
-        st.markdown("""
-        Your files are stored in Dropbox at:
-        
-        **Apps → NikkangKK**
-        
-        You can view them at [Dropbox.com](https://www.dropbox.com/home/Apps/NikkangKK)
-        """)
