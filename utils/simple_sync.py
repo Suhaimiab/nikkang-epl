@@ -30,53 +30,50 @@ class DropboxSync:
         self.authenticate()
     
     def authenticate(self):
-        """Get token from local file or Streamlit secrets"""
-        token = None
-        
-        # METHOD 1: Local file (desktop)
-        local_token_file = Path("nikkang_data/dropbox_token.txt")
-        if local_token_file.exists():
-            try:
-                with open(local_token_file, 'r') as f:
-                    token = f.read().strip()
-                st.success("🔑 Using local token")
-            except Exception as e:
-                st.warning(f"Local token failed: {e}")
-        
-        # METHOD 2: Streamlit secrets (cloud)
-        if not token:
-            try:
-                if hasattr(st, 'secrets') and 'dropbox' in st.secrets:
-                    token = st.secrets["dropbox"]["access_token"]
-                    st.success("🔑 Using Streamlit secrets")
-            except Exception as e:
-                self.error_message = f"Secrets failed: {e}"
-        
-        if token:
-            try:
-                self.dbx = dropbox.Dropbox(token)
-                # Test connection
-                self.dbx.users_get_current_account()
-                self.configured = True
-                st.info("✅ Connected to Dropbox!")
-            except Exception as e:
-                self.error_message = f"Connection failed: {e}"
-        else:
-            self.error_message = "No token found"
-    
-    def upload_file(self, file_path, dropbox_path):
-        """Upload file to Dropbox"""
-        try:
-            with open(file_path, 'rb') as f:
-                # Upload with overwrite mode
-                self.dbx.files_upload(
-                    f.read(),
-                    dropbox_path,
-                    mode=dropbox.files.WriteMode.overwrite
-                )
-            return True, f"Uploaded {Path(file_path).name}"
-        except Exception as e:
-            return False, f"Upload failed: {e}"
+            """Get token from secrets (Refresh Token) or local file"""
+            # 1. Try to load from Streamlit secrets (The Permanent Way)
+            if hasattr(st, 'secrets') and 'dropbox' in st.secrets:
+                try:
+                    secrets = st.secrets["dropbox"]
+                    # Check if we have the new permanent setup
+                    if "refresh_token" in secrets and "app_key" in secrets and "app_secret" in secrets:
+                        self.dbx = dropbox.Dropbox(
+                            app_key=secrets["app_key"],
+                            app_secret=secrets["app_secret"],
+                            oauth2_refresh_token=secrets["refresh_token"]
+                        )
+                        # Test connection
+                        self.dbx.users_get_current_account()
+                        self.configured = True
+                        st.success("✅ Connected to Dropbox (Auto-Refresh Active!)")
+                        return
+                    
+                    # Fallback for old access_token method (Temporary)
+                    elif "access_token" in secrets:
+                        token = secrets["access_token"]
+                        self.dbx = dropbox.Dropbox(token)
+                        self.dbx.users_get_current_account()
+                        self.configured = True
+                        st.success("🔑 Using simple access token")
+                        return
+                except Exception as e:
+                    self.error_message = f"Secrets connection failed: {e}"
+
+            # 2. Try Local File (Desktop/Testing)
+            local_token_file = Path("nikkang_data/dropbox_token.txt")
+            if local_token_file.exists():
+                try:
+                    with open(local_token_file, 'r') as f:
+                        token = f.read().strip()
+                    self.dbx = dropbox.Dropbox(token)
+                    self.dbx.users_get_current_account()
+                    self.configured = True
+                    st.success("🔑 Using local token")
+                except Exception as e:
+                    self.error_message = f"Local token failed: {e}"
+            else:
+                if not self.error_message:
+                    self.error_message = "No credentials found in secrets or local file"
     
     def download_file(self, dropbox_path, local_path):
         """Download file from Dropbox"""
