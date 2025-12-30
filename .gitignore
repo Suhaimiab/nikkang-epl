@@ -31,3 +31,4 @@ nikkang_data/*-kk-*.json
 "!nikkang_data/predictions.json" 
 "!nikkang_data/results.json" 
 "!nikkang_data/settings.json" 
+nikkang_data/token.pickle 
