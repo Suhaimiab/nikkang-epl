@@ -188,7 +188,7 @@ def require_admin(page_title: str = "Admin Page"):
         if st.session_state.login_time:
             st.caption(f"Login time: {st.session_state.login_time.strftime('%H:%M:%S')}")
         
-        if st.button("🚪 Logout", use_container_width=True):
+        if st.button("🚪 Logout", width='stretch'):
             admin_logout()
     
     return True
@@ -309,7 +309,7 @@ def admin_info_widget():
             **Login:** {st.session_state.login_time.strftime('%H:%M:%S') if st.session_state.login_time else 'N/A'}
             """)
             
-            if st.button("🚪 Logout", key="sidebar_logout", use_container_width=True):
+            if st.button("🚪 Logout", key="sidebar_logout", width='stretch'):
                 admin_logout()
 
 def security_check():

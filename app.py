@@ -117,7 +117,7 @@ def display_logo_sidebar():
     """Display logo in sidebar with attractive styling"""
     if check_logo_exists():
         st.sidebar.markdown('<div class="sidebar-logo-container">', unsafe_allow_html=True)
-        st.sidebar.image("nikkang_logo.png", use_container_width=True)
+        st.sidebar.image("nikkang_logo.png", width='stretch')
         st.sidebar.markdown('</div>', unsafe_allow_html=True)
     else:
         st.sidebar.markdown("""
@@ -135,7 +135,7 @@ def display_logo_main():
     
     with col2:
         if check_logo_exists():
-            st.image("nikkang_logo.png", use_container_width=True)
+            st.image("nikkang_logo.png", width='stretch')
         else:
             st.markdown("""
             <div style="text-align: center; padding: 2rem 0;">
@@ -180,7 +180,7 @@ def main():
     
     # Admin access
     st.sidebar.markdown("### 🔐 Admin Access")
-    if st.sidebar.button("🛠️ Admin Panel", use_container_width=True):
+    if st.sidebar.button("🛠️ Admin Panel", width='stretch'):
         st.switch_page("pages/6_admin.py")
     
     st.sidebar.markdown("---")
@@ -308,15 +308,15 @@ def main():
     action_col1, action_col2, action_col3 = st.columns(3)
     
     with action_col1:
-        if st.button("📝 Register Now", use_container_width=True, type="primary"):
+        if st.button("📝 Register Now", width='stretch', type="primary"):
             st.switch_page("pages/2_register.py")
     
     with action_col2:
-        if st.button("🎯 Make Predictions", use_container_width=True):
+        if st.button("🎯 Make Predictions", width='stretch'):
             st.switch_page("pages/3_predictions.py")
     
     with action_col3:
-        if st.button("📊 View Leaderboard", use_container_width=True):
+        if st.button("📊 View Leaderboard", width='stretch'):
             st.switch_page("pages/5_leaderboard.py")
     
     # Footer

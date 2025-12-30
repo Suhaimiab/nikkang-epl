@@ -135,7 +135,7 @@ with st.form("registration_form"):
     # Terms agreement
     agree = st.checkbox("I agree to participate in the competition and follow the rules")
     
-    submit = st.form_submit_button("🎯 Register", use_container_width=True)
+    submit = st.form_submit_button("🎯 Register", width='stretch')
     
     if submit:
         # Validation

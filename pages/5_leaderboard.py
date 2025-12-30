@@ -184,7 +184,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 if Path("nikkang_logo.png").exists():
-    st.sidebar.image("nikkang_logo.png", use_container_width=True)
+    st.sidebar.image("nikkang_logo.png", width='stretch')
     st.sidebar.markdown("---")
 
 st.markdown("""
@@ -542,7 +542,7 @@ with tab1:
             f'S3{s3_i}': p['s3_pts'], f'S4{s4_i}': p['s4_pts'],
             'Total': p['total_pts'], 'KK': p['total_kk']
         } for p in lb])
-        st.dataframe(df, use_container_width=True, hide_index=True)
+        st.dataframe(df, width='stretch', hide_index=True)
         st.caption("🔒 = Manual (Locked) | 🔄 = Auto-calculated")
         
         # Download as PNG button
@@ -630,7 +630,7 @@ def display_round_tab(round_num, info):
         data.append(row)
     
     stage_df = pd.DataFrame(data)
-    st.dataframe(stage_df, use_container_width=True, hide_index=True)
+    st.dataframe(stage_df, width='stretch', hide_index=True)
     
     # Download as PNG button for stage
     col_dl1, col_dl2, col_dl3 = st.columns([1, 1, 2])

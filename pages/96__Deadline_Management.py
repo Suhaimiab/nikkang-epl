@@ -28,7 +28,7 @@ if not check_password():
 
 # Logo
 if Path("nikkang_logo.png").exists():
-    st.sidebar.image("nikkang_logo.png", use_container_width=True)
+    st.sidebar.image("nikkang_logo.png", width='stretch')
     st.sidebar.markdown("---")
 
 st.title("⏰ Deadline & Late Submission Management")

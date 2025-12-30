@@ -315,7 +315,7 @@ with tab3:
             
             df_display = df[cols_to_show]
             
-            st.dataframe(df_display, use_container_width=True, hide_index=True)
+            st.dataframe(df_display, width='stretch', hide_index=True)
             
             # Summary stats
             st.markdown("---")

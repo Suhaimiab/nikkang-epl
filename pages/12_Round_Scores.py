@@ -27,7 +27,7 @@ if not check_password():
     st.stop()
 
 if Path("nikkang_logo.png").exists():
-    st.sidebar.image("nikkang_logo.png", use_container_width=True)
+    st.sidebar.image("nikkang_logo.png", width='stretch')
     st.sidebar.markdown("---")
 
 st.markdown("""
@@ -171,10 +171,10 @@ def display_round_entry(round_num, round_info):
             col1, col2 = st.columns(2)
             
             with col1:
-                save_btn = st.form_submit_button("💾 Save Scores", use_container_width=True)
+                save_btn = st.form_submit_button("💾 Save Scores", width='stretch')
             
             with col2:
-                lock_btn = st.form_submit_button("🔒 Save & Lock Stage", use_container_width=True, type="primary")
+                lock_btn = st.form_submit_button("🔒 Save & Lock Stage", width='stretch', type="primary")
             
             if save_btn or lock_btn:
                 round_scores[round_key] = entries
@@ -203,7 +203,7 @@ def display_round_entry(round_num, round_info):
         
         df = pd.DataFrame(table_data)
         df = df.sort_values(['Points', 'KK Count'], ascending=[False, False])
-        st.dataframe(df, use_container_width=True, hide_index=True)
+        st.dataframe(df, width='stretch', hide_index=True)
     else:
         st.info("No scores entered yet")
     
@@ -328,7 +328,7 @@ with tab5:
         
         # Display summary
         display_cols = ['Name', 'S1', 'S2', 'S3', 'S4', 'Total Pts', 'Total KK']
-        st.dataframe(df[display_cols], use_container_width=True, hide_index=True)
+        st.dataframe(df[display_cols], width='stretch', hide_index=True)
         
         st.markdown("---")
         st.markdown("#### Lock Status")

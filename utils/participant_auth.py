@@ -140,7 +140,7 @@ def participant_login_form() -> bool:
     
     st.write("---")
     
-    if st.button("LOGIN", use_container_width=True, type="primary", key="auth_login_button"):
+    if st.button("LOGIN", width='stretch', type="primary", key="auth_login_button"):
         
         if not nickname:
             st.error("❌ Enter your nickname")
@@ -258,7 +258,7 @@ def participant_info_sidebar():
             st.markdown("### 👤 Logged In")
             st.info(f"**{st.session_state.participant_nickname}**")
             
-            if st.button("🚪 Logout", use_container_width=True, key="logout_btn"):
+            if st.button("🚪 Logout", width='stretch', key="logout_btn"):
                 participant_logout()
 
 def change_participant_password(old_password: str, new_password: str) -> Tuple[bool, str]:

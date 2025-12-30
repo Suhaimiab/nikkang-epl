@@ -31,7 +31,7 @@ except:
 if Path("nikkang_logo.png").exists():
     st.sidebar.markdown('<div style="padding-top: 0.5rem;"></div>', unsafe_allow_html=True)
     st.sidebar.markdown('<div class="sidebar-logo-container">', unsafe_allow_html=True)
-    st.sidebar.image("nikkang_logo.png", use_container_width=True)
+    st.sidebar.image("nikkang_logo.png", width='stretch')
     st.sidebar.markdown('</div>', unsafe_allow_html=True)
     st.sidebar.markdown("---")
 
@@ -471,7 +471,7 @@ with tab2:
             if performance_data:
                 st.markdown("### 📅 Week by Week")
                 perf_df = pd.DataFrame(performance_data)
-                st.dataframe(perf_df, use_container_width=True, hide_index=True)
+                st.dataframe(perf_df, width='stretch', hide_index=True)
                 
                 # Points trend chart
                 st.markdown("### 📈 Points Trend")
@@ -540,7 +540,7 @@ with tab3:
         
         if all_results_data:
             results_df = pd.DataFrame(all_results_data)
-            st.dataframe(results_df, use_container_width=True, hide_index=True)
+            st.dataframe(results_df, width='stretch', hide_index=True)
 
 # Footer
 st.markdown("---")

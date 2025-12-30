@@ -26,7 +26,7 @@ if not check_password():
 
 # Logo
 if Path("nikkang_logo.png").exists():
-    st.sidebar.image("nikkang_logo.png", use_container_width=True)
+    st.sidebar.image("nikkang_logo.png", width='stretch')
     st.sidebar.markdown("---")
 
 st.title("✏️ Edit Predictions")
@@ -198,13 +198,13 @@ st.markdown("---")
 col1, col2, col3 = st.columns(3)
 
 with col1:
-    save_button = st.button("💾 Save Predictions", use_container_width=True, type="primary")
+    save_button = st.button("💾 Save Predictions", width='stretch', type="primary")
 
 with col2:
-    preview_button = st.button("👀 Preview", use_container_width=True)
+    preview_button = st.button("👀 Preview", width='stretch')
 
 with col3:
-    cancel_button = st.button("❌ Cancel", use_container_width=True)
+    cancel_button = st.button("❌ Cancel", width='stretch')
 
 # Handle form submission
 if save_button:

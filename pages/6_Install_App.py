@@ -63,7 +63,7 @@ APP_URL = "https://nikkang-epl.streamlit.app"
 if Path("nikkang_logo.png").exists():
     st.sidebar.markdown('<div style="padding-top: 0.5rem;"></div>', unsafe_allow_html=True)
     st.sidebar.markdown('<div class="sidebar-logo-container">', unsafe_allow_html=True)
-    st.sidebar.image("nikkang_logo.png", use_container_width=True)
+    st.sidebar.image("nikkang_logo.png", width='stretch')
     st.sidebar.markdown('</div>', unsafe_allow_html=True)
     st.sidebar.markdown("---")
 

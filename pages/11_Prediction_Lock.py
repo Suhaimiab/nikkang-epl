@@ -42,7 +42,7 @@ if not check_password():
 if Path("nikkang_logo.png").exists():
     st.sidebar.markdown('<div style="padding-top: 0.5rem;"></div>', unsafe_allow_html=True)
     st.sidebar.markdown('<div class="sidebar-logo-container">', unsafe_allow_html=True)
-    st.sidebar.image("nikkang_logo.png", use_container_width=True)
+    st.sidebar.image("nikkang_logo.png", width='stretch')
     st.sidebar.markdown('</div>', unsafe_allow_html=True)
     st.sidebar.markdown("---")
 
@@ -131,14 +131,14 @@ with tab1:
     col1, col2 = st.columns(2)
     
     with col1:
-        if st.button("🔒 Enable Global Lock", use_container_width=True, type="primary" if not settings.get("global_lock") else "secondary"):
+        if st.button("🔒 Enable Global Lock", width='stretch', type="primary" if not settings.get("global_lock") else "secondary"):
             settings["global_lock"] = True
             save_settings(settings)
             st.success("✅ Global lock enabled - all predictions are now locked!")
             st.rerun()
     
     with col2:
-        if st.button("🔓 Disable Global Lock", use_container_width=True, type="primary" if settings.get("global_lock") else "secondary"):
+        if st.button("🔓 Disable Global Lock", width='stretch', type="primary" if settings.get("global_lock") else "secondary"):
             settings["global_lock"] = False
             save_settings(settings)
             st.success("✅ Global lock disabled - predictions are now open!")
@@ -177,7 +177,7 @@ with tab1:
         )
     
     with col2:
-        if st.button("🔒 Lock Week", use_container_width=True):
+        if st.button("🔒 Lock Week", width='stretch'):
             if selected_week not in locked_weeks:
                 locked_weeks.append(selected_week)
                 settings["locked_weeks"] = locked_weeks
@@ -188,7 +188,7 @@ with tab1:
                 st.warning(f"Week {selected_week} is already locked")
     
     with col3:
-        if st.button("🔓 Unlock Week", use_container_width=True):
+        if st.button("🔓 Unlock Week", width='stretch'):
             if selected_week in locked_weeks:
                 locked_weeks.remove(selected_week)
                 settings["locked_weeks"] = locked_weeks
@@ -205,7 +205,7 @@ with tab1:
     col1, col2, col3 = st.columns(3)
     
     with col1:
-        if st.button("🔒 Lock All Past Weeks", use_container_width=True):
+        if st.button("🔒 Lock All Past Weeks", width='stretch'):
             current = dm.get_current_week()
             for w in weeks:
                 if w < current and w not in locked_weeks:
@@ -216,14 +216,14 @@ with tab1:
             st.rerun()
     
     with col2:
-        if st.button("🔒 Lock All Weeks", use_container_width=True):
+        if st.button("🔒 Lock All Weeks", width='stretch'):
             settings["locked_weeks"] = list(weeks)
             save_settings(settings)
             st.success("✅ All weeks locked!")
             st.rerun()
     
     with col3:
-        if st.button("🔓 Unlock All Weeks", use_container_width=True):
+        if st.button("🔓 Unlock All Weeks", width='stretch'):
             settings["locked_weeks"] = []
             save_settings(settings)
             st.success("✅ All weeks unlocked!")
@@ -300,7 +300,7 @@ with tab2:
         df = pd.DataFrame(matrix_data)
         
         # Style the dataframe
-        st.dataframe(df, use_container_width=True, hide_index=True)
+        st.dataframe(df, width='stretch', hide_index=True)
         
         # Generate PNG for download
         def generate_prediction_matrix_png(df, week, matches):
@@ -416,7 +416,7 @@ with tab2:
                 data=png_bytes,
                 file_name=f"predictions_week_{view_week}_{datetime.now().strftime('%Y%m%d')}.png",
                 mime="image/png",
-                use_container_width=True
+                width='stretch'
             )
         
         with col2:
@@ -429,7 +429,7 @@ with tab2:
                 data=csv_data,
                 file_name=f"predictions_week_{view_week}_{datetime.now().strftime('%Y%m%d')}.csv",
                 mime="text/csv",
-                use_container_width=True
+                width='stretch'
             )
         
         with col3:
@@ -472,7 +472,7 @@ with tab2:
                 data=html_doc,
                 file_name=f"predictions_week_{view_week}_{datetime.now().strftime('%Y%m%d')}.html",
                 mime="text/html",
-                use_container_width=True
+                width='stretch'
             )
         
         st.markdown("---")
@@ -544,7 +544,7 @@ with tab2:
                     })
                 
                 pred_df = pd.DataFrame(match_preds)
-                st.dataframe(pred_df, use_container_width=True, hide_index=True)
+                st.dataframe(pred_df, width='stretch', hide_index=True)
         
         st.markdown("---")
         
@@ -592,7 +592,7 @@ with tab2:
         
         if missing:
             missing_df = pd.DataFrame(missing)
-            st.dataframe(missing_df, use_container_width=True, hide_index=True)
+            st.dataframe(missing_df, width='stretch', hide_index=True)
         else:
             st.success("✅ All participants have submitted predictions for all matches!")
 
@@ -723,10 +723,10 @@ with tab3:
                 col1, col2 = st.columns(2)
                 
                 with col1:
-                    save_btn = st.form_submit_button("💾 Save Predictions", use_container_width=True, type="primary")
+                    save_btn = st.form_submit_button("💾 Save Predictions", width='stretch', type="primary")
                 
                 with col2:
-                    clear_btn = st.form_submit_button("🗑️ Clear All Predictions", use_container_width=True)
+                    clear_btn = st.form_submit_button("🗑️ Clear All Predictions", width='stretch')
                 
                 if save_btn:
                     # Save predictions
@@ -758,7 +758,7 @@ with tab3:
         col1, col2 = st.columns(2)
         
         with col1:
-            if st.button("📋 View All Predictions for This Participant", use_container_width=True):
+            if st.button("📋 View All Predictions for This Participant", width='stretch'):
                 all_preds = dm.load_predictions()
                 participant_preds = all_preds.get(selected_participant_id, {})
                 
@@ -771,7 +771,7 @@ with tab3:
                     st.info(f"No predictions found for {selected_participant_name}")
         
         with col2:
-            if st.button("📊 Recalculate Points", use_container_width=True):
+            if st.button("📊 Recalculate Points", width='stretch'):
                 dm.recalculate_all_points()
                 st.success("✅ All points recalculated!")
 
@@ -849,7 +849,7 @@ with tab4:
             })
         
         week_df = pd.DataFrame(week_stats)
-        st.dataframe(week_df, use_container_width=True, hide_index=True)
+        st.dataframe(week_df, width='stretch', hide_index=True)
         
         st.markdown("---")
         
@@ -876,7 +876,7 @@ with tab4:
         
         activity_df = pd.DataFrame(activity)
         activity_df = activity_df.sort_values('Predictions', ascending=False)
-        st.dataframe(activity_df, use_container_width=True, hide_index=True)
+        st.dataframe(activity_df, width='stretch', hide_index=True)
 
 # ============================================================================
 # TAB 5: SETTINGS
@@ -904,7 +904,7 @@ with tab5:
     
     with col2:
         st.markdown("<br>", unsafe_allow_html=True)
-        if st.button("💾 Save Current Week", use_container_width=True, type="primary"):
+        if st.button("💾 Save Current Week", width='stretch', type="primary"):
             settings["current_week"] = new_week
             save_settings(settings)
             st.success(f"✅ Current week set to **Week {new_week}**!")
@@ -959,7 +959,7 @@ with tab5:
             data=settings_json,
             file_name="prediction_settings.json",
             mime="application/json",
-            use_container_width=True
+            width='stretch'
         )
     
     with col2:

@@ -107,7 +107,7 @@ with tab2:
         new_password = st.text_input("New Password", type="password", help="Minimum 6 characters")
         confirm_password = st.text_input("Confirm New Password", type="password")
         
-        change = st.form_submit_button("🔄 Change Password", use_container_width=True, type="primary")
+        change = st.form_submit_button("🔄 Change Password", width='stretch', type="primary")
         
         if change:
             # Validation

@@ -39,7 +39,7 @@ if not check_password():
 if Path("nikkang_logo.png").exists():
     st.sidebar.markdown('<div style="padding-top: 0.5rem;"></div>', unsafe_allow_html=True)
     st.sidebar.markdown('<div class="sidebar-logo-container">', unsafe_allow_html=True)
-    st.sidebar.image("nikkang_logo.png", use_container_width=True)
+    st.sidebar.image("nikkang_logo.png", width='stretch')
     st.sidebar.markdown('</div>', unsafe_allow_html=True)
     st.sidebar.markdown("---")
 
@@ -173,7 +173,7 @@ st.info("💡 **Pred_Home** and **Pred_Away** are numeric columns - perfect for 
 # Generate button
 st.markdown("---")
 
-if st.button("📥 Generate Prediction Matrix CSV", type="primary", use_container_width=True):
+if st.button("📥 Generate Prediction Matrix CSV", type="primary", width='stretch'):
     with st.spinner("Generating CSV file..."):
         # Build data
         all_rows = []
@@ -249,14 +249,14 @@ if st.button("📥 Generate Prediction Matrix CSV", type="primary", use_containe
                 data=csv,
                 file_name=filename,
                 mime="text/csv",
-                use_container_width=True,
+                width='stretch',
                 type="primary"
             )
         
         # Preview
         st.markdown("---")
         st.markdown("### 👀 Preview (First 20 rows)")
-        st.dataframe(df.head(20), use_container_width=True)
+        st.dataframe(df.head(20), width='stretch')
         
         # Summary by week
         st.markdown("---")
@@ -275,7 +275,7 @@ if st.button("📥 Generate Prediction Matrix CSV", type="primary", use_containe
             })
         
         summary_df = pd.DataFrame(summary_data)
-        st.dataframe(summary_df, use_container_width=True, hide_index=True)
+        st.dataframe(summary_df, width='stretch', hide_index=True)
 
 # Usage guide
 st.markdown("---")

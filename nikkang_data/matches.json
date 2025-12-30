@@ -362,5 +362,109 @@
       "away": "Nottingham",
       "gotw": false
     }
+  ],
+  "18": [
+    {
+      "home": "Man United",
+      "away": "Newcastle",
+      "gotw": false
+    },
+    {
+      "home": "Nottingham",
+      "away": "Man City",
+      "gotw": false
+    },
+    {
+      "home": "Arsenal",
+      "away": "Brighton Hove",
+      "gotw": false
+    },
+    {
+      "home": "Brentford",
+      "away": "Bournemouth",
+      "gotw": false
+    },
+    {
+      "home": "Burnley",
+      "away": "Everton",
+      "gotw": false
+    },
+    {
+      "home": "Liverpool",
+      "away": "Wolverhampton",
+      "gotw": false
+    },
+    {
+      "home": "West Ham",
+      "away": "Fulham",
+      "gotw": false
+    },
+    {
+      "home": "Chelsea",
+      "away": "Aston Villa",
+      "gotw": true
+    },
+    {
+      "home": "Sunderland",
+      "away": "Leeds United",
+      "gotw": false
+    },
+    {
+      "home": "Crystal Palace",
+      "away": "Tottenham",
+      "gotw": false
+    }
+  ],
+  "19": [
+    {
+      "home": "Burnley",
+      "away": "Newcastle",
+      "gotw": false
+    },
+    {
+      "home": "Chelsea",
+      "away": "Bournemouth",
+      "gotw": false
+    },
+    {
+      "home": "Nottingham",
+      "away": "Everton",
+      "gotw": false
+    },
+    {
+      "home": "West Ham",
+      "away": "Brighton Hove",
+      "gotw": false
+    },
+    {
+      "home": "Arsenal",
+      "away": "Aston Villa",
+      "gotw": true
+    },
+    {
+      "home": "Man United",
+      "away": "Wolverhampton",
+      "gotw": false
+    },
+    {
+      "home": "Crystal Palace",
+      "away": "Fulham",
+      "gotw": false
+    },
+    {
+      "home": "Liverpool",
+      "away": "Leeds United",
+      "gotw": false
+    },
+    {
+      "home": "Sunderland",
+      "away": "Man City",
+      "gotw": false
+    },
+    {
+      "home": "Brentford",
+      "away": "Tottenham",
+      "gotw": false
+    }
   ]
 }

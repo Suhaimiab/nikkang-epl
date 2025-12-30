@@ -26,7 +26,7 @@ except:
 
 # Logo
 if Path("nikkang_logo.png").exists():
-    st.sidebar.image("nikkang_logo.png", use_container_width=True)
+    st.sidebar.image("nikkang_logo.png", width='stretch')
     st.sidebar.markdown("---")
 
 st.markdown('<div style="background:linear-gradient(135deg,#dc3545 0%,#c82333 100%);color:white;padding:1.5rem;border-radius:10px;text-align:center;margin-bottom:1.5rem;"><h1 style="margin:0;font-size:2rem;">🔧 Results Repair Tool</h1><p style="margin:0.5rem 0 0 0;opacity:0.9;">Fix mismatched results data</p></div>', unsafe_allow_html=True)
@@ -94,7 +94,7 @@ for idx, fixture in enumerate(week_fixtures):
     })
 
 df_comparison = pd.DataFrame(comparison_data)
-st.dataframe(df_comparison, use_container_width=True, hide_index=True)
+st.dataframe(df_comparison, width='stretch', hide_index=True)
 
 # ============================================================================
 # STEP 2: CLEAR RESULTS
@@ -106,7 +106,7 @@ st.warning("⚠️ This will DELETE all results for this week. You will need to 
 
 col1, col2 = st.columns([1, 3])
 with col1:
-    if st.button("🗑️ CLEAR WEEK RESULTS", type="primary", use_container_width=True):
+    if st.button("🗑️ CLEAR WEEK RESULTS", type="primary", width='stretch'):
         # Clear list format
         if week_str in results_data:
             del results_data[week_str]
@@ -206,9 +206,9 @@ else:
             })
     
     if preview_data:
-        st.dataframe(pd.DataFrame(preview_data), use_container_width=True, hide_index=True)
+        st.dataframe(pd.DataFrame(preview_data), width='stretch', hide_index=True)
     
-    if st.button("💾 SAVE ALL RESULTS", type="primary", use_container_width=True):
+    if st.button("💾 SAVE ALL RESULTS", type="primary", width='stretch'):
         # Build results list
         results_list = []
         

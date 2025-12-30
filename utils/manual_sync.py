@@ -31,7 +31,7 @@ def manual_sync_section():
         st.markdown("### 📥 Download Backup")
         st.write("Save current data to download")
         
-        if st.button("📦 Create Backup", use_container_width=True):
+        if st.button("📦 Create Backup", width='stretch'):
             backup_data = create_backup()
             if backup_data:
                 st.download_button(
@@ -39,7 +39,7 @@ def manual_sync_section():
                     data=backup_data,
                     file_name=f"nikkang_backup_{datetime.now().strftime('%Y%m%d_%H%M%S')}.zip",
                     mime="application/zip",
-                    use_container_width=True
+                    width='stretch'
                 )
                 st.success("✅ Backup created! Click Download button above.")
     
@@ -55,7 +55,7 @@ def manual_sync_section():
         )
         
         if uploaded_file is not None:
-            if st.button("🔄 Restore from Backup", type="primary", use_container_width=True):
+            if st.button("🔄 Restore from Backup", type="primary", width='stretch'):
                 success = restore_backup(uploaded_file)
                 if success:
                     st.success("✅ Data restored successfully!")

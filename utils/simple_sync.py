@@ -229,7 +229,7 @@ def simple_sync_ui():
     
     with col1:
         st.markdown("### 📤 Push to Cloud")
-        if st.button("☁️ Sync to Dropbox", use_container_width=True, type="primary"):
+        if st.button("☁️ Sync to Dropbox", width='stretch', type="primary"):
             with st.spinner("Uploading..."):
                 success, message = sync.sync_all_to_cloud()
                 if success:
@@ -240,7 +240,7 @@ def simple_sync_ui():
     
     with col2:
         st.markdown("### 📥 Pull from Cloud")
-        if st.button("🔄 Sync from Dropbox", use_container_width=True):
+        if st.button("🔄 Sync from Dropbox", width='stretch'):
             with st.spinner("Downloading..."):
                 success, message = sync.sync_all_from_cloud()
                 if success:

@@ -143,7 +143,7 @@ with tab1:
                 })
             
             df = pd.DataFrame(df_data)
-            st.dataframe(df, use_container_width=True)
+            st.dataframe(df, width='stretch')
             
             # Edit/Delete options
             st.markdown("---")
@@ -242,7 +242,7 @@ with tab2:
             status = st.selectbox("Status", ["active", "inactive"], index=0)
             notes = st.text_area("Notes", placeholder="VIP member, special considerations, etc.")
         
-        submit = st.form_submit_button("➕ Add Participant", use_container_width=True)
+        submit = st.form_submit_button("➕ Add Participant", width='stretch')
         
         if submit:
             if not name:
@@ -298,7 +298,7 @@ with tab3:
             try:
                 df = pd.read_csv(uploaded_file)
                 st.write("Preview:")
-                st.dataframe(df.head(), use_container_width=True)
+                st.dataframe(df.head(), width='stretch')
                 
                 if st.button("Import All"):
                     imported_count = 0
@@ -351,7 +351,7 @@ with tab3:
                 data=csv,
                 file_name=f"participants_{datetime.now().strftime('%Y%m%d')}.csv",
                 mime="text/csv",
-                use_container_width=True
+                width='stretch'
             )
             
             # JSON export
@@ -361,7 +361,7 @@ with tab3:
                 data=json_data,
                 file_name=f"participants_backup_{datetime.now().strftime('%Y%m%d')}.json",
                 mime="application/json",
-                use_container_width=True
+                width='stretch'
             )
         else:
             st.info("No participants to export")

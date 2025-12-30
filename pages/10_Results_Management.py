@@ -51,7 +51,7 @@ except:
 
 # Logo in sidebar
 if Path("nikkang_logo.png").exists():
-    st.sidebar.image("nikkang_logo.png", use_container_width=True)
+    st.sidebar.image("nikkang_logo.png", width='stretch')
     st.sidebar.markdown("---")
 
 # Header
@@ -195,7 +195,7 @@ with tab1:
     
     st.markdown("---")
     
-    if st.button("🔍 Fetch Fixtures", type="primary", use_container_width=True, key="fetch_fixtures"):
+    if st.button("🔍 Fetch Fixtures", type="primary", width='stretch', key="fetch_fixtures"):
         with st.spinner("Fetching fixtures from API..."):
             try:
                 headers = {"X-Auth-Token": API_KEY}
@@ -266,7 +266,7 @@ with tab1:
             })
         
         df = pd.DataFrame(display_data)
-        st.dataframe(df, use_container_width=True, hide_index=True)
+        st.dataframe(df, width='stretch', hide_index=True)
         
         # Import options
         st.markdown("---")
@@ -281,7 +281,7 @@ with tab1:
         
         skip_existing = st.checkbox("Skip existing matches", value=True)
         
-        if st.button("✅ Import Fixtures", type="primary", use_container_width=True):
+        if st.button("✅ Import Fixtures", type="primary", width='stretch'):
             imported = 0
             skipped = 0
             
@@ -354,7 +354,7 @@ with tab2:
     
     st.markdown("---")
     
-    if st.button("🔍 Fetch Results", type="primary", use_container_width=True, key="fetch_results"):
+    if st.button("🔍 Fetch Results", type="primary", width='stretch', key="fetch_results"):
         with st.spinner("Fetching results from API..."):
             try:
                 headers = {"X-Auth-Token": API_KEY}
@@ -469,7 +469,7 @@ with tab2:
         # Show table
         if display_data:
             df = pd.DataFrame(display_data)
-            st.dataframe(df, use_container_width=True, hide_index=True)
+            st.dataframe(df, width='stretch', hide_index=True)
             
             st.session_state["match_mapping"] = match_mapping
             
@@ -482,7 +482,7 @@ with tab2:
             with col2:
                 only_matched = st.checkbox("Only matched fixtures", value=True, key="only_matched")
             
-            if st.button("✅ Apply Results", type="primary", use_container_width=True):
+            if st.button("✅ Apply Results", type="primary", width='stretch'):
                 applied = 0
                 skipped = 0
                 not_matched = 0
@@ -666,7 +666,7 @@ with tab3:
                 st.markdown("---")
             
             # Save button
-            if st.button("💾 Save Results", type="primary", use_container_width=True):
+            if st.button("💾 Save Results", type="primary", width='stretch'):
                 saved = 0
                 results_data = dm.load_results()
                 
@@ -721,7 +721,7 @@ with tab4:
     
     st.markdown("---")
     
-    if st.button("🔄 Recalculate All Points", type="primary", use_container_width=True):
+    if st.button("🔄 Recalculate All Points", type="primary", width='stretch'):
         with st.spinner("Recalculating points..."):
             participants_dict = dm.load_participants()
             
@@ -880,7 +880,7 @@ with tab4:
             if points_summary:
                 df = pd.DataFrame(points_summary)
                 df = df.sort_values('Total', ascending=False)
-                st.dataframe(df, use_container_width=True, hide_index=True)
+                st.dataframe(df, width='stretch', hide_index=True)
                 st.success(f"✅ Points recalculated for {len(points_summary)} participants!")
             else:
                 st.warning("No predictions found to calculate. Make sure participants have submitted predictions.")
@@ -969,7 +969,7 @@ Base URL: {BASE_URL}
             if display:
                 df = pd.DataFrame(display)
                 df = df.sort_values(['Week', 'Index'])
-                st.dataframe(df, use_container_width=True, hide_index=True)
+                st.dataframe(df, width='stretch', hide_index=True)
                 st.info(f"Total: {len(display)} results")
             else:
                 st.info("No results in list format found.")

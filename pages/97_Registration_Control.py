@@ -25,7 +25,7 @@ if not check_password():
 
 # Logo
 if Path("nikkang_logo.png").exists():
-    st.sidebar.image("nikkang_logo.png", use_container_width=True)
+    st.sidebar.image("nikkang_logo.png", width='stretch')
     st.sidebar.markdown("---")
 
 st.title("🔒 Registration Control")
@@ -71,7 +71,7 @@ st.markdown("### Change Registration Status:")
 col1, col2 = st.columns(2)
 
 with col1:
-    if st.button("🔒 Lock Registration", use_container_width=True, type="primary", disabled=registration_locked):
+    if st.button("🔒 Lock Registration", width='stretch', type="primary", disabled=registration_locked):
         settings['registration_locked'] = True
         
         # Save settings
@@ -84,7 +84,7 @@ with col1:
         st.rerun()
 
 with col2:
-    if st.button("🔓 Unlock Registration", use_container_width=True, disabled=not registration_locked):
+    if st.button("🔓 Unlock Registration", width='stretch', disabled=not registration_locked):
         settings['registration_locked'] = False
         
         # Save settings

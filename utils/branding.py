@@ -324,7 +324,7 @@ def display_sidebar_logo():
         # Add some top padding for better positioning
         st.sidebar.markdown('<div style="padding-top: 0.5rem;"></div>', unsafe_allow_html=True)
         st.sidebar.markdown('<div class="sidebar-logo-container">', unsafe_allow_html=True)
-        st.sidebar.image("nikkang_logo.png", use_container_width=True, output_format="PNG")
+        st.sidebar.image("nikkang_logo.png", width='stretch', output_format="PNG")
         st.sidebar.markdown('</div>', unsafe_allow_html=True)
     else:
         # Fallback text logo
@@ -353,7 +353,7 @@ def display_main_logo(title=None, subtitle=None):
     with col2:
         if check_logo_exists():
             st.markdown('<div style="text-align: center;">', unsafe_allow_html=True)
-            st.image("nikkang_logo.png", use_container_width=True, output_format="PNG")
+            st.image("nikkang_logo.png", width='stretch', output_format="PNG")
             st.markdown('</div>', unsafe_allow_html=True)
         else:
             st.markdown("""
@@ -442,16 +442,16 @@ def display_sidebar_navigation():
     """Display navigation buttons in sidebar"""
     st.sidebar.markdown("### 🎯 Quick Navigation")
     
-    if st.sidebar.button("🏠 Home", use_container_width=True):
+    if st.sidebar.button("🏠 Home", width='stretch'):
         st.switch_page("pages/1_home.py")
     
-    if st.sidebar.button("📝 Register", use_container_width=True):
+    if st.sidebar.button("📝 Register", width='stretch'):
         st.switch_page("pages/2_register.py")
     
-    if st.sidebar.button("🎯 Predictions", use_container_width=True):
+    if st.sidebar.button("🎯 Predictions", width='stretch'):
         st.switch_page("pages/3_predictions.py")
     
-    if st.sidebar.button("📊 Leaderboard", use_container_width=True):
+    if st.sidebar.button("📊 Leaderboard", width='stretch'):
         st.switch_page("pages/5_leaderboard.py")
     
     st.sidebar.markdown("---")

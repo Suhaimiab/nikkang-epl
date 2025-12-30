@@ -27,7 +27,7 @@ if not check_password():
     st.stop()
 
 if Path("nikkang_logo.png").exists():
-    st.sidebar.image("nikkang_logo.png", use_container_width=True)
+    st.sidebar.image("nikkang_logo.png", width='stretch')
     st.sidebar.markdown("---")
 
 st.markdown("""
@@ -78,7 +78,7 @@ with tab1:
             
             col1, col2 = st.columns(2)
             with col1:
-                if st.button("⭐ Set as GOTW", type="primary", use_container_width=True):
+                if st.button("⭐ Set as GOTW", type="primary", width='stretch'):
                     raw = dm.load_matches()
                     wk = str(selected_week)
                     for i in range(len(raw[wk])):
@@ -87,7 +87,7 @@ with tab1:
                     st.success("✅ GOTW set!")
                     st.rerun()
             with col2:
-                if st.button("❌ Clear GOTW", use_container_width=True):
+                if st.button("❌ Clear GOTW", width='stretch'):
                     raw = dm.load_matches()
                     wk = str(selected_week)
                     for i in range(len(raw[wk])):
@@ -126,7 +126,7 @@ with tab2:
                 'GOTW': '⭐' if m.get('gotw') else '',
                 'Result': f"{results.get(m.get('id'), {}).get('home_score', '-')}-{results.get(m.get('id'), {}).get('away_score', '-')}" if m.get('id') in results else 'TBD'
             } for m in all_matches]
-            st.dataframe(pd.DataFrame(data), use_container_width=True, hide_index=True)
+            st.dataframe(pd.DataFrame(data), width='stretch', hide_index=True)
 
 # TAB 3: ADD MATCHES
 with tab3:
@@ -143,7 +143,7 @@ with tab3:
             away = st.selectbox("Away:", EPL_TEAMS, key="add_away")
             match_time = st.selectbox("Kickoff:", KICKOFF_TIMES, index=2)
         
-        if st.form_submit_button("➕ Add Match", use_container_width=True):
+        if st.form_submit_button("➕ Add Match", width='stretch'):
             if home == away:
                 st.error("Teams cannot be the same!")
             else:
@@ -169,7 +169,7 @@ with tab3:
     bulk_time = st.selectbox("Default time:", KICKOFF_TIMES, index=2, key="bulk_t")
     bulk_text = st.text_area("Matches:", height=100)
     
-    if st.button("➕ Add All", use_container_width=True):
+    if st.button("➕ Add All", width='stretch'):
         if bulk_text.strip():
             raw = dm.load_matches()
             wk = str(bulk_week)
@@ -216,7 +216,7 @@ with tab4:
                 
                 col1, col2 = st.columns(2)
                 with col1:
-                    if st.button("💾 Save", key=f"save_{i}", use_container_width=True):
+                    if st.button("💾 Save", key=f"save_{i}", width='stretch'):
                         if new_gotw and not m.get('gotw'):
                             for j in range(len(raw[wk])):
                                 raw[wk][j]['gotw'] = False
@@ -225,7 +225,7 @@ with tab4:
                         st.success("✅ Saved!")
                         st.rerun()
                 with col2:
-                    if st.button("🗑️ Delete", key=f"del_{i}", use_container_width=True):
+                    if st.button("🗑️ Delete", key=f"del_{i}", width='stretch'):
                         del raw[wk][i]
                         if not raw[wk]:
                             del raw[wk]
@@ -244,7 +244,7 @@ with tab5:
         matches = raw.get(wk, [])
         
         if matches:
-            if st.button("⚡ Auto-Sort by Kickoff Time", type="primary", use_container_width=True):
+            if st.button("⚡ Auto-Sort by Kickoff Time", type="primary", width='stretch'):
                 raw[wk] = sorted(matches, key=lambda m: f"{m.get('date', '9999-12-31')} {m.get('time', '23:59')}")
                 dm.save_matches(raw)
                 st.success("✅ Sorted!")
@@ -292,7 +292,7 @@ with tab6:
         
         col1, col2 = st.columns(2)
         with col1:
-            if st.button("🗑️ Delete Week", type="primary", use_container_width=True):
+            if st.button("🗑️ Delete Week", type="primary", width='stretch'):
                 if confirm == f"DELETE WEEK {del_week}":
                     raw = dm.load_matches()
                     if str(del_week) in raw:
@@ -303,7 +303,7 @@ with tab6:
                 else:
                     st.error("Type confirmation text exactly")
         with col2:
-            if st.button("📥 Backup First", use_container_width=True):
+            if st.button("📥 Backup First", width='stretch'):
                 dm.backup_all_data()
                 st.success("✅ Backup created!")
 

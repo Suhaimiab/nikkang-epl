@@ -369,16 +369,16 @@ def get_leaderboard_data():
 def display_logo_sidebar():
     """Display logo in sidebar"""
     if Path("nikkang_logo.png").exists():
-        st.sidebar.image("nikkang_logo.png", use_container_width=True)
+        st.sidebar.image("nikkang_logo.png", width='stretch')
         st.sidebar.markdown("---")
     
     # Add Guide link to sidebar
     st.sidebar.markdown("### 📚 Quick Links")
-    if st.sidebar.button("📖 How to Play (Guide)", use_container_width=True, key="sidebar_guide"):
+    if st.sidebar.button("📖 How to Play (Guide)", width='stretch', key="sidebar_guide"):
         st.switch_page("pages/16_Guide.py")
-    if st.sidebar.button("🎯 Make Predictions", use_container_width=True, key="sidebar_predict"):
+    if st.sidebar.button("🎯 Make Predictions", width='stretch', key="sidebar_predict"):
         st.switch_page("pages/3_predictions.py")
-    if st.sidebar.button("📊 Leaderboard", use_container_width=True, key="sidebar_leaderboard"):
+    if st.sidebar.button("📊 Leaderboard", width='stretch', key="sidebar_leaderboard"):
         st.switch_page("pages/5_leaderboard.py")
     st.sidebar.markdown("---")
     
@@ -388,7 +388,7 @@ def display_logo_main():
     with col2:
         logo_path = Path("nikkang_logo.png")
         if logo_path.exists():
-            st.image("nikkang_logo.png", use_container_width=True)
+            st.image("nikkang_logo.png", width='stretch')
 
 # Display logos
 display_logo_sidebar()
@@ -407,7 +407,7 @@ with col_guide2:
         <span style="font-size:1rem;">🆕 <strong>New here?</strong> Learn how to play and win!</span>
     </div>
     """, unsafe_allow_html=True)
-    if st.button("📖 View Guide - How to Play", use_container_width=True, type="primary", key="top_guide_btn"):
+    if st.button("📖 View Guide - How to Play", width='stretch', type="primary", key="top_guide_btn"):
         st.switch_page("pages/16_Guide.py")
 
 # Get current data
@@ -625,7 +625,7 @@ with col1:
         <p>Join the competition!</p>
     </div>
     """, unsafe_allow_html=True)
-    if st.button("Register", use_container_width=True, type="primary"):
+    if st.button("Register", width='stretch', type="primary"):
         st.switch_page("pages/2_register.py")
 
 with col2:
@@ -635,7 +635,7 @@ with col2:
         <p>Submit predictions</p>
     </div>
     """, unsafe_allow_html=True)
-    if st.button("Make Predictions", use_container_width=True):
+    if st.button("Make Predictions", width='stretch'):
         st.switch_page("pages/3_predictions.py")
 
 with col3:
@@ -645,7 +645,7 @@ with col3:
         <p>Full standings</p>
     </div>
     """, unsafe_allow_html=True)
-    if st.button("View Leaderboard", use_container_width=True):
+    if st.button("View Leaderboard", width='stretch'):
         st.switch_page("pages/5_leaderboard.py")
 
 with col4:
@@ -655,7 +655,7 @@ with col4:
         <p>How to play</p>
     </div>
     """, unsafe_allow_html=True)
-    if st.button("View Guide", use_container_width=True, key="quick_action_guide"):
+    if st.button("View Guide", width='stretch', key="quick_action_guide"):
         st.switch_page("pages/16_Guide.py")
 
 st.markdown("---")

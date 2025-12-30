@@ -1271,7 +1271,68 @@
   "S67F9LGN": {},
   "5XEIF377": {},
   "11": {
-    "Y8PX0JE4": [],
+    "Y8PX0JE4": [
+      {
+        "home": 1,
+        "away": 1,
+        "submitted_at": "2025-12-23 13:35:43",
+        "late": false
+      },
+      {
+        "home": 0,
+        "away": 0,
+        "submitted_at": "2025-12-23 13:35:43",
+        "late": false
+      },
+      {
+        "home": 0,
+        "away": 0,
+        "submitted_at": "2025-12-23 13:35:43",
+        "late": false
+      },
+      {
+        "home": 0,
+        "away": 0,
+        "submitted_at": "2025-12-23 13:35:43",
+        "late": false
+      },
+      {
+        "home": 0,
+        "away": 0,
+        "submitted_at": "2025-12-23 13:35:43",
+        "late": false
+      },
+      {
+        "home": 0,
+        "away": 0,
+        "submitted_at": "2025-12-23 13:35:43",
+        "late": false
+      },
+      {
+        "home": 0,
+        "away": 0,
+        "submitted_at": "2025-12-23 13:35:43",
+        "late": false
+      },
+      {
+        "home": 0,
+        "away": 0,
+        "submitted_at": "2025-12-23 13:35:43",
+        "late": false
+      },
+      {
+        "home": 0,
+        "away": 0,
+        "submitted_at": "2025-12-23 13:35:43",
+        "late": false
+      },
+      {
+        "home": 0,
+        "away": 0,
+        "submitted_at": "2025-12-23 13:35:43",
+        "late": false
+      }
+    ],
     "AME76IMV": [],
     "6TF6LDIN": [],
     "S67F9LGN": [],
@@ -1573,43 +1634,63 @@
     "F25PL7HG": [
       {
         "home": 2,
-        "away": 2
+        "away": 1,
+        "submitted_at": "2025-12-26 11:49:17",
+        "late": false
+      },
+      {
+        "home": 1,
+        "away": 2,
+        "submitted_at": "2025-12-26 11:49:17",
+        "late": false
       },
       {
         "home": 2,
-        "away": 1
-      },
-      {
-        "home": 2,
-        "away": 1
+        "away": 0,
+        "submitted_at": "2025-12-26 11:49:17",
+        "late": false
       },
       {
         "home": 0,
-        "away": 1
+        "away": 2,
+        "submitted_at": "2025-12-26 11:49:17",
+        "late": false
+      },
+      {
+        "home": 1,
+        "away": 2,
+        "submitted_at": "2025-12-26 11:49:17",
+        "late": false
       },
       {
         "home": 3,
-        "away": 0
-      },
-      {
-        "home": 2,
-        "away": 1
-      },
-      {
-        "home": 1,
-        "away": 0
+        "away": 1,
+        "submitted_at": "2025-12-26 11:49:17",
+        "late": false
       },
       {
         "home": 1,
-        "away": 1
+        "away": 0,
+        "submitted_at": "2025-12-26 11:49:17",
+        "late": false
       },
       {
         "home": 2,
-        "away": 1
+        "away": 1,
+        "submitted_at": "2025-12-26 11:49:17",
+        "late": false
       },
       {
         "home": 2,
-        "away": 0
+        "away": 1,
+        "submitted_at": "2025-12-26 11:49:17",
+        "late": false
+      },
+      {
+        "home": 2,
+        "away": 0,
+        "submitted_at": "2025-12-26 11:49:17",
+        "late": false
       }
     ],
     "X6ZFJ5WC": [
@@ -1741,43 +1822,63 @@
     "C560FL0O": [
       {
         "home": 2,
-        "away": 1
+        "away": 1,
+        "submitted_at": "2025-12-26 02:47:55",
+        "late": false
       },
       {
         "home": 2,
-        "away": 0
+        "away": 0,
+        "submitted_at": "2025-12-26 02:47:55",
+        "late": false
       },
       {
         "home": 3,
-        "away": 0
+        "away": 0,
+        "submitted_at": "2025-12-26 02:47:55",
+        "late": false
       },
       {
         "home": 3,
-        "away": 0
+        "away": 0,
+        "submitted_at": "2025-12-26 02:47:55",
+        "late": false
       },
       {
         "home": 3,
-        "away": 1
+        "away": 1,
+        "submitted_at": "2025-12-26 02:47:55",
+        "late": false
       },
       {
         "home": 3,
-        "away": 0
+        "away": 0,
+        "submitted_at": "2025-12-26 02:47:55",
+        "late": false
       },
       {
         "home": 1,
-        "away": 2
+        "away": 2,
+        "submitted_at": "2025-12-26 02:47:55",
+        "late": false
       },
       {
         "home": 3,
-        "away": 0
+        "away": 0,
+        "submitted_at": "2025-12-26 02:47:55",
+        "late": false
       },
       {
         "home": 3,
-        "away": 0
+        "away": 0,
+        "submitted_at": "2025-12-26 02:47:55",
+        "late": false
       },
       {
         "home": 2,
-        "away": 0
+        "away": 0,
+        "submitted_at": "2025-12-26 02:47:55",
+        "late": false
       }
     ],
     "LE87Q6XR": [
@@ -5610,52 +5711,62 @@
       {
         "home": 0,
         "away": 2,
-        "late": false
-      },
-      {
-        "home": 0,
-        "away": 1,
-        "late": false
+        "submitted_at": "2025-12-26 03:20:53",
+        "late": true
       },
       {
         "home": 2,
         "away": 0,
-        "late": false
-      },
-      {
-        "home": 3,
-        "away": 0,
-        "late": false
+        "submitted_at": "2025-12-26 03:20:53",
+        "late": true
       },
       {
         "home": 0,
         "away": 1,
-        "late": false
-      },
-      {
-        "home": 0,
-        "away": 2,
-        "late": false
-      },
-      {
-        "home": 0,
-        "away": 2,
-        "late": false
-      },
-      {
-        "home": 0,
-        "away": 2,
-        "late": false
+        "submitted_at": "2025-12-26 03:20:53",
+        "late": true
       },
       {
         "home": 0,
         "away": 3,
-        "late": false
+        "submitted_at": "2025-12-26 03:20:53",
+        "late": true
+      },
+      {
+        "home": 3,
+        "away": 0,
+        "submitted_at": "2025-12-26 03:20:53",
+        "late": true
+      },
+      {
+        "home": 2,
+        "away": 0,
+        "submitted_at": "2025-12-26 03:20:53",
+        "late": true
       },
       {
         "home": 0,
-        "away": 2,
-        "late": false
+        "away": 1,
+        "submitted_at": "2025-12-26 03:20:53",
+        "late": true
+      },
+      {
+        "home": 1,
+        "away": 0,
+        "submitted_at": "2025-12-26 03:20:53",
+        "late": true
+      },
+      {
+        "home": 2,
+        "away": 0,
+        "submitted_at": "2025-12-26 03:20:53",
+        "late": true
+      },
+      {
+        "home": 2,
+        "away": 1,
+        "submitted_at": "2025-12-26 03:20:53",
+        "late": true
       }
     ],
     "GLIEX3LV": [
@@ -5759,6 +5870,1400 @@
       {
         "home": 0,
         "away": 2,
+        "late": false
+      }
+    ]
+  },
+  "18": {
+    "Y8PX0JE4": [
+      {
+        "home": 1,
+        "away": 1,
+        "submitted_at": "2025-12-23 13:37:53",
+        "late": false
+      },
+      {
+        "home": 0,
+        "away": 3,
+        "submitted_at": "2025-12-23 13:37:53",
+        "late": false
+      },
+      {
+        "home": 2,
+        "away": 0,
+        "submitted_at": "2025-12-23 13:37:53",
+        "late": false
+      },
+      {
+        "home": 3,
+        "away": 0,
+        "submitted_at": "2025-12-23 13:37:53",
+        "late": false
+      },
+      {
+        "home": 0,
+        "away": 0,
+        "submitted_at": "2025-12-23 13:37:53",
+        "late": false
+      },
+      {
+        "home": 2,
+        "away": 0,
+        "submitted_at": "2025-12-23 13:37:53",
+        "late": false
+      },
+      {
+        "home": 0,
+        "away": 2,
+        "submitted_at": "2025-12-23 13:37:53",
+        "late": false
+      },
+      {
+        "home": 1,
+        "away": 1,
+        "submitted_at": "2025-12-23 13:37:53",
+        "late": false
+      },
+      {
+        "home": 2,
+        "away": 0,
+        "submitted_at": "2025-12-23 13:37:53",
+        "late": false
+      },
+      {
+        "home": 0,
+        "away": 0,
+        "submitted_at": "2025-12-23 13:37:53",
+        "late": false
+      }
+    ],
+    "CZW9R5D7": [
+      {
+        "home": 1,
+        "away": 0,
+        "late": false
+      },
+      {
+        "home": 0,
+        "away": 1,
+        "late": false
+      },
+      {
+        "home": 3,
+        "away": 1,
+        "late": false
+      },
+      {
+        "home": 0,
+        "away": 2,
+        "late": false
+      },
+      {
+        "home": 0,
+        "away": 2,
+        "late": false
+      },
+      {
+        "home": 1,
+        "away": 0,
+        "late": false
+      },
+      {
+        "home": 1,
+        "away": 2,
+        "late": false
+      },
+      {
+        "home": 2,
+        "away": 0,
+        "late": false
+      },
+      {
+        "home": 1,
+        "away": 2,
+        "late": false
+      },
+      {
+        "home": 1,
+        "away": 1,
+        "late": false
+      }
+    ],
+    "P6VF9XYD": [
+      {
+        "home": 2,
+        "away": 1,
+        "late": false
+      },
+      {
+        "home": 2,
+        "away": 3,
+        "late": false
+      },
+      {
+        "home": 2,
+        "away": 1,
+        "late": false
+      },
+      {
+        "home": 2,
+        "away": 1,
+        "late": false
+      },
+      {
+        "home": 2,
+        "away": 1,
+        "late": false
+      },
+      {
+        "home": 2,
+        "away": 1,
+        "late": false
+      },
+      {
+        "home": 2,
+        "away": 1,
+        "late": false
+      },
+      {
+        "home": 3,
+        "away": 1,
+        "late": false
+      },
+      {
+        "home": 2,
+        "away": 1,
+        "late": false
+      },
+      {
+        "home": 2,
+        "away": 1,
+        "late": false
+      }
+    ],
+    "VI7QJCHW": [
+      {
+        "home": 2,
+        "away": 1,
+        "late": false
+      },
+      {
+        "home": 1,
+        "away": 3,
+        "late": false
+      },
+      {
+        "home": 2,
+        "away": 1,
+        "late": false
+      },
+      {
+        "home": 2,
+        "away": 1,
+        "late": false
+      },
+      {
+        "home": 1,
+        "away": 3,
+        "late": false
+      },
+      {
+        "home": 2,
+        "away": 0,
+        "late": false
+      },
+      {
+        "home": 2,
+        "away": 2,
+        "late": false
+      },
+      {
+        "home": 2,
+        "away": 1,
+        "late": false
+      },
+      {
+        "home": 1,
+        "away": 2,
+        "late": false
+      },
+      {
+        "home": 2,
+        "away": 1,
+        "late": false
+      }
+    ],
+    "C6FKV1H3": [
+      {
+        "home": 1,
+        "away": 1,
+        "late": false
+      },
+      {
+        "home": 2,
+        "away": 3,
+        "late": false
+      },
+      {
+        "home": 2,
+        "away": 0,
+        "late": false
+      },
+      {
+        "home": 1,
+        "away": 1,
+        "late": false
+      },
+      {
+        "home": 0,
+        "away": 2,
+        "late": false
+      },
+      {
+        "home": 2,
+        "away": 0,
+        "late": false
+      },
+      {
+        "home": 1,
+        "away": 2,
+        "late": false
+      },
+      {
+        "home": 1,
+        "away": 0,
+        "late": false
+      },
+      {
+        "home": 2,
+        "away": 0,
+        "late": false
+      },
+      {
+        "home": 1,
+        "away": 2,
+        "late": false
+      }
+    ],
+    "6TF6LDIN": [
+      {
+        "home": 2,
+        "away": 1,
+        "late": false
+      },
+      {
+        "home": 1,
+        "away": 3,
+        "late": false
+      },
+      {
+        "home": 2,
+        "away": 0,
+        "late": false
+      },
+      {
+        "home": 2,
+        "away": 2,
+        "late": false
+      },
+      {
+        "home": 0,
+        "away": 2,
+        "late": false
+      },
+      {
+        "home": 3,
+        "away": 0,
+        "late": false
+      },
+      {
+        "home": 1,
+        "away": 3,
+        "late": false
+      },
+      {
+        "home": 2,
+        "away": 1,
+        "late": false
+      },
+      {
+        "home": 1,
+        "away": 0,
+        "late": false
+      },
+      {
+        "home": 2,
+        "away": 1,
+        "late": false
+      }
+    ],
+    "4PTJ7W7Y": [
+      {
+        "home": 2,
+        "away": 2,
+        "late": false
+      },
+      {
+        "home": 1,
+        "away": 3,
+        "late": false
+      },
+      {
+        "home": 2,
+        "away": 0,
+        "late": false
+      },
+      {
+        "home": 1,
+        "away": 2,
+        "late": false
+      },
+      {
+        "home": 1,
+        "away": 2,
+        "late": false
+      },
+      {
+        "home": 3,
+        "away": 0,
+        "late": false
+      },
+      {
+        "home": 2,
+        "away": 2,
+        "late": false
+      },
+      {
+        "home": 1,
+        "away": 2,
+        "late": false
+      },
+      {
+        "home": 2,
+        "away": 1,
+        "late": false
+      },
+      {
+        "home": 2,
+        "away": 1,
+        "late": false
+      }
+    ],
+    "X6ZFJ5WC": [
+      {
+        "home": 2,
+        "away": 1,
+        "late": false
+      },
+      {
+        "home": 0,
+        "away": 3,
+        "late": false
+      },
+      {
+        "home": 2,
+        "away": 1,
+        "late": false
+      },
+      {
+        "home": 2,
+        "away": 1,
+        "late": false
+      },
+      {
+        "home": 1,
+        "away": 2,
+        "late": false
+      },
+      {
+        "home": 2,
+        "away": 0,
+        "late": false
+      },
+      {
+        "home": 2,
+        "away": 1,
+        "late": false
+      },
+      {
+        "home": 2,
+        "away": 1,
+        "late": false
+      },
+      {
+        "home": 2,
+        "away": 1,
+        "late": false
+      },
+      {
+        "home": 2,
+        "away": 1,
+        "late": false
+      }
+    ],
+    "GLIEX3LV": [
+      {
+        "home": 1,
+        "away": 0,
+        "late": false
+      },
+      {
+        "home": 1,
+        "away": 2,
+        "late": false
+      },
+      {
+        "home": 3,
+        "away": 1,
+        "late": false
+      },
+      {
+        "home": 1,
+        "away": 0,
+        "late": false
+      },
+      {
+        "home": 2,
+        "away": 1,
+        "late": false
+      },
+      {
+        "home": 3,
+        "away": 2,
+        "late": false
+      },
+      {
+        "home": 1,
+        "away": 0,
+        "late": false
+      },
+      {
+        "home": 1,
+        "away": 0,
+        "late": false
+      },
+      {
+        "home": 2,
+        "away": 1,
+        "late": false
+      },
+      {
+        "home": 1,
+        "away": 0,
+        "late": false
+      }
+    ],
+    "YYVSPOY8": [
+      {
+        "home": 2,
+        "away": 1,
+        "late": false
+      },
+      {
+        "home": 0,
+        "away": 2,
+        "late": false
+      },
+      {
+        "home": 3,
+        "away": 0,
+        "late": false
+      },
+      {
+        "home": 2,
+        "away": 1,
+        "late": false
+      },
+      {
+        "home": 1,
+        "away": 1,
+        "late": false
+      },
+      {
+        "home": 3,
+        "away": 0,
+        "late": false
+      },
+      {
+        "home": 2,
+        "away": 1,
+        "late": false
+      },
+      {
+        "home": 2,
+        "away": 1,
+        "late": false
+      },
+      {
+        "home": 1,
+        "away": 0,
+        "late": false
+      },
+      {
+        "home": 2,
+        "away": 1,
+        "late": false
+      }
+    ],
+    "UY6977NN": [
+      {
+        "home": 1,
+        "away": 1,
+        "submitted_at": "2025-12-25 23:39:01",
+        "late": false
+      },
+      {
+        "home": 0,
+        "away": 1,
+        "submitted_at": "2025-12-25 23:39:01",
+        "late": false
+      },
+      {
+        "home": 2,
+        "away": 1,
+        "submitted_at": "2025-12-25 23:39:01",
+        "late": false
+      },
+      {
+        "home": 2,
+        "away": 2,
+        "submitted_at": "2025-12-25 23:39:01",
+        "late": false
+      },
+      {
+        "home": 2,
+        "away": 1,
+        "submitted_at": "2025-12-25 23:39:01",
+        "late": false
+      },
+      {
+        "home": 3,
+        "away": 0,
+        "submitted_at": "2025-12-25 23:39:01",
+        "late": false
+      },
+      {
+        "home": 1,
+        "away": 1,
+        "submitted_at": "2025-12-25 23:39:01",
+        "late": false
+      },
+      {
+        "home": 2,
+        "away": 1,
+        "submitted_at": "2025-12-25 23:39:01",
+        "late": false
+      },
+      {
+        "home": 1,
+        "away": 1,
+        "submitted_at": "2025-12-25 23:39:01",
+        "late": false
+      },
+      {
+        "home": 2,
+        "away": 1,
+        "submitted_at": "2025-12-25 23:39:01",
+        "late": false
+      }
+    ],
+    "1NXMGX5Y": [
+      {
+        "home": 2,
+        "away": 1,
+        "late": false
+      },
+      {
+        "home": 0,
+        "away": 3,
+        "late": false
+      },
+      {
+        "home": 2,
+        "away": 1,
+        "late": false
+      },
+      {
+        "home": 1,
+        "away": 1,
+        "late": false
+      },
+      {
+        "home": 0,
+        "away": 2,
+        "late": false
+      },
+      {
+        "home": 3,
+        "away": 0,
+        "late": false
+      },
+      {
+        "home": 1,
+        "away": 1,
+        "late": false
+      },
+      {
+        "home": 1,
+        "away": 2,
+        "late": false
+      },
+      {
+        "home": 1,
+        "away": 2,
+        "late": false
+      },
+      {
+        "home": 1,
+        "away": 1,
+        "late": false
+      }
+    ],
+    "C560FL0O": [
+      {
+        "home": 2,
+        "away": 1,
+        "submitted_at": "2025-12-26 02:39:56",
+        "late": false
+      },
+      {
+        "home": 2,
+        "away": 0,
+        "submitted_at": "2025-12-26 02:39:56",
+        "late": false
+      },
+      {
+        "home": 3,
+        "away": 0,
+        "submitted_at": "2025-12-26 02:39:56",
+        "late": false
+      },
+      {
+        "home": 3,
+        "away": 0,
+        "submitted_at": "2025-12-26 02:39:56",
+        "late": false
+      },
+      {
+        "home": 3,
+        "away": 1,
+        "submitted_at": "2025-12-26 02:39:56",
+        "late": false
+      },
+      {
+        "home": 3,
+        "away": 0,
+        "submitted_at": "2025-12-26 02:39:56",
+        "late": false
+      },
+      {
+        "home": 1,
+        "away": 2,
+        "submitted_at": "2025-12-26 02:39:56",
+        "late": false
+      },
+      {
+        "home": 3,
+        "away": 0,
+        "submitted_at": "2025-12-26 02:39:56",
+        "late": false
+      },
+      {
+        "home": 3,
+        "away": 0,
+        "submitted_at": "2025-12-26 02:39:56",
+        "late": false
+      },
+      {
+        "home": 2,
+        "away": 0,
+        "submitted_at": "2025-12-26 02:39:56",
+        "late": false
+      }
+    ],
+    "S67F9LGN": [
+      {
+        "home": 2,
+        "away": 2,
+        "submitted_at": "2025-12-26 02:45:05",
+        "late": false
+      },
+      {
+        "home": 0,
+        "away": 2,
+        "submitted_at": "2025-12-26 02:45:05",
+        "late": false
+      },
+      {
+        "home": 2,
+        "away": 0,
+        "submitted_at": "2025-12-26 02:45:05",
+        "late": false
+      },
+      {
+        "home": 0,
+        "away": 2,
+        "submitted_at": "2025-12-26 02:45:05",
+        "late": false
+      },
+      {
+        "home": 0,
+        "away": 0,
+        "submitted_at": "2025-12-26 02:45:05",
+        "late": false
+      },
+      {
+        "home": 3,
+        "away": 0,
+        "submitted_at": "2025-12-26 02:45:05",
+        "late": false
+      },
+      {
+        "home": 2,
+        "away": 0,
+        "submitted_at": "2025-12-26 02:45:05",
+        "late": false
+      },
+      {
+        "home": 0,
+        "away": 1,
+        "submitted_at": "2025-12-26 02:45:05",
+        "late": false
+      },
+      {
+        "home": 3,
+        "away": 1,
+        "submitted_at": "2025-12-26 02:45:05",
+        "late": false
+      },
+      {
+        "home": 2,
+        "away": 0,
+        "submitted_at": "2025-12-26 02:45:05",
+        "late": false
+      }
+    ],
+    "PEQBGO9R": [
+      {
+        "home": 2,
+        "away": 0,
+        "submitted_at": "2025-12-26 03:27:15",
+        "late": false
+      },
+      {
+        "home": 0,
+        "away": 3,
+        "submitted_at": "2025-12-26 03:27:15",
+        "late": false
+      },
+      {
+        "home": 3,
+        "away": 1,
+        "submitted_at": "2025-12-26 03:27:15",
+        "late": false
+      },
+      {
+        "home": 0,
+        "away": 0,
+        "submitted_at": "2025-12-26 03:27:15",
+        "late": false
+      },
+      {
+        "home": 0,
+        "away": 2,
+        "submitted_at": "2025-12-26 03:27:15",
+        "late": false
+      },
+      {
+        "home": 2,
+        "away": 0,
+        "submitted_at": "2025-12-26 03:27:15",
+        "late": false
+      },
+      {
+        "home": 0,
+        "away": 0,
+        "submitted_at": "2025-12-26 03:27:15",
+        "late": false
+      },
+      {
+        "home": 2,
+        "away": 0,
+        "submitted_at": "2025-12-26 03:27:15",
+        "late": false
+      },
+      {
+        "home": 2,
+        "away": 0,
+        "submitted_at": "2025-12-26 03:27:15",
+        "late": false
+      },
+      {
+        "home": 0,
+        "away": 1,
+        "submitted_at": "2025-12-26 03:27:15",
+        "late": false
+      }
+    ],
+    "AME76IMV": [
+      {
+        "home": 2,
+        "away": 0,
+        "submitted_at": "2025-12-26 08:05:01",
+        "late": false
+      },
+      {
+        "home": 0,
+        "away": 3,
+        "submitted_at": "2025-12-26 08:05:01",
+        "late": false
+      },
+      {
+        "home": 2,
+        "away": 0,
+        "submitted_at": "2025-12-26 08:05:01",
+        "late": false
+      },
+      {
+        "home": 0,
+        "away": 2,
+        "submitted_at": "2025-12-26 08:05:01",
+        "late": false
+      },
+      {
+        "home": 0,
+        "away": 2,
+        "submitted_at": "2025-12-26 08:05:01",
+        "late": false
+      },
+      {
+        "home": 3,
+        "away": 0,
+        "submitted_at": "2025-12-26 08:05:01",
+        "late": false
+      },
+      {
+        "home": 0,
+        "away": 2,
+        "submitted_at": "2025-12-26 08:05:01",
+        "late": false
+      },
+      {
+        "home": 2,
+        "away": 2,
+        "submitted_at": "2025-12-26 08:05:01",
+        "late": false
+      },
+      {
+        "home": 1,
+        "away": 2,
+        "submitted_at": "2025-12-26 08:05:01",
+        "late": false
+      },
+      {
+        "home": 2,
+        "away": 0,
+        "submitted_at": "2025-12-26 08:05:01",
+        "late": false
+      }
+    ],
+    "O5TSV85N": [
+      {
+        "home": 2,
+        "away": 1,
+        "late": false
+      },
+      {
+        "home": 0,
+        "away": 2,
+        "late": false
+      },
+      {
+        "home": 2,
+        "away": 0,
+        "late": false
+      },
+      {
+        "home": 2,
+        "away": 2,
+        "late": false
+      },
+      {
+        "home": 0,
+        "away": 1,
+        "late": false
+      },
+      {
+        "home": 3,
+        "away": 0,
+        "late": false
+      },
+      {
+        "home": 1,
+        "away": 1,
+        "late": false
+      },
+      {
+        "home": 1,
+        "away": 2,
+        "late": false
+      },
+      {
+        "home": 2,
+        "away": 1,
+        "late": false
+      },
+      {
+        "home": 1,
+        "away": 1,
+        "late": false
+      }
+    ],
+    "LE87Q6XR": [
+      {
+        "home": 1,
+        "away": 2,
+        "late": false
+      },
+      {
+        "home": 0,
+        "away": 2,
+        "late": false
+      },
+      {
+        "home": 2,
+        "away": 0,
+        "late": false
+      },
+      {
+        "home": 3,
+        "away": 2,
+        "late": false
+      },
+      {
+        "home": 1,
+        "away": 2,
+        "late": false
+      },
+      {
+        "home": 2,
+        "away": 0,
+        "late": false
+      },
+      {
+        "home": 2,
+        "away": 2,
+        "late": false
+      },
+      {
+        "home": 1,
+        "away": 2,
+        "late": false
+      },
+      {
+        "home": 1,
+        "away": 0,
+        "late": false
+      },
+      {
+        "home": 1,
+        "away": 1,
+        "late": false
+      }
+    ],
+    "5XEIF377": [
+      {
+        "home": 2,
+        "away": 2,
+        "late": false
+      },
+      {
+        "home": 1,
+        "away": 3,
+        "late": false
+      },
+      {
+        "home": 2,
+        "away": 0,
+        "late": false
+      },
+      {
+        "home": 1,
+        "away": 1,
+        "late": false
+      },
+      {
+        "home": 1,
+        "away": 2,
+        "late": false
+      },
+      {
+        "home": 3,
+        "away": 1,
+        "late": false
+      },
+      {
+        "home": 1,
+        "away": 2,
+        "late": false
+      },
+      {
+        "home": 2,
+        "away": 1,
+        "late": false
+      },
+      {
+        "home": 2,
+        "away": 1,
+        "late": false
+      },
+      {
+        "home": 2,
+        "away": 1,
+        "late": false
+      }
+    ],
+    "F25PL7HG": [
+      {
+        "home": 2,
+        "away": 1,
+        "submitted_at": "2025-12-26 15:38:32",
+        "late": false
+      },
+      {
+        "home": 1,
+        "away": 2,
+        "submitted_at": "2025-12-26 15:38:32",
+        "late": false
+      },
+      {
+        "home": 2,
+        "away": 0,
+        "submitted_at": "2025-12-26 15:38:32",
+        "late": false
+      },
+      {
+        "home": 0,
+        "away": 2,
+        "submitted_at": "2025-12-26 15:38:32",
+        "late": false
+      },
+      {
+        "home": 1,
+        "away": 2,
+        "submitted_at": "2025-12-26 15:38:32",
+        "late": false
+      },
+      {
+        "home": 3,
+        "away": 1,
+        "submitted_at": "2025-12-26 15:38:32",
+        "late": false
+      },
+      {
+        "home": 1,
+        "away": 2,
+        "submitted_at": "2025-12-26 15:38:32",
+        "late": false
+      },
+      {
+        "home": 2,
+        "away": 1,
+        "submitted_at": "2025-12-26 15:38:32",
+        "late": false
+      },
+      {
+        "home": 2,
+        "away": 1,
+        "submitted_at": "2025-12-26 15:38:32",
+        "late": false
+      },
+      {
+        "home": 2,
+        "away": 0,
+        "submitted_at": "2025-12-26 15:38:32",
+        "late": false
+      }
+    ],
+    "TFKY8CVC": [
+      {
+        "home": 2,
+        "away": 1,
+        "submitted_at": "2025-12-26 15:06:50",
+        "late": false
+      },
+      {
+        "home": 1,
+        "away": 2,
+        "submitted_at": "2025-12-26 15:06:50",
+        "late": false
+      },
+      {
+        "home": 2,
+        "away": 1,
+        "submitted_at": "2025-12-26 15:06:50",
+        "late": false
+      },
+      {
+        "home": 0,
+        "away": 2,
+        "submitted_at": "2025-12-26 15:06:50",
+        "late": false
+      },
+      {
+        "home": 2,
+        "away": 1,
+        "submitted_at": "2025-12-26 15:06:50",
+        "late": false
+      },
+      {
+        "home": 1,
+        "away": 2,
+        "submitted_at": "2025-12-26 15:06:50",
+        "late": false
+      },
+      {
+        "home": 2,
+        "away": 1,
+        "submitted_at": "2025-12-26 15:06:50",
+        "late": false
+      },
+      {
+        "home": 1,
+        "away": 2,
+        "submitted_at": "2025-12-26 15:06:50",
+        "late": false
+      },
+      {
+        "home": 2,
+        "away": 1,
+        "submitted_at": "2025-12-26 15:06:50",
+        "late": false
+      },
+      {
+        "home": 2,
+        "away": 1,
+        "submitted_at": "2025-12-26 15:06:50",
+        "late": false
+      }
+    ]
+  },
+  "19": {
+    "Y8PX0JE4": [
+      {
+        "home": 0,
+        "away": 0,
+        "submitted_at": "2025-12-27 23:59:08",
+        "late": false
+      },
+      {
+        "home": 3,
+        "away": 1,
+        "submitted_at": "2025-12-27 23:59:08",
+        "late": false
+      },
+      {
+        "home": 1,
+        "away": 1,
+        "submitted_at": "2025-12-27 23:59:08",
+        "late": false
+      },
+      {
+        "home": 1,
+        "away": 2,
+        "submitted_at": "2025-12-27 23:59:08",
+        "late": false
+      },
+      {
+        "home": 2,
+        "away": 0,
+        "submitted_at": "2025-12-27 23:59:08",
+        "late": false
+      },
+      {
+        "home": 2,
+        "away": 0,
+        "submitted_at": "2025-12-27 23:59:08",
+        "late": false
+      },
+      {
+        "home": 1,
+        "away": 1,
+        "submitted_at": "2025-12-27 23:59:08",
+        "late": false
+      },
+      {
+        "home": 2,
+        "away": 0,
+        "submitted_at": "2025-12-27 23:59:08",
+        "late": false
+      },
+      {
+        "home": 1,
+        "away": 1,
+        "submitted_at": "2025-12-27 23:59:08",
+        "late": false
+      },
+      {
+        "home": 2,
+        "away": 1,
+        "submitted_at": "2025-12-27 23:59:08",
+        "late": false
+      }
+    ],
+    "X6ZFJ5WC": [
+      {
+        "home": 0,
+        "away": 1,
+        "late": false
+      },
+      {
+        "home": 2,
+        "away": 10,
+        "late": false
+      },
+      {
+        "home": 2,
+        "away": 1,
+        "late": false
+      },
+      {
+        "home": 0,
+        "away": 2,
+        "late": false
+      },
+      {
+        "home": 2,
+        "away": 1,
+        "late": false
+      },
+      {
+        "home": 2,
+        "away": 0,
+        "late": false
+      },
+      {
+        "home": 2,
+        "away": 1,
+        "late": false
+      },
+      {
+        "home": 2,
+        "away": 0,
+        "late": false
+      },
+      {
+        "home": 0,
+        "away": 2,
+        "late": false
+      },
+      {
+        "home": 2,
+        "away": 1,
+        "late": false
+      }
+    ],
+    "1NXMGX5Y": [
+      {
+        "home": 1,
+        "away": 2,
+        "late": false
+      },
+      {
+        "home": 2,
+        "away": 1,
+        "late": false
+      },
+      {
+        "home": 1,
+        "away": 1,
+        "late": false
+      },
+      {
+        "home": 0,
+        "away": 0,
+        "late": false
+      },
+      {
+        "home": 2,
+        "away": 1,
+        "late": false
+      },
+      {
+        "home": 2,
+        "away": 0,
+        "late": false
+      },
+      {
+        "home": 1,
+        "away": 0,
+        "late": false
+      },
+      {
+        "home": 3,
+        "away": 0,
+        "late": false
+      },
+      {
+        "home": 0,
+        "away": 2,
+        "late": false
+      },
+      {
+        "home": 1,
+        "away": 2,
+        "late": false
+      }
+    ],
+    "YYVSPOY8": [
+      {
+        "home": 2,
+        "away": 2,
+        "late": false
+      },
+      {
+        "home": 2,
+        "away": 1,
+        "late": false
+      },
+      {
+        "home": 1,
+        "away": 1,
+        "late": false
+      },
+      {
+        "home": 0,
+        "away": 2,
+        "late": false
+      },
+      {
+        "home": 2,
+        "away": 1,
+        "late": false
+      },
+      {
+        "home": 2,
+        "away": 1,
+        "late": false
+      },
+      {
+        "home": 2,
+        "away": 1,
+        "late": false
+      },
+      {
+        "home": 2,
+        "away": 1,
+        "late": false
+      },
+      {
+        "home": 1,
+        "away": 2,
+        "late": false
+      },
+      {
+        "home": 2,
+        "away": 1,
         "late": false
       }
     ]

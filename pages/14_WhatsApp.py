@@ -65,7 +65,7 @@ def display_bulk_send_interface(results, title="Individual Links"):
             data=links_text,
             file_name=f"whatsapp_{datetime.now().strftime('%Y%m%d_%H%M')}.txt",
             mime="text/plain",
-            use_container_width=True
+            width='stretch'
         )
     
     with col2:
@@ -89,7 +89,7 @@ function openAll() {{ {links_js}.forEach((l, i) => setTimeout(() => window.open(
             data=html_content,
             file_name=f"whatsapp_{datetime.now().strftime('%Y%m%d_%H%M')}.html",
             mime="text/html",
-            use_container_width=True
+            width='stretch'
         )
     
     st.markdown("---")
@@ -108,7 +108,7 @@ function openAll() {{ {links_js}.forEach((l, i) => setTimeout(() => window.open(
     
     with st.expander("📋 View Data Table"):
         df = pd.DataFrame(results)
-        st.dataframe(df, use_container_width=True)
+        st.dataframe(df, width='stretch')
 
 # Page config
 st.set_page_config(
@@ -132,7 +132,7 @@ if not check_password():
 if Path("nikkang_logo.png").exists():
     st.sidebar.markdown('<div style="padding-top: 0.5rem;"></div>', unsafe_allow_html=True)
     st.sidebar.markdown('<div class="sidebar-logo-container">', unsafe_allow_html=True)
-    st.sidebar.image("nikkang_logo.png", use_container_width=True)
+    st.sidebar.image("nikkang_logo.png", width='stretch')
     st.sidebar.markdown('</div>', unsafe_allow_html=True)
     st.sidebar.markdown("---")
 
@@ -343,7 +343,7 @@ def show_group_send_buttons(group_id, message, button_key, filename="group_messa
         col1, col2 = st.columns(2)
         
         with col1:
-            if st.button("🚀 Generate WhatsApp Link", key=f"{button_key}_link", use_container_width=True, type="primary"):
+            if st.button("🚀 Generate WhatsApp Link", key=f"{button_key}_link", width='stretch', type="primary"):
                 if not group_id:
                     st.warning("⚠️ No group phone entered. Use copy method instead →")
                 else:
@@ -442,7 +442,7 @@ _Nikkang KK Admin Team_"""
         with col1:
             st.info("💡 **Mobile?** Tap 'Done Editing' button after making changes →")
         with col2:
-            if st.button("✅ Done Editing", key="done_edit_reminder", use_container_width=True):
+            if st.button("✅ Done Editing", key="done_edit_reminder", width='stretch'):
                 st.success("✅ Edits saved!")
         
         st.markdown("---")
@@ -501,7 +501,7 @@ _Nikkang KK Admin Team_"""
             st.code(preview, language=None)
         
         # Generate notifications
-        if st.button("🚀 Generate Notifications", key="reminder_btn", use_container_width=True, type="primary"):
+        if st.button("🚀 Generate Notifications", key="reminder_btn", width='stretch', type="primary"):
             if not participants:
                 st.error("No participants to notify!")
             else:
@@ -613,7 +613,7 @@ _Nikkang KK Admin Team_"""
                 with st.expander("👁️ Preview Message (Sample)"):
                     st.code(sample_message, language=None)
         
-        if st.button("🚀 Generate Welcome Messages", key="welcome_btn", use_container_width=True, type="primary"):
+        if st.button("🚀 Generate Welcome Messages", key="welcome_btn", width='stretch', type="primary"):
             if not new_participants:
                 st.error("Please select participants!")
             else:
@@ -748,7 +748,7 @@ _Nikkang KK Admin Team_"""
     else:
         # INDIVIDUAL DETAILED RESULTS
         # Button to generate results
-        if st.button("📊 Generate Results Notifications", key="results_btn", use_container_width=True, type="primary"):
+        if st.button("📊 Generate Results Notifications", key="results_btn", width='stretch', type="primary"):
             if not participants:
                 st.error("No participants to notify!")
             else:
@@ -1044,7 +1044,7 @@ _Nikkang KK Admin Team_"""
             with st.expander("👁️ Preview Message"):
                 st.code(winner_message, language=None)
             
-            if st.button("🚀 Send Winner Notification", key="winner_btn", use_container_width=True, type="primary"):
+            if st.button("🚀 Send Winner Notification", key="winner_btn", width='stretch', type="primary"):
                 winner = next((p for p in participants if p.get('name') == winner_name), None)
                 
                 if winner:
@@ -1128,7 +1128,7 @@ _Nikkang KK Admin Team_"""
             with st.expander("👁️ Preview Message"):
                 st.code(kk_message, language=None)
             
-            if st.button("🚀 Send KK Champion Notification", key="kk_btn", use_container_width=True, type="primary"):
+            if st.button("🚀 Send KK Champion Notification", key="kk_btn", width='stretch', type="primary"):
                 champion = next((p for p in participants if p.get('name') == kk_champion), None)
                 
                 if champion:
@@ -1200,7 +1200,7 @@ with tab6:
             st.markdown("#### 📝 Message Preview:")
             st.code(custom_message, language=None)
         
-        if st.button("🚀 Generate Custom Notifications", key="custom_btn", use_container_width=True, type="primary"):
+        if st.button("🚀 Generate Custom Notifications", key="custom_btn", width='stretch', type="primary"):
             if not custom_message:
                 st.error("Please enter a message!")
             elif not participants:

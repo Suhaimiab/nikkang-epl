@@ -128,7 +128,7 @@ with col1:
             'Count': [active_count, inactive_count]
         })
         
-        st.dataframe(status_data, use_container_width=True, hide_index=True)
+        st.dataframe(status_data, width='stretch', hide_index=True)
         
         # Participation rate
         total_matches = count_items(matches)
@@ -159,7 +159,7 @@ with col2:
             'Count': [scheduled, completed_matches]
         })
         
-        st.dataframe(progress_data, use_container_width=True, hide_index=True)
+        st.dataframe(progress_data, width='stretch', hide_index=True)
         
         # Completion rate
         total_m = count_items(matches)
@@ -178,26 +178,26 @@ col1, col2, col3 = st.columns(3)
 
 with col1:
     st.subheader("Participant Management")
-    if st.button("➕ Add Participant", use_container_width=True):
+    if st.button("➕ Add Participant", width='stretch'):
         st.switch_page("pages/8_Manage_Participants.py")
     
-    if st.button("📋 View All Participants", use_container_width=True):
+    if st.button("📋 View All Participants", width='stretch'):
         st.switch_page("pages/8_Manage_Participants.py")
 
 with col2:
     st.subheader("Match Management")
-    if st.button("⚽ Enter Results", use_container_width=True):
+    if st.button("⚽ Enter Results", width='stretch'):
         st.switch_page("pages/4_Results.py")
     
-    if st.button("📥 Import Fixtures", use_container_width=True):
+    if st.button("📥 Import Fixtures", width='stretch'):
         st.switch_page("pages/10_Results_Management.py")
 
 with col3:
     st.subheader("Communications")
-    if st.button("📱 Send WhatsApp", use_container_width=True):
+    if st.button("📱 Send WhatsApp", width='stretch'):
         st.switch_page("pages/14_WhatsApp.py")
     
-    if st.button("📊 View Leaderboard", use_container_width=True):
+    if st.button("📊 View Leaderboard", width='stretch'):
         st.switch_page("pages/5_Leaderboard.py")
 
 st.markdown("---")
@@ -236,7 +236,7 @@ if count_items(participants) > 0:
             })
         
         df_top = pd.DataFrame(top_data)
-        st.dataframe(df_top, use_container_width=True, hide_index=True)
+        st.dataframe(df_top, width='stretch', hide_index=True)
     else:
         st.info("No points have been awarded yet")
 else:
@@ -269,7 +269,7 @@ with col1:
 with col2:
     st.subheader("Backup & Export")
     
-    if st.button("💾 Create Backup", use_container_width=True):
+    if st.button("💾 Create Backup", width='stretch'):
         try:
             success, message = backup_all_data()
             if success:
@@ -295,15 +295,15 @@ if current_user:
 col1, col2, col3 = st.columns(3)
 
 with col1:
-    if st.button("🔄 Refresh Dashboard", use_container_width=True):
+    if st.button("🔄 Refresh Dashboard", width='stretch'):
         st.rerun()
 
 with col2:
-    if st.button("⚙️ Admin Settings", use_container_width=True, disabled=True):
+    if st.button("⚙️ Admin Settings", width='stretch', disabled=True):
         st.info("Coming soon!")
 
 with col3:
-    if st.button("🚪 Logout", use_container_width=True, type="secondary"):
+    if st.button("🚪 Logout", width='stretch', type="secondary"):
         admin_logout()
 
 # Footer
