@@ -13,7 +13,8 @@
     "total_points": 15,
     "team": "Liverpool",
     "password_hash": "797cbe113446397eea27c9e0f457246867202597919019f9fe49f5ed24b6a25a",
-    "password_created_at": "2025-12-14 00:09:07"
+    "password_created_at": "2025-12-14 00:09:07",
+    "last_login": "2026-01-05T17:49:07.049518"
   },
   "AME76IMV": {
     "id": "AME76IMV",
@@ -43,7 +44,9 @@
     "notes": "",
     "predictions": {},
     "total_points": 21,
-    "team": ""
+    "team": "",
+    "password_hash": "54fa18b2946c5c99a4be984d15b14b9d61830143acffd1c092beed8d1f1fb03c",
+    "password_created_at": "2025-12-30 14:54:25"
   },
   "S67F9LGN": {
     "id": "S67F9LGN",
@@ -89,7 +92,9 @@
     "notes": "",
     "predictions": {},
     "total_points": 15,
-    "team": ""
+    "team": "",
+    "password_hash": "f8469d413b10dde42c821360ba3ce6975454c88419f4107af0a1b3132bebb9b2",
+    "password_created_at": "2025-12-30 15:46:30"
   },
   "VEGX01BX": {
     "id": "VEGX01BX",
@@ -149,7 +154,9 @@
     "notes": "",
     "predictions": {},
     "total_points": 0,
-    "team": ""
+    "team": "",
+    "password_hash": "02a2abd33851d2c7fe6e577915eb2591ef04e0ae5dec7a4d3fcbfde2ae3b82f7",
+    "password_created_at": "2025-12-30 15:51:11"
   },
   "4PTJ7W7Y": {
     "id": "4PTJ7W7Y",
@@ -163,7 +170,9 @@
     "notes": "",
     "predictions": {},
     "total_points": 0,
-    "team": ""
+    "team": "",
+    "password_hash": "1829e7d574a417f870b5aeda5e4ab93419d0c191f0c21517a134b861c0e80a3a",
+    "password_created_at": "2025-12-30 15:15:59"
   },
   "VI7QJCHW": {
     "id": "VI7QJCHW",
@@ -177,7 +186,9 @@
     "notes": "",
     "predictions": {},
     "total_points": 0,
-    "team": "Man United"
+    "team": "Man United",
+    "password_hash": "8afd2d464a1d2feb779672576ed39d90fc2a25275a0b0e0d04abf3e78340ff3b",
+    "password_created_at": "2026-01-02 14:25:08"
   },
   "F25PL7HG": {
     "id": "F25PL7HG",
@@ -223,7 +234,9 @@
     "notes": "",
     "predictions": {},
     "total_points": 0,
-    "team": "Tottenham"
+    "team": "Tottenham",
+    "password_hash": "2eb881cf77bf8c6a9ad241b055cfee9b9d704d3582bffbde81ac3011edaf587e",
+    "password_created_at": "2026-01-03 01:52:06"
   },
   "1NXMGX5Y": {
     "id": "1NXMGX5Y",
@@ -317,7 +330,9 @@
     "notes": "",
     "predictions": {},
     "total_points": 0,
-    "team": ""
+    "team": "",
+    "password_hash": "0e7e405d8e0bc6686d510eb24a84e9db3f2bc20c3470a7038b20ae18be51bb61",
+    "password_created_at": "2025-12-30 15:18:48"
   },
   "YYVSPOY8": {
     "id": "YYVSPOY8",

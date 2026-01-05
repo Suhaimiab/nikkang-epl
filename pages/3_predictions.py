@@ -6,6 +6,7 @@ FIXES:
 - Predictions now reload correctly when week changes
 - Changes are properly reflected when you come back
 - No more stale data showing wrong scores
+- CURRENT WEEK AT TOP OF SELECTOR
 """
 
 import streamlit as st
@@ -64,11 +65,21 @@ if not weeks:
     st.info("No gameweeks available yet. Check back soon!")
     st.stop()
 
-# IMPORTANT: Select week FIRST
+# Get current week
+current_week = dm.get_current_week()
+
+# Sort weeks with current week at top
+weeks_sorted = sorted(weeks)
+if current_week in weeks_sorted:
+    weeks_sorted.remove(current_week)
+    weeks_sorted = [current_week] + weeks_sorted
+
+# IMPORTANT: Select week FIRST with current week at top
 selected_week = st.selectbox(
     "Select Gameweek:", 
-    weeks, 
-    format_func=lambda x: f"Week {x}",
+    options=weeks_sorted,
+    format_func=lambda x: f"Week {x} {'✅ (Current)' if x == current_week else ''}",
+    help="Current week is shown at the top",
     key="week_selector"
 )
 
@@ -152,7 +163,7 @@ with st.form(f"predictions_week_{selected_week}"):
     # Submit button
     submitted = st.form_submit_button(
         "💾 Save Predictions", 
-        width='stretch', 
+        use_container_width=True, 
         type="primary"
     )
     

@@ -358,5 +358,209 @@
     "away_score": 2,
     "entered_at": "2025-12-27T19:29:58.319165",
     "source": "API"
+  },
+  "19": [
+    {
+      "home": 1,
+      "away": 3
+    },
+    {
+      "home": 2,
+      "away": 2
+    },
+    {
+      "home": 0,
+      "away": 2
+    },
+    {
+      "home": 2,
+      "away": 2
+    },
+    {
+      "home": 4,
+      "away": 1
+    },
+    {
+      "home": 1,
+      "away": 1
+    },
+    {
+      "home": 1,
+      "away": 1
+    },
+    {
+      "home": 0,
+      "away": 0
+    },
+    {
+      "home": 0,
+      "away": 0
+    },
+    {
+      "home": 0,
+      "away": 0
+    }
+  ],
+  "19_0": {
+    "home_score": 1,
+    "away_score": 3,
+    "entered_at": "2026-01-02T04:43:54.860977",
+    "source": "API"
+  },
+  "19_1": {
+    "home_score": 2,
+    "away_score": 2,
+    "entered_at": "2026-01-02T04:43:54.860991",
+    "source": "API"
+  },
+  "19_2": {
+    "home_score": 0,
+    "away_score": 2,
+    "entered_at": "2026-01-02T04:43:54.860997",
+    "source": "API"
+  },
+  "19_3": {
+    "home_score": 2,
+    "away_score": 2,
+    "entered_at": "2026-01-02T04:43:54.861002",
+    "source": "API"
+  },
+  "19_4": {
+    "home_score": 4,
+    "away_score": 1,
+    "entered_at": "2026-01-02T04:43:54.861007",
+    "source": "API"
+  },
+  "19_5": {
+    "home_score": 1,
+    "away_score": 1,
+    "entered_at": "2026-01-02T04:43:54.861012",
+    "source": "API"
+  },
+  "19_6": {
+    "home_score": 1,
+    "away_score": 1,
+    "entered_at": "2026-01-02T04:43:54.861018",
+    "source": "API"
+  },
+  "19_7": {
+    "home_score": 0,
+    "away_score": 0,
+    "entered_at": "2026-01-02T04:43:54.861023",
+    "source": "API"
+  },
+  "19_8": {
+    "home_score": 0,
+    "away_score": 0,
+    "entered_at": "2026-01-02T04:43:54.861029",
+    "source": "API"
+  },
+  "19_9": {
+    "home_score": 0,
+    "away_score": 0,
+    "entered_at": "2026-01-02T04:43:54.861035",
+    "source": "API"
+  },
+  "20": [
+    {
+      "home": 3,
+      "away": 1
+    },
+    {
+      "home": 2,
+      "away": 0
+    },
+    {
+      "home": 3,
+      "away": 0
+    },
+    {
+      "home": 2,
+      "away": 3
+    },
+    {
+      "home": 1,
+      "away": 1
+    },
+    {
+      "home": 2,
+      "away": 4
+    },
+    {
+      "home": 2,
+      "away": 2
+    },
+    {
+      "home": 2,
+      "away": 0
+    },
+    {
+      "home": 1,
+      "away": 1
+    },
+    {
+      "home": 1,
+      "away": 1
+    }
+  ],
+  "20_0": {
+    "home_score": 3,
+    "away_score": 1,
+    "entered_at": "2026-01-05T03:43:23.353379",
+    "source": "API"
+  },
+  "20_1": {
+    "home_score": 2,
+    "away_score": 0,
+    "entered_at": "2026-01-05T03:43:23.353392",
+    "source": "API"
+  },
+  "20_2": {
+    "home_score": 3,
+    "away_score": 0,
+    "entered_at": "2026-01-05T03:43:23.353398",
+    "source": "API"
+  },
+  "20_3": {
+    "home_score": 2,
+    "away_score": 3,
+    "entered_at": "2026-01-05T03:43:23.353403",
+    "source": "API"
+  },
+  "20_4": {
+    "home_score": 1,
+    "away_score": 1,
+    "entered_at": "2026-01-05T03:43:23.353408",
+    "source": "API"
+  },
+  "20_5": {
+    "home_score": 2,
+    "away_score": 4,
+    "entered_at": "2026-01-05T03:43:23.353413",
+    "source": "API"
+  },
+  "20_7": {
+    "home_score": 2,
+    "away_score": 0,
+    "entered_at": "2026-01-05T03:43:23.353419",
+    "source": "API"
+  },
+  "20_8": {
+    "home_score": 1,
+    "away_score": 1,
+    "entered_at": "2026-01-05T03:43:23.353425",
+    "source": "API"
+  },
+  "20_6": {
+    "home_score": 2,
+    "away_score": 2,
+    "entered_at": "2026-01-05T03:43:23.353430",
+    "source": "API"
+  },
+  "20_9": {
+    "home_score": 1,
+    "away_score": 1,
+    "entered_at": "2026-01-05T03:43:23.353436",
+    "source": "API"
   }
 }
