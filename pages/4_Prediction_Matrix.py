@@ -93,9 +93,7 @@ if not participants:
 if not week_predictions:
     st.info(f"📭 No predictions submitted yet for Week {current_week}")
     st.markdown("### Be the first to predict!")
-    
-    if st.button("🎯 Make Your Predictions", type="primary"):
-        st.switch_page("pages/3_Predictions")
+    st.markdown("Go to the **Predictions** page to make your predictions.")
     st.stop()
 
 # Count how many participants have predictions
@@ -155,15 +153,17 @@ with col1:
     st.metric("Total Matches", len(matches))
 
 with col2:
-    st.metric("Participants", participants_with_predictions)
+    # Show both: those who predicted and total registered
+    st.metric("Participants", f"{participants_with_predictions}/{len(participants)}")
 
 with col3:
     gotw_count = sum(1 for m in matches if m.get('gotw', False))
     st.metric("GOTW Matches", gotw_count)
 
 with col4:
-    # Calculate completion rate
-    total_possible = participants_with_predictions * len(matches)
+    # Calculate completion rate based on TOTAL participants (not just those who predicted)
+    total_registered = len(participants)
+    total_possible = total_registered * len(matches)
     total_made = sum(
         len([p for p in week_predictions.get(uid, []) if p])
         for uid in [p.get('id', '') for p in participants]
@@ -179,7 +179,7 @@ st.info("💡 **Tip:** Scroll horizontally to see all participants. GOTW (⭐) m
 
 st.dataframe(
     df,
-    use_container_width=True,
+    width="stretch",
     hide_index=True,
     column_config={
         "Match": st.column_config.NumberColumn("Match #", width="small"),
@@ -205,7 +205,7 @@ with col1:
         data=csv,
         file_name=f"predictions_week_{current_week}_{datetime.now().strftime('%Y%m%d')}.csv",
         mime="text/csv",
-        use_container_width=True
+        width="stretch"
     )
 
 with col2:
@@ -242,7 +242,7 @@ with col2:
         data=html,
         file_name=f"predictions_week_{current_week}.html",
         mime="text/html",
-        use_container_width=True
+        width="stretch"
     )
 
 with col3:
@@ -287,7 +287,7 @@ with col1:
             })
     
     if popular:
-        st.dataframe(pd.DataFrame(popular), hide_index=True, use_container_width=True)
+        st.dataframe(pd.DataFrame(popular), hide_index=True, width="stretch")
         st.caption("💡 Most predicted scores for the top 5 matches")
 
 with col2:
@@ -314,27 +314,10 @@ with col2:
         })
     
     if diversity:
-        st.dataframe(pd.DataFrame(diversity), hide_index=True, use_container_width=True)
+        st.dataframe(pd.DataFrame(diversity), hide_index=True, width="stretch")
         st.caption("💡 Higher diversity = more strategic differences")
 
 st.markdown("---")
-
-# Quick actions
-st.markdown("### ⚡ Quick Actions")
-
-col1, col2, col3 = st.columns(3)
-
-with col1:
-    if st.button("🎯 Make/Edit Predictions", use_container_width=True, type="primary"):
-        st.switch_page("pages/3_Predictions")
-
-with col2:
-    if st.button("📊 View Leaderboard", use_container_width=True):
-        st.switch_page("pages/5_Leaderboard")
-
-with col3:
-    if st.button("🔄 Refresh Data", use_container_width=True):
-        st.rerun()
 
 # Footer
 st.markdown("---")
