@@ -95,7 +95,7 @@ if not week_predictions:
     st.markdown("### Be the first to predict!")
     
     if st.button("🎯 Make Your Predictions", type="primary"):
-        st.switch_page("pages/3_Predictions.py")
+        st.switch_page("pages/3_Predictions")
     st.stop()
 
 # Count how many participants have predictions
@@ -326,11 +326,11 @@ col1, col2, col3 = st.columns(3)
 
 with col1:
     if st.button("🎯 Make/Edit Predictions", use_container_width=True, type="primary"):
-        st.switch_page("pages/3_Predictions.py")
+        st.switch_page("pages/3_Predictions")
 
 with col2:
     if st.button("📊 View Leaderboard", use_container_width=True):
-        st.switch_page("pages/5_Leaderboard.py")
+        st.switch_page("pages/5_Leaderboard")
 
 with col3:
     if st.button("🔄 Refresh Data", use_container_width=True):
