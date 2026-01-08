@@ -59,7 +59,7 @@ def show_request_form():
                 help="Enter your display name/nickname"
             )
         
-        submit = st.form_submit_button("🔍 Request Reset Code", use_container_width=True)
+        submit = st.form_submit_button("🔍 Request Reset Code", width='stretch')
         
         if submit:
             if not identifier:
@@ -146,12 +146,12 @@ def show_code_display():
     # Button to continue (outside any form)
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
-        if st.button("📝 Continue to Reset Password", type="primary", use_container_width=True, key="continue_btn"):
+        if st.button("📝 Continue to Reset Password", type="primary", width='stretch', key="continue_btn"):
             st.session_state.reset_step = 'verify'
             st.rerun()
     
     st.markdown("---")
-    if st.button("🔙 Start Over", use_container_width=False, key="back_btn"):
+    if st.button("🔙 Start Over", width='content', key="back_btn"):
         reset_session()
         st.rerun()
 
@@ -199,10 +199,10 @@ def show_verification_form():
         col1, col2 = st.columns(2)
         
         with col1:
-            submit = st.form_submit_button("✅ Reset Password", use_container_width=True)
+            submit = st.form_submit_button("✅ Reset Password", width='stretch')
         
         with col2:
-            cancel = st.form_submit_button("❌ Cancel", use_container_width=True)
+            cancel = st.form_submit_button("❌ Cancel", width='stretch')
         
         if cancel:
             reset_session()
@@ -242,7 +242,7 @@ def show_verification_form():
     st.markdown("---")
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
-        if st.button("🔄 Request New Code", use_container_width=True, key="request_new"):
+        if st.button("🔄 Request New Code", width='stretch', key="request_new"):
             reset_session()
             st.rerun()
 
@@ -265,12 +265,12 @@ def show_completion():
     col1, col2 = st.columns(2)
     
     with col1:
-        if st.button("🏠 Go to Home", use_container_width=True):
+        if st.button("🏠 Go to Home", width='stretch'):
             reset_session()
             st.switch_page("app.py")
     
     with col2:
-        if st.button("📊 Go to Predictions", use_container_width=True):
+        if st.button("📊 Go to Predictions", width='stretch'):
             reset_session()
             st.switch_page("pages/3_Predictions.py")
     

@@ -6,6 +6,8 @@ Adds matplotlib-based PNG generation capability
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 from matplotlib.table import Table
+import warnings
+warnings.filterwarnings('ignore', message='Glyph.*missing from font')
 import numpy as np
 from io import BytesIO
 

@@ -163,7 +163,7 @@ with st.form(f"predictions_week_{selected_week}"):
     # Submit button
     submitted = st.form_submit_button(
         "💾 Save Predictions", 
-        use_container_width=True, 
+        width='stretch', 
         type="primary"
     )
     

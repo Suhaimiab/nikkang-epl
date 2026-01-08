@@ -15,6 +15,8 @@ import io
 import base64
 import matplotlib.pyplot as plt
 import matplotlib
+import warnings
+warnings.filterwarnings('ignore', message='Glyph.*missing from font')
 matplotlib.use('Agg')  # Use non-interactive backend
 
 sys.path.append(str(Path(__file__).parent.parent))

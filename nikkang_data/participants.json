@@ -172,7 +172,8 @@
     "total_points": 0,
     "team": "",
     "password_hash": "1829e7d574a417f870b5aeda5e4ab93419d0c191f0c21517a134b861c0e80a3a",
-    "password_created_at": "2025-12-30 15:15:59"
+    "password_created_at": "2025-12-30 15:15:59",
+    "last_login": "2026-01-06T10:59:34.500356"
   },
   "VI7QJCHW": {
     "id": "VI7QJCHW",
@@ -284,7 +285,8 @@
     "total_points": 0,
     "team": "Liverpool",
     "password_hash": "08caeee6e09d06eabf4fedc4efcfb997aa65da5622fa199c98017a7c781170b6",
-    "password_created_at": "2025-12-26 11:07:05"
+    "password_created_at": "2025-12-26 11:07:05",
+    "last_login": "2026-01-06T13:58:34.372692"
   },
   "TFKY8CVC": {
     "id": "TFKY8CVC",
@@ -316,7 +318,8 @@
     "total_points": 0,
     "team": "Man United",
     "password_hash": "b66a233f4c56789052461fe9a19f21aad3846d1bc86cf17654e24f40f56756c5",
-    "password_created_at": "2025-12-26 03:19:22"
+    "password_created_at": "2025-12-26 03:19:22",
+    "last_login": "2026-01-06T10:58:46.634601"
   },
   "GLIEX3LV": {
     "id": "GLIEX3LV",

@@ -237,10 +237,10 @@ def participant_login_form():
         col1, col2 = st.columns([2, 1])
         
         with col1:
-            submit = st.form_submit_button("🚀 Login", use_container_width=True)
+            submit = st.form_submit_button("🚀 Login", width='stretch')
         
         with col2:
-            forgot = st.form_submit_button("🔑 Forgot?", use_container_width=True)
+            forgot = st.form_submit_button("🔑 Forgot?", width='stretch')
         
         if forgot:
             st.switch_page("pages/Forgot_Password.py")
@@ -321,10 +321,10 @@ def show_password_creation_form():
         col1, col2 = st.columns(2)
         
         with col1:
-            submit = st.form_submit_button("✅ Create & Login", use_container_width=True)
+            submit = st.form_submit_button("✅ Create & Login", width='stretch')
         
         with col2:
-            cancel = st.form_submit_button("❌ Cancel", use_container_width=True)
+            cancel = st.form_submit_button("❌ Cancel", width='stretch')
         
         if cancel:
             st.session_state.login_step = 'login'
@@ -392,6 +392,6 @@ def participant_info_sidebar():
             st.sidebar.markdown("### 👤 Logged In")
             st.sidebar.info(f"**{participant_data.get('display_name', 'Participant')}**")
             
-            if st.sidebar.button("🚪 Logout", use_container_width=True):
+            if st.sidebar.button("🚪 Logout", width='stretch'):
                 logout_participant()
                 st.rerun()

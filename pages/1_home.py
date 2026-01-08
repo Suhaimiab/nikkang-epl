@@ -60,19 +60,19 @@ col1, col2, col3, col4 = st.columns(4)
 
 with col1:
     if st.button("🎯 Make Predictions", use_container_width=True, type="primary"):
-        st.switch_page("pages/3_Predictions.py")
+        st.switch_page("pages/3_Predictions")
 
 with col2:
     if st.button("📊 View Leaderboard", use_container_width=True):
-        st.switch_page("pages/5_Leaderboard.py")
+        st.switch_page("pages/5_Leaderboard")
 
 with col3:
     if st.button("📋 Prediction Matrix", use_container_width=True):
-        st.switch_page("pages/4_Prediction_Matrix.py")
+        st.switch_page("pages/4_Prediction_Matrix")
 
 with col4:
     if st.button("📝 Register", use_container_width=True):
-        st.switch_page("pages/2_Register.py")
+        st.switch_page("pages/2_Register")
 
 st.markdown("---")
 
@@ -274,15 +274,15 @@ col1, col2, col3 = st.columns([1, 1, 1])
 
 with col1:
     if st.button("📝 Register Now", use_container_width=True, type="primary", key="cta_register"):
-        st.switch_page("pages/2_Register.py")
+        st.switch_page("pages/2_Register")
 
 with col2:
     if st.button("🎯 Make Predictions", use_container_width=True, type="primary", key="cta_predict"):
-        st.switch_page("pages/3_Predictions.py")
+        st.switch_page("pages/3_Predictions")
 
 with col3:
     if st.button("📊 View Leaderboard", use_container_width=True, key="cta_leaderboard"):
-        st.switch_page("pages/5_Leaderboard.py")
+        st.switch_page("pages/5_Leaderboard")
 
 # Footer
 st.markdown("---")

@@ -13,7 +13,8 @@ import io
 import matplotlib.pyplot as plt
 import matplotlib
 matplotlib.use('Agg')
-
+import warnings
+warnings.filterwarnings('ignore', message='Glyph.*missing from font')
 # Add utils to path
 import sys
 sys.path.append(str(Path(__file__).parent.parent))

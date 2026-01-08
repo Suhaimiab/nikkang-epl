@@ -228,7 +228,7 @@ for idx, match in enumerate(week_matches, 1):
 df = pd.DataFrame(matrix_data)
 
 st.success(f"✅ Matrix built successfully! {len(df)} rows, {len(df.columns)} columns")
-st.dataframe(df, use_container_width=True)
+st.dataframe(df, width='stretch')
 
 st.markdown("---")
 st.markdown("## 🎯 Conclusion")
