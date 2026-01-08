@@ -333,24 +333,58 @@ with tab2:
     - Updates results automatically
     """)
     
-    # Date range for results
-    col1, col2 = st.columns(2)
+    # Import method selection
+    results_import_method = st.radio(
+        "Import Method:",
+        ["By Gameweek", "By Date Range"],
+        horizontal=True,
+        key="results_import_method"
+    )
     
-    with col1:
-        results_from = st.date_input(
-            "From Date:",
-            value=datetime.now().date() - timedelta(days=7),
-            help="Start date for results",
-            key="results_from"
-        )
-    
-    with col2:
-        results_to = st.date_input(
-            "To Date:",
-            value=datetime.now().date(),
-            help="End date for results",
-            key="results_to"
-        )
+    if results_import_method == "By Gameweek":
+        # Gameweek selector
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            results_week = st.number_input(
+                "Gameweek Number:",
+                min_value=1,
+                max_value=38,
+                value=dm.get_current_week() if hasattr(dm, 'get_current_week') else 1,
+                help="EPL gameweek number (1-38)",
+                key="results_week"
+            )
+        
+        with col2:
+            st.metric("Selected Week", f"Week {results_week}", "")
+        
+        results_fetch_params = {"matchday": results_week, "status": "FINISHED"}
+        
+    else:
+        # Date range for results
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            results_from = st.date_input(
+                "From Date:",
+                value=datetime.now().date() - timedelta(days=7),
+                help="Start date for results",
+                key="results_from"
+            )
+        
+        with col2:
+            results_to = st.date_input(
+                "To Date:",
+                value=datetime.now().date(),
+                help="End date for results",
+                key="results_to"
+            )
+        
+        results_fetch_params = {
+            "status": "FINISHED",
+            "dateFrom": results_from.strftime("%Y-%m-%d"),
+            "dateTo": results_to.strftime("%Y-%m-%d")
+        }
     
     st.markdown("---")
     
@@ -358,16 +392,11 @@ with tab2:
         with st.spinner("Fetching results from API..."):
             try:
                 headers = {"X-Auth-Token": API_KEY}
-                params = {
-                    "status": "FINISHED",
-                    "dateFrom": results_from.strftime("%Y-%m-%d"),
-                    "dateTo": results_to.strftime("%Y-%m-%d")
-                }
                 
                 response = requests.get(
                     f"{BASE_URL}/competitions/{COMPETITION_ID}/matches",
                     headers=headers,
-                    params=params,
+                    params=results_fetch_params,
                     timeout=15
                 )
                 
