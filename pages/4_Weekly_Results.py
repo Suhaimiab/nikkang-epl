@@ -2,6 +2,7 @@
 Weekly Prediction Results - Gameweek by Gameweek
 Nikkang KK EPL Prediction Competition
 Detailed breakdown of predictions vs results for each gameweek
+COMPLETE FIXED VERSION
 """
 
 import streamlit as st
@@ -15,12 +16,13 @@ import matplotlib
 matplotlib.use('Agg')
 import warnings
 warnings.filterwarnings('ignore', message='Glyph.*missing from font')
+
 # Add utils to path
 import sys
 sys.path.append(str(Path(__file__).parent.parent))
 
 from utils.data_manager import DataManager
-from utils.auth import check_password
+from utils.sync_ui import add_sync_buttons_sidebar, validate_week
 
 # Page config
 st.set_page_config(
@@ -28,6 +30,11 @@ st.set_page_config(
     page_icon="📊",
     layout="wide"
 )
+
+# Initialize data manager and sync
+dm = DataManager()
+current_week = validate_week(dm)
+add_sync_buttons_sidebar(dm)
 
 def generate_weekly_results_png(table_data, week_matches, week_results, selected_week, gotw_index, get_team_abbrev_func, champions=None, champ_pts=0, champ_kk=0):
     """Generate a styled PNG image of weekly results with actual scores and winner info"""
@@ -105,7 +112,7 @@ def generate_weekly_results_png(table_data, week_matches, week_results, selected
         ax.text(x + w/2, table_top - row_height/2, header, 
                ha='center', va='center', fontsize=6, fontweight='bold', color='white')
     
-    # Draw ACTUAL RESULTS row (new row showing what actually happened)
+    # Draw ACTUAL RESULTS row
     results_y = table_top - 2 * row_height
     
     # Results row label
@@ -242,7 +249,6 @@ def generate_weekly_results_png(table_data, week_matches, week_results, selected
 # Custom CSS for the results table
 st.markdown("""
 <style>
-    /* Main header styling */
     .week-header {
         background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
         color: white;
@@ -251,19 +257,15 @@ st.markdown("""
         text-align: center;
         margin-bottom: 1.5rem;
     }
-    
     .week-header h1 {
         margin: 0;
         font-size: 2rem;
         color: #00d4ff;
     }
-    
     .week-header p {
         margin: 0.5rem 0 0 0;
         color: #aaa;
     }
-    
-    /* Results table styling */
     .results-table {
         width: 100%;
         border-collapse: collapse;
@@ -273,7 +275,6 @@ st.markdown("""
         overflow: hidden;
         box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     }
-    
     .results-table th {
         background: #1a1a2e;
         color: white;
@@ -282,82 +283,62 @@ st.markdown("""
         font-weight: 600;
         border: 1px solid #2a2a4e;
     }
-    
     .results-table td {
         padding: 8px 6px;
         text-align: center;
         border: 1px solid #e0e0e0;
     }
-    
     .results-table tr:nth-child(even) {
         background: #f8f9fa;
     }
-    
     .results-table tr:hover {
         background: #e8f4f8;
     }
-    
-    /* Score cells */
     .exact-score {
         background: #28a745 !important;
         color: white;
         font-weight: bold;
     }
-    
     .correct-result {
         background: #ffc107 !important;
         color: #333;
         font-weight: bold;
     }
-    
     .wrong {
         background: #dc3545 !important;
         color: white;
     }
-    
     .gotw-cell {
         background: #9b59b6 !important;
         color: white;
         font-weight: bold;
     }
-    
-    /* Points column */
     .points-col {
         background: #17a2b8 !important;
         color: white;
         font-weight: bold;
         font-size: 1rem;
     }
-    
-    /* KK column */
     .kk-col {
         background: #28a745 !important;
         color: white;
         font-weight: bold;
     }
-    
-    /* Rank badges */
     .rank-1 { background: gold; color: #333; }
     .rank-2 { background: silver; color: #333; }
     .rank-3 { background: #cd7f32; color: white; }
-    
-    /* Match header */
     .match-header {
         font-size: 0.75rem;
         line-height: 1.2;
     }
-    
     .match-teams {
         font-weight: bold;
         color: #1a1a2e;
     }
-    
     .match-score {
         color: #dc3545;
         font-weight: bold;
     }
-    
-    /* Champion banner */
     .champion-banner {
         background: linear-gradient(135deg, #ffd700 0%, #ffed4a 100%);
         color: #1a1a2e;
@@ -368,8 +349,6 @@ st.markdown("""
         font-weight: bold;
         font-size: 1.2rem;
     }
-    
-    /* Legend */
     .legend {
         display: flex;
         gap: 1rem;
@@ -379,14 +358,12 @@ st.markdown("""
         background: #f8f9fa;
         border-radius: 8px;
     }
-    
     .legend-item {
         display: flex;
         align-items: center;
         gap: 0.5rem;
         font-size: 0.85rem;
     }
-    
     .legend-box {
         width: 20px;
         height: 20px;
@@ -395,17 +372,10 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# Authentication - optional for viewing
-# if not check_password():
-#     st.stop()
-
 # Logo in sidebar
 if Path("nikkang_logo.png").exists():
-    st.sidebar.image("nikkang_logo.png", width='stretch')
+    st.sidebar.image("nikkang_logo.png", use_column_width=True)
     st.sidebar.markdown("---")
-
-# Initialize data manager
-dm = DataManager()
 
 # Team abbreviation mapping
 TEAM_ABBREV = {
@@ -425,68 +395,11 @@ def get_team_abbrev(team_name):
     """Get proper 3-letter abbreviation for team"""
     if not team_name:
         return 'TBC'
-    # Check exact match first
     if team_name in TEAM_ABBREV:
         return TEAM_ABBREV[team_name]
-    # Check partial match
     for full_name, abbrev in TEAM_ABBREV.items():
         if full_name.lower() in team_name.lower() or team_name.lower() in full_name.lower():
             return abbrev
-    # Fallback to first 3 chars
-    return team_name[:3].upper()
-
-# Team abbreviations mapping
-TEAM_ABBREV = {
-    'Arsenal': 'ARS',
-    'Aston Villa': 'AVL',
-    'Bournemouth': 'BOU',
-    'Brentford': 'BRE',
-    'Brighton': 'BHA',
-    'Chelsea': 'CHE',
-    'Crystal Palace': 'CRY',
-    'Everton': 'EVE',
-    'Fulham': 'FUL',
-    'Ipswich Town': 'IPS',
-    'Ipswich': 'IPS',
-    'Leicester City': 'LEI',
-    'Leicester': 'LEI',
-    'Liverpool': 'LIV',
-    'Man City': 'MCI',
-    'Manchester City': 'MCI',
-    'Man United': 'MUN',
-    'Manchester United': 'MUN',
-    'Newcastle': 'NEW',
-    'Newcastle United': 'NEW',
-    "Nott'm Forest": 'NFO',
-    'Nottingham Forest': 'NFO',
-    'Southampton': 'SOU',
-    'Tottenham': 'TOT',
-    'Spurs': 'TOT',
-    'West Ham': 'WHU',
-    'Wolves': 'WOL',
-    'Wolverhampton': 'WOL',
-    'Burnley': 'BUR',
-    'Luton': 'LUT',
-    'Luton Town': 'LUT',
-    'Sheffield United': 'SHU',
-    'Sheffield Utd': 'SHU',
-    'Sunderland': 'SUN',
-    'Leeds': 'LEE',
-    'Leeds United': 'LEE',
-}
-
-def get_team_abbrev(team_name):
-    """Get proper 3-letter abbreviation for team"""
-    if not team_name:
-        return 'TBC'
-    # Check exact match first
-    if team_name in TEAM_ABBREV:
-        return TEAM_ABBREV[team_name]
-    # Check partial match
-    for full_name, abbrev in TEAM_ABBREV.items():
-        if full_name.lower() in team_name.lower() or team_name.lower() in full_name.lower():
-            return abbrev
-    # Fallback to first 3 letters
     return team_name[:3].upper()
 
 # Header
@@ -512,10 +425,16 @@ if not available_weeks:
     st.info("Weekly results are available from Week 11 onwards.")
     st.stop()
 
+# Put current week at top
+weeks_sorted = sorted(available_weeks, reverse=True)
+if current_week in weeks_sorted:
+    weeks_sorted.remove(current_week)
+    weeks_sorted.insert(0, current_week)
+
 selected_week = st.selectbox(
     "🗓️ Select Gameweek:",
-    available_weeks,
-    format_func=lambda x: f"Gameweek {x}"
+    weeks_sorted,
+    format_func=lambda x: f"Gameweek {x}{' (Current)' if x == current_week else ''}"
 )
 
 st.markdown("---")
@@ -545,8 +464,13 @@ for idx, match in enumerate(week_matches):
 table_data = []
 
 for p in participants:
-    if p.get('status') != 'active':
+    # Skip if p is not a dict (string IDs or invalid data)
+    if not isinstance(p, dict):
         continue
+    
+    # Don't filter by status - include all participants
+    # if p.get('status') != 'active':
+    #     continue
     
     p_id = p.get('id')
     p_name = p.get('display_name') or p.get('name', 'Unknown')
@@ -599,21 +523,19 @@ for p in participants:
         is_exact = False
         is_correct = False
 
-        # ✅ CHECK IF LATE OR MISSED SUBMISSION - SCORES 0
+        # Check if late or missed submission
         if pred.get('late', False) or pred.get('missed', False):
-            points = 0  # Automatic 0 points for late/missing
-
-        # ✅ CHECK IF MATCH HAS RESULT - DON'T SCORE UNCOMPLETED MATCHES
+            points = 0
+        # Check if match has result
         elif actual_home == '-' or actual_away == '-':
-            points = 0  # No result yet - don't score
-
-        # ✅ ONLY SCORE IF MATCH IS COMPLETED
+            points = 0
+        # Only score if match is completed
         else:
             try:
                 pred_h = int(pred_home) if pred_home != '-' else -1
                 pred_a = int(pred_away) if pred_away != '-' else -1
-                act_h = int(actual_home)  # ✅ Only convert if not '-'
-                act_a = int(actual_away)  # ✅ Only convert if not '-'
+                act_h = int(actual_home)
+                act_a = int(actual_away)
                 
                 if pred_h == act_h and pred_a == act_a:
                     # Exact score
@@ -655,7 +577,6 @@ table_data.sort(key=lambda x: (-x['total_points'], -x['kk_count']))
 prev_pts, prev_kk, prev_rank = None, None, 0
 for idx, row in enumerate(table_data):
     if row['total_points'] == prev_pts and row['kk_count'] == prev_kk:
-        # Same points AND KK = same rank (joint position)
         row['rank'] = prev_rank
     else:
         row['rank'] = idx + 1
@@ -663,7 +584,7 @@ for idx, row in enumerate(table_data):
     prev_pts = row['total_points']
     prev_kk = row['kk_count']
 
-# Find champion(s) - must have same points AND same KK to be joint winners
+# Find champion(s)
 champions = []
 if table_data:
     max_points = table_data[0]['total_points']
@@ -673,7 +594,7 @@ if table_data:
         if r['total_points'] == max_points and r['kk_count'] == max_kk_at_top:
             champions.append(r['name'])
         elif r['total_points'] < max_points:
-            break  # No need to check further
+            break
 
 # Display champion banner
 if table_data and champions:
@@ -762,7 +683,6 @@ st.markdown(html_table, unsafe_allow_html=True)
 col_dl1, col_dl2, col_dl3 = st.columns([1, 1, 2])
 with col_dl1:
     if table_data:
-        # Get champion points and KK for the PNG
         champ_pts = table_data[0]['total_points'] if table_data else 0
         champ_kk = table_data[0]['kk_count'] if table_data else 0
         png_bytes = generate_weekly_results_png(

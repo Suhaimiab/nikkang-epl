@@ -1,27 +1,32 @@
 """
-Prediction Matrix - Public Version
-Based on exact structure from Prediction Lock
-Format: predictions[week][user_id] = [array of predictions]
+Prediction Matrix - View All Predictions
+Nikkang KK EPL Prediction Competition
+See what everyone has predicted for each match
+COMPLETE FIXED VERSION
 """
 
 import streamlit as st
 import pandas as pd
-import json
-from datetime import datetime
 from pathlib import Path
+from datetime import datetime
 import sys
 
-# Add utils to path
 sys.path.append(str(Path(__file__).parent.parent))
 
 from utils.data_manager import DataManager
+from utils.sync_ui import add_sync_buttons_sidebar, validate_week
 
 # Page config
 st.set_page_config(
-    page_title="Prediction Matrix - Nikkang KK EPL",
-    page_icon="📊",
+    page_title="Prediction Matrix - Nikkang KK",
+    page_icon="📋",
     layout="wide"
 )
+
+# Initialize data manager and sync
+dm = DataManager()
+current_week = validate_week(dm)
+add_sync_buttons_sidebar(dm)
 
 # Import branding
 try:
@@ -30,301 +35,281 @@ try:
 except:
     pass
 
-# Initialize data manager
-dm = DataManager()
-
-# Settings file
-SETTINGS_FILE = Path("nikkang_data/settings.json")
-
-def load_settings():
-    """Load settings from JSON file"""
-    if SETTINGS_FILE.exists():
-        try:
-            with open(SETTINGS_FILE, 'r') as f:
-                return json.load(f)
-        except:
-            return {"current_week": 1}
-    return {"current_week": 1}
-
-st.title("📊 Prediction Matrix - Current Week")
-st.markdown("View all participant predictions for the **current week only**")
-st.info("🔓 **Open Access:** All participants can view the latest predictions")
-st.markdown("---")
-
-# Load settings and data
-settings = load_settings()
-current_week = settings.get("current_week", 1)
-
-# Display current week
-col1, col2 = st.columns([3, 1])
-
-with col1:
-    st.markdown(f"### 📅 Current Week: **Week {current_week}**")
-    st.caption("Showing latest predictions for the current gameweek only")
-
-with col2:
-    auto_refresh = st.checkbox("🔄 Auto-refresh", value=False)
-
-if auto_refresh:
-    import time
-    time.sleep(30)
-    st.rerun()
-
-st.markdown("---")
-
-# Get matches for current week
-matches = dm.get_matches_by_week(current_week)
-participants = dm.get_all_participants()
-all_predictions = dm.load_predictions()
-
-# Get predictions for this specific week
-# Format: {"21": {"USER_ID": [{"home": 2, "away": 1}, ...], ...}}
-week_predictions = all_predictions.get(str(current_week), {})
-
-if not matches:
-    st.warning(f"⚠️ No matches configured for Week {current_week}")
-    st.info("Please contact admin to add matches for this week.")
-    st.stop()
-
-if not participants:
-    st.warning("⚠️ No participants registered yet")
-    st.stop()
-
-if not week_predictions:
-    st.info(f"📭 No predictions submitted yet for Week {current_week}")
-    st.markdown("### Be the first to predict!")
-    st.markdown("Go to the **Predictions** page to make your predictions.")
-    st.stop()
-
-# Count how many participants have predictions
-participants_with_predictions = len([p for p in participants if p.get('id', '') in week_predictions])
-
-st.success(f"✅ **{participants_with_predictions} participants** have submitted predictions for Week {current_week}")
-
-# Build matrix - rows are MATCHES, columns are PARTICIPANTS
-st.markdown(f"### 🎯 Current Predictions - Week {current_week}")
-st.caption(f"📅 Updated: {datetime.now().strftime('%d %B %Y %H:%M')}")
-
-matrix_data = []
-
-for idx, match in enumerate(matches):
-    home = match.get('home', match.get('home_team', ''))
-    away = match.get('away', match.get('away_team', ''))
-    is_gotw = match.get('gotw', False)
-    
-    row = {
-        'Match': idx + 1,
-        'Home': home,
-        'Away': away,
-        'GOTW': '⭐' if is_gotw else ''
+# Custom CSS
+st.markdown("""
+<style>
+    .matrix-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 1.5rem;
+        border-radius: 10px;
+        text-align: center;
+        margin-bottom: 1.5rem;
     }
-    
-    # Add each participant's prediction for this match
-    for p in participants:
-        uid = p.get('id', '')
-        participant_name = p.get('display_name') or p.get('name', 'Unknown')
-        
-        # Get this user's predictions for current week
-        user_week_preds = week_predictions.get(uid, [])
-        
-        # Get prediction for this specific match (by index)
-        if idx < len(user_week_preds):
-            pred = user_week_preds[idx]
-            if isinstance(pred, dict):
-                pred_home = pred.get('home', pred.get('home_score', '?'))
-                pred_away = pred.get('away', pred.get('away_score', '?'))
-                row[participant_name] = f"{pred_home}-{pred_away}"
-            else:
-                row[participant_name] = "-"
-        else:
-            row[participant_name] = "-"
-    
-    matrix_data.append(row)
+    .prediction-cell {
+        padding: 0.5rem;
+        text-align: center;
+        border-radius: 5px;
+        font-weight: bold;
+    }
+    .prediction-locked {
+        background: #f8f9fa;
+        color: #6c757d;
+    }
+    .prediction-submitted {
+        background: #d4edda;
+        color: #155724;
+    }
+    .prediction-pending {
+        background: #fff3cd;
+        color: #856404;
+    }
+    .gotw-match {
+        border: 2px solid #ffc107;
+        background: #fff9e6;
+    }
+    .stats-card {
+        background: white;
+        border-radius: 10px;
+        padding: 1rem;
+        text-align: center;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+</style>
+""", unsafe_allow_html=True)
 
-# Create DataFrame
-df = pd.DataFrame(matrix_data)
+# Logo in sidebar
+if Path("nikkang_logo.png").exists():
+    st.sidebar.image("nikkang_logo.png", use_column_width=True)
+    st.sidebar.markdown("---")
 
-# Display stats
-st.markdown(f"#### 📈 Week {current_week} Statistics")
+# Header
+st.markdown("""
+<div class="matrix-header">
+    <h1 style="margin: 0; font-size: 2rem;">📋 Prediction Matrix</h1>
+    <p style="margin: 0.5rem 0 0 0; opacity: 0.9;">See what everyone has predicted</p>
+</div>
+""", unsafe_allow_html=True)
 
-col1, col2, col3, col4 = st.columns(4)
+# Load data
+participants = dm.get_all_participants()
+matches_data = dm.load_matches()
+predictions_data = dm.load_predictions()
 
-with col1:
-    st.metric("Total Matches", len(matches))
+# Get available weeks
+available_weeks = sorted([int(w) for w in matches_data.keys() if matches_data.get(w)], reverse=True)
 
-with col2:
-    # Show both: those who predicted and total registered
-    st.metric("Participants", f"{participants_with_predictions}/{len(participants)}")
+if not available_weeks:
+    st.warning("No matches set up yet.")
+    st.stop()
 
-with col3:
-    gotw_count = sum(1 for m in matches if m.get('gotw', False))
-    st.metric("GOTW Matches", gotw_count)
+# Put current week at top
+weeks_sorted = sorted(available_weeks, reverse=True)
+if current_week in weeks_sorted:
+    weeks_sorted.remove(current_week)
+    weeks_sorted.insert(0, current_week)
 
-with col4:
-    # Calculate completion rate based on TOTAL participants (not just those who predicted)
-    total_registered = len(participants)
-    total_possible = total_registered * len(matches)
-    total_made = sum(
-        len([p for p in week_predictions.get(uid, []) if p])
-        for uid in [p.get('id', '') for p in participants]
-        if uid in week_predictions
-    )
-    completion_rate = (total_made / total_possible * 100) if total_possible > 0 else 0
-    st.metric("Completion", f"{completion_rate:.0f}%")
-
-st.markdown("---")
-
-# Display matrix
-st.info("💡 **Tip:** Scroll horizontally to see all participants. GOTW (⭐) matches earn double points!")
-
-st.dataframe(
-    df,
-    width="stretch",
-    hide_index=True,
-    column_config={
-        "Match": st.column_config.NumberColumn("Match #", width="small"),
-        "Home": st.column_config.TextColumn("Home Team", width="medium"),
-        "Away": st.column_config.TextColumn("Away Team", width="medium"),
-        "GOTW": st.column_config.TextColumn("GOTW", width="small"),
-    },
-    height=600
+# Week selector
+selected_week = st.selectbox(
+    "🗓️ Select Gameweek:",
+    weeks_sorted,
+    format_func=lambda x: f"Gameweek {x}{' (Current)' if x == current_week else ''}"
 )
 
 st.markdown("---")
 
-# Download options
-st.markdown("### 📥 Download Options")
+# Get data for selected week
+week_str = str(selected_week)
+week_matches = matches_data.get(week_str, [])
+week_predictions = predictions_data.get(week_str, {})
 
-col1, col2, col3 = st.columns(3)
+if not week_matches:
+    st.warning(f"No matches found for Gameweek {selected_week}")
+    st.stop()
+
+# Count participants with predictions
+participants_with_predictions = 0
+for p in participants:
+    if not isinstance(p, dict):
+        continue
+    p_id = p.get('id', '')
+    if p_id in week_predictions and week_predictions[p_id]:
+        participants_with_predictions += 1
+
+# Summary stats
+st.markdown("### 📊 Summary")
+
+col1, col2, col3, col4 = st.columns(4)
 
 with col1:
-    st.markdown("#### 📄 CSV")
-    csv = df.to_csv(index=False)
-    st.download_button(
-        label="⬇️ Download CSV",
-        data=csv,
-        file_name=f"predictions_week_{current_week}_{datetime.now().strftime('%Y%m%d')}.csv",
-        mime="text/csv",
-        width="stretch"
-    )
+    total_participants = len([p for p in participants if isinstance(p, dict)])
+    st.metric("Total Participants", total_participants)
 
 with col2:
-    st.markdown("#### 🌐 HTML")
-    
-    html = f"""
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <meta charset="UTF-8">
-        <title>Predictions Week {current_week}</title>
-        <style>
-            body {{ font-family: Arial; padding: 20px; background: #f5f5f5; }}
-            h1 {{ color: #2E7D32; text-align: center; }}
-            table {{ border-collapse: collapse; width: 100%; background: white; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }}
-            th {{ background: #2E7D32; color: white; padding: 12px; text-align: center; }}
-            td {{ padding: 10px; border: 1px solid #ddd; text-align: center; }}
-            tr:nth-child(even) {{ background: #f9f9f9; }}
-            tr:hover {{ background: #f0f0f0; }}
-            .gotw {{ color: #FFA000; font-weight: bold; }}
-        </style>
-    </head>
-    <body>
-        <h1>🏆 Nikkang KK - Week {current_week} Predictions</h1>
-        <p style="text-align: center; color: #666;">Generated: {datetime.now().strftime('%d %B %Y %H:%M')}</p>
-        {df.to_html(index=False, escape=False)}
-        <p style="text-align: center; color: #666; margin-top: 20px;">⭐ = Game of the Week (Double Points)</p>
-    </body>
-    </html>
-    """
-    
-    st.download_button(
-        label="⬇️ Download HTML",
-        data=html,
-        file_name=f"predictions_week_{current_week}.html",
-        mime="text/html",
-        width="stretch"
-    )
+    st.metric("Predictions Submitted", participants_with_predictions)
 
 with col3:
-    st.markdown("#### 📸 Screenshot")
-    st.info("""
-    **Use browser screenshot:**
-    - Windows: Win+Shift+S
-    - Mac: Cmd+Shift+4
-    - Mobile: Power+Vol Down
-    """)
+    completion_rate = (participants_with_predictions / total_participants * 100) if total_participants > 0 else 0
+    st.metric("Completion Rate", f"{completion_rate:.0f}%")
+
+with col4:
+    st.metric("Matches This Week", len(week_matches))
 
 st.markdown("---")
 
-# Analysis
-st.markdown("### 📊 Prediction Analysis")
+# Build prediction matrix
+st.markdown("### 📋 Prediction Matrix")
 
-col1, col2 = st.columns(2)
+# Create matrix data
+matrix_data = []
 
-with col1:
-    st.markdown("#### 🔥 Most Popular Predictions")
+for p in participants:
+    # SAFETY CHECK - Skip if not a dict
+    if not isinstance(p, dict):
+        continue
     
-    popular = []
-    for idx, match in enumerate(matches[:5]):
-        home = match.get('home', match.get('home_team', ''))
-        away = match.get('away', match.get('away_team', ''))
-        
-        # Count predictions for this match
-        pred_counts = {}
-        for uid, user_preds in week_predictions.items():
-            if idx < len(user_preds):
-                pred = user_preds[idx]
-                if isinstance(pred, dict):
-                    score = f"{pred.get('home', '?')}-{pred.get('away', '?')}"
-                    pred_counts[score] = pred_counts.get(score, 0) + 1
-        
-        if pred_counts:
-            most_pop = max(pred_counts.items(), key=lambda x: x[1])
-            popular.append({
-                'Match': f"{home} vs {away}",
-                'Score': most_pop[0],
-                'Votes': f"{most_pop[1]} ({most_pop[1]/len(week_predictions)*100:.0f}%)"
-            })
+    p_id = p.get('id', '')
+    p_name = p.get('display_name') or p.get('name', 'Unknown')
     
-    if popular:
-        st.dataframe(pd.DataFrame(popular), hide_index=True, width="stretch")
-        st.caption("💡 Most predicted scores for the top 5 matches")
+    # Get predictions for this participant
+    p_preds = week_predictions.get(p_id, [])
+    
+    row = {'Name': p_name}
+    
+    # Add each match prediction
+    for idx, match in enumerate(week_matches):
+        home = match.get('home', 'TBC')
+        away = match.get('away', 'TBC')
+        is_gotw = match.get('gotw', False)
+        
+        match_label = f"{home[:3].upper()} v {away[:3].upper()}"
+        if is_gotw:
+            match_label += " ⭐"
+        
+        # Get prediction for this match
+        if idx < len(p_preds) and p_preds[idx]:
+            pred = p_preds[idx]
+            if isinstance(pred, dict):
+                pred_home = pred.get('home', pred.get('home_score', '-'))
+                pred_away = pred.get('away', pred.get('away_score', '-'))
+                row[match_label] = f"{pred_home}-{pred_away}"
+            else:
+                row[match_label] = "-"
+        else:
+            row[match_label] = "-"
+    
+    matrix_data.append(row)
 
-with col2:
-    st.markdown("#### 🎲 Prediction Diversity")
-    
-    diversity = []
-    for idx, match in enumerate(matches[:5]):
-        home = match.get('home', match.get('home_team', ''))
-        away = match.get('away', match.get('away_team', ''))
-        
-        # Count unique predictions
-        unique_preds = set()
-        for uid, user_preds in week_predictions.items():
-            if idx < len(user_preds):
-                pred = user_preds[idx]
-                if isinstance(pred, dict):
-                    score = f"{pred.get('home', '?')}-{pred.get('away', '?')}"
-                    unique_preds.add(score)
-        
-        diversity.append({
-            'Match': f"{home} vs {away}",
-            'Unique': len(unique_preds),
-            'Diversity': f"{(len(unique_preds)/len(week_predictions)*100):.0f}%" if week_predictions else "0%"
-        })
-    
-    if diversity:
-        st.dataframe(pd.DataFrame(diversity), hide_index=True, width="stretch")
-        st.caption("💡 Higher diversity = more strategic differences")
+# Display as DataFrame
+if matrix_data:
+    df = pd.DataFrame(matrix_data)
+    st.dataframe(df, use_container_width=True, hide_index=True)
+else:
+    st.info("No predictions submitted yet for this gameweek.")
 
 st.markdown("---")
+
+# Match-by-match breakdown
+st.markdown("### 🎯 Match-by-Match Breakdown")
+
+for idx, match in enumerate(week_matches):
+    home = match.get('home', 'TBC')
+    away = match.get('away', 'TBC')
+    is_gotw = match.get('gotw', False)
+    match_date = match.get('date', '')
+    match_time = match.get('time', '')
+    
+    # Match header
+    gotw_badge = "⭐ GAME OF THE WEEK" if is_gotw else ""
+    
+    with st.expander(f"Match {idx + 1}: {home} vs {away} {gotw_badge}"):
+        st.markdown(f"**Date:** {match_date} {match_time}")
+        
+        if is_gotw:
+            st.info("💰 Double points for this match! (10/5 pts)")
+        
+        # Collect predictions for this match
+        match_predictions = []
+        
+        for p in participants:
+            # SAFETY CHECK
+            if not isinstance(p, dict):
+                continue
+            
+            p_id = p.get('id', '')
+            p_name = p.get('display_name') or p.get('name', 'Unknown')
+            
+            p_preds = week_predictions.get(p_id, [])
+            
+            if idx < len(p_preds) and p_preds[idx]:
+                pred = p_preds[idx]
+                if isinstance(pred, dict):
+                    pred_home = pred.get('home', pred.get('home_score', '-'))
+                    pred_away = pred.get('away', pred.get('away_score', '-'))
+                    match_predictions.append({
+                        'Participant': p_name,
+                        'Prediction': f"{pred_home} - {pred_away}"
+                    })
+        
+        if match_predictions:
+            pred_df = pd.DataFrame(match_predictions)
+            st.dataframe(pred_df, use_container_width=True, hide_index=True)
+            
+            # Show popular predictions
+            predictions_count = {}
+            for mp in match_predictions:
+                pred = mp['Prediction']
+                predictions_count[pred] = predictions_count.get(pred, 0) + 1
+            
+            if predictions_count:
+                most_popular = max(predictions_count.items(), key=lambda x: x[1])
+                st.markdown(f"**Most popular prediction:** {most_popular[0]} ({most_popular[1]} participants)")
+        else:
+            st.info("No predictions submitted for this match yet.")
+
+st.markdown("---")
+
+# Popular predictions summary
+st.markdown("### 🔥 Most Popular Predictions")
+
+all_predictions = {}
+
+for idx, match in enumerate(week_matches):
+    home = match.get('home', 'TBC')
+    away = match.get('away', 'TBC')
+    match_key = f"{home} v {away}"
+    
+    predictions_count = {}
+    
+    for p in participants:
+        # SAFETY CHECK
+        if not isinstance(p, dict):
+            continue
+        
+        p_id = p.get('id', '')
+        p_preds = week_predictions.get(p_id, [])
+        
+        if idx < len(p_preds) and p_preds[idx]:
+            pred = p_preds[idx]
+            if isinstance(pred, dict):
+                pred_home = pred.get('home', pred.get('home_score', '-'))
+                pred_away = pred.get('away', pred.get('away_score', '-'))
+                pred_str = f"{pred_home}-{pred_away}"
+                predictions_count[pred_str] = predictions_count.get(pred_str, 0) + 1
+    
+    if predictions_count:
+        most_popular = max(predictions_count.items(), key=lambda x: x[1])
+        all_predictions[match_key] = f"{most_popular[0]} ({most_popular[1]} picks)"
+
+if all_predictions:
+    pop_df = pd.DataFrame([
+        {'Match': k, 'Most Popular': v} 
+        for k, v in all_predictions.items()
+    ])
+    st.dataframe(pop_df, use_container_width=True, hide_index=True)
+else:
+    st.info("No predictions data available.")
 
 # Footer
 st.markdown("---")
-st.markdown(f"""
-<div style='text-align: center; color: #666; font-size: 12px;'>
-    <p>📊 Prediction Matrix - Current Week Only | Nikkang KK EPL</p>
-    <p>⭐ GOTW = Double Points | Week {current_week} | 🔓 Open to all participants</p>
-    <p>Last updated: {datetime.now().strftime('%d %B %Y %H:%M')}</p>
-</div>
-""", unsafe_allow_html=True)
+st.caption(f"Nikkang KK EPL Prediction Competition 2025-26 • Gameweek {selected_week}")

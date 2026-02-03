@@ -570,5 +570,253 @@
       "away": "Liverpool",
       "gotw": true
     }
+  ],
+  "22": [
+    {
+      "home": "Man United",
+      "away": "Man City",
+      "gotw": true
+    },
+    {
+      "home": "Sunderland",
+      "away": "Crystal Palace",
+      "gotw": false
+    },
+    {
+      "home": "Chelsea",
+      "away": "Brentford",
+      "gotw": false
+    },
+    {
+      "home": "Liverpool",
+      "away": "Burnley",
+      "gotw": false
+    },
+    {
+      "home": "Leeds United",
+      "away": "Fulham",
+      "gotw": false
+    },
+    {
+      "home": "Tottenham",
+      "away": "West Ham",
+      "gotw": false
+    },
+    {
+      "home": "Nottingham",
+      "away": "Arsenal",
+      "gotw": false
+    },
+    {
+      "home": "Wolverhampton",
+      "away": "Newcastle",
+      "gotw": false
+    },
+    {
+      "home": "Aston Villa",
+      "away": "Everton",
+      "gotw": false
+    },
+    {
+      "home": "Brighton Hove",
+      "away": "Bournemouth",
+      "gotw": false
+    }
+  ],
+  "23": [
+    {
+      "home": "West Ham",
+      "away": "Sunderland",
+      "gotw": false
+    },
+    {
+      "home": "Burnley",
+      "away": "Tottenham",
+      "gotw": false
+    },
+    {
+      "home": "Fulham",
+      "away": "Brighton Hove",
+      "gotw": false
+    },
+    {
+      "home": "Man City",
+      "away": "Wolverhampton",
+      "gotw": false
+    },
+    {
+      "home": "Bournemouth",
+      "away": "Liverpool",
+      "gotw": false
+    },
+    {
+      "home": "Crystal Palace",
+      "away": "Chelsea",
+      "gotw": false
+    },
+    {
+      "home": "Brentford",
+      "away": "Nottingham",
+      "gotw": false
+    },
+    {
+      "home": "Newcastle",
+      "away": "Aston Villa",
+      "gotw": false
+    },
+    {
+      "home": "Arsenal",
+      "away": "Man United",
+      "gotw": true
+    },
+    {
+      "home": "Everton",
+      "away": "Leeds United",
+      "gotw": false
+    }
+  ],
+  "24": [
+    {
+      "home": "Brighton Hove",
+      "away": "Everton",
+      "gotw": false
+    },
+    {
+      "home": "Leeds United",
+      "away": "Arsenal",
+      "gotw": false
+    },
+    {
+      "home": "Wolverhampton",
+      "away": "Bournemouth",
+      "gotw": false
+    },
+    {
+      "home": "Chelsea",
+      "away": "West Ham",
+      "gotw": false
+    },
+    {
+      "home": "Liverpool",
+      "away": "Newcastle",
+      "gotw": false
+    },
+    {
+      "home": "Aston Villa",
+      "away": "Brentford",
+      "gotw": false
+    },
+    {
+      "home": "Man United",
+      "away": "Fulham",
+      "gotw": false
+    },
+    {
+      "home": "Nottingham",
+      "away": "Crystal Palace",
+      "gotw": false
+    },
+    {
+      "home": "Tottenham",
+      "away": "Man City",
+      "gotw": true
+    },
+    {
+      "home": "Sunderland",
+      "away": "Burnley",
+      "gotw": false
+    }
+  ],
+  "25": [
+    {
+      "id": "538031",
+      "home": "Leeds United",
+      "away": "Nottingham",
+      "date": "2026-02-07",
+      "time": "04:00",
+      "gotw": false,
+      "week": 25
+    },
+    {
+      "id": "538032",
+      "home": "Man United",
+      "away": "Tottenham",
+      "date": "2026-02-07",
+      "time": "20:30",
+      "gotw": false,
+      "week": 25
+    },
+    {
+      "id": "538025",
+      "home": "Bournemouth",
+      "away": "Aston Villa",
+      "date": "2026-02-07",
+      "time": "23:00",
+      "gotw": false,
+      "week": 25
+    },
+    {
+      "id": "538027",
+      "home": "Arsenal",
+      "away": "Sunderland",
+      "date": "2026-02-07",
+      "time": "23:00",
+      "gotw": false,
+      "week": 25
+    },
+    {
+      "id": "538028",
+      "home": "Burnley",
+      "away": "West Ham",
+      "date": "2026-02-07",
+      "time": "23:00",
+      "gotw": false,
+      "week": 25
+    },
+    {
+      "id": "538029",
+      "home": "Fulham",
+      "away": "Everton",
+      "date": "2026-02-07",
+      "time": "23:00",
+      "gotw": false,
+      "week": 25
+    },
+    {
+      "id": "538034",
+      "home": "Wolverhampton",
+      "away": "Chelsea",
+      "date": "2026-02-07",
+      "time": "23:00",
+      "gotw": false,
+      "week": 25
+    },
+    {
+      "id": "538033",
+      "home": "Newcastle",
+      "away": "Brentford",
+      "date": "2026-02-08",
+      "time": "01:30",
+      "gotw": false,
+      "week": 25
+    },
+    {
+      "id": "538026",
+      "home": "Brighton Hove",
+      "away": "Crystal Palace",
+      "date": "2026-02-08",
+      "time": "22:00",
+      "gotw": false,
+      "week": 25
+    },
+    {
+      "id": "538030",
+      "home": "Liverpool",
+      "away": "Man City",
+      "date": "2026-02-09",
+      "time": "00:30",
+      "gotw": false,
+      "week": 25
+    }
   ]
 }

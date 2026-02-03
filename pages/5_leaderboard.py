@@ -19,6 +19,9 @@ import warnings
 warnings.filterwarnings('ignore', message='Glyph.*missing from font')
 matplotlib.use('Agg')  # Use non-interactive backend
 
+from utils.data_manager import DataManager
+from utils.sync_ui import add_sync_buttons_sidebar, validate_week
+
 sys.path.append(str(Path(__file__).parent.parent))
 
 from utils.data_manager import DataManager, load_manual_scores, get_participant_manual_scores
@@ -197,6 +200,8 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 dm = DataManager()
+current_week = validate_week(dm)
+add_sync_buttons_sidebar(dm)
 
 ROUND_SCORES_FILE = Path("nikkang_data/round_scores.json")
 

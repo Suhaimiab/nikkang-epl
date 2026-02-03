@@ -9,9 +9,10 @@ from pathlib import Path
 from datetime import datetime
 import sys
 
-sys.path.append(str(Path(__file__).parent.parent))
-
 from utils.data_manager import DataManager
+from utils.sync_ui import add_sync_buttons_sidebar, validate_week
+
+sys.path.append(str(Path(__file__).parent.parent))
 
 # Page config
 st.set_page_config(
@@ -108,8 +109,9 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# Initialize
 dm = DataManager()
+current_week = validate_week(dm)
+add_sync_buttons_sidebar(dm)
 
 # Get user from session or query params
 user_id = st.query_params.get("user_id", None)

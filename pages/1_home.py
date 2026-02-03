@@ -10,6 +10,9 @@ import sys
 # Add utils to path
 sys.path.append(str(Path(__file__).parent.parent))
 
+from utils.data_manager import DataManager
+from utils.sync_ui import add_sync_buttons_sidebar, validate_week
+
 # Page config
 st.set_page_config(
     page_title="Home - Nikkang KK EPL",
@@ -23,6 +26,14 @@ try:
     inject_custom_css()
 except:
     pass
+
+# ============================================================================
+# ADD THESE 3 LINES HERE (Initialize data manager and sync)
+# ============================================================================
+dm = DataManager()
+current_week = validate_week(dm)
+add_sync_buttons_sidebar(dm)
+# ============================================================================
 
 # Logo
 if Path("nikkang_logo.png").exists():

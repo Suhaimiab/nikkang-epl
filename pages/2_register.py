@@ -2,16 +2,15 @@
 Registration Page
 Nikkang KK EPL Prediction Competition
 Public page for new participant registration
+FIXED VERSION - Uses DataManager class
 """
 
 import streamlit as st
 from datetime import datetime
-from utils.data_manager import (
-    load_participants,
-    save_participants,
-    generate_user_id
-)
+from utils.data_manager import DataManager
 from utils.auth import is_registration_locked
+import string
+import random
 
 # Page configuration
 st.set_page_config(
@@ -20,7 +19,14 @@ st.set_page_config(
     layout="centered"
 )
 
+# Initialize data manager
+dm = DataManager()
+
 # Helper functions
+def generate_user_id(length=8):
+    """Generate a random user ID"""
+    return ''.join(random.choices(string.ascii_uppercase + string.digits, k=length))
+
 def safe_get(item, key, default=None):
     """Safely get attribute from dict or object"""
     if isinstance(item, dict):
@@ -135,7 +141,7 @@ with st.form("registration_form"):
     # Terms agreement
     agree = st.checkbox("I agree to participate in the competition and follow the rules")
     
-    submit = st.form_submit_button("🎯 Register", width='stretch')
+    submit = st.form_submit_button("🎯 Register", use_container_width=True)
     
     if submit:
         # Validation
@@ -146,8 +152,8 @@ with st.form("registration_form"):
         elif not agree:
             st.error("❌ Please agree to the terms to continue")
         else:
-            # Load existing participants
-            participants_raw = load_participants()
+            # Load existing participants using DataManager
+            participants_raw = dm.load_participants()
             participants = to_dict_format(participants_raw)
             
             # Check if phone already registered
@@ -188,7 +194,7 @@ with st.form("registration_form"):
                 
                 # Add to participants
                 participants[user_id] = new_participant
-                save_participants(participants)
+                dm.save_participants(participants)
                 
                 # Success message
                 st.success("✅ Registration successful!")

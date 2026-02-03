@@ -22,12 +22,18 @@ sys.path.append(str(Path(__file__).parent.parent))
 from utils.data_manager import DataManager
 from utils.auth import check_password
 
+from utils.data_manager import DataManager
+from utils.sync_ui import add_admin_week_changer
+
 # Page config
 st.set_page_config(
     page_title="Prediction Management - Nikkang KK",
     page_icon="🔒",
     layout="wide"
 )
+
+dm = DataManager()
+add_admin_week_changer(dm)
 
 # Import branding
 try:

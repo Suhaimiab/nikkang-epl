@@ -14,6 +14,9 @@ from pathlib import Path
 import sys
 from utils.prediction_tracker import PredictionTracker
 
+from utils.data_manager import DataManager
+from utils.sync_ui import add_sync_buttons_sidebar, validate_week
+
 # Add utils to path
 sys.path.append(str(Path(__file__).parent.parent))
 
@@ -31,6 +34,10 @@ st.set_page_config(
     page_icon="🎯",
     layout="wide"
 )
+
+dm = DataManager()
+current_week = validate_week(dm)
+add_sync_buttons_sidebar(dm)
 
 # REQUIRE AUTHENTICATION
 require_participant_auth()

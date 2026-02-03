@@ -10,6 +10,9 @@ import sys
 from datetime import datetime, timedelta
 import requests
 
+from utils.data_manager import DataManager
+from utils.sync_ui import add_admin_week_changer
+
 # Add utils to path
 sys.path.append(str(Path(__file__).parent.parent))
 
@@ -33,6 +36,9 @@ st.set_page_config(
     page_icon="📊",
     layout="wide"
 )
+
+dm = DataManager()
+add_admin_week_changer(dm)
 
 # Import branding
 try:
@@ -650,11 +656,11 @@ with tab3:
         # Filter matches
         week_matches = [m for m in all_matches if m.get('week', m.get('matchday')) == selected_week]
         
-        if week_matches:
+if week_matches:
             st.markdown(f"#### Week {selected_week} ({len(week_matches)} matches)")
             st.markdown("---")
             
-            for match in week_matches:
+            for idx, match in enumerate(week_matches):
                 mid = match.get('id', '')
                 home = match.get('home', match.get('home_team', 'Home'))
                 away = match.get('away', match.get('away_team', 'Away'))
@@ -671,7 +677,7 @@ with tab3:
                     home_score = st.number_input(
                         "H", min_value=0, max_value=20,
                         value=existing.get('home_score', 0),
-                        key=f"manual_home_{mid}",
+                        key=f"manual_home_{selected_week}_{idx}",  # ✅ UNIQUE KEY
                         label_visibility="collapsed"
                     )
                 
@@ -682,7 +688,7 @@ with tab3:
                     away_score = st.number_input(
                         "A", min_value=0, max_value=20,
                         value=existing.get('away_score', 0),
-                        key=f"manual_away_{mid}",
+                        key=f"manual_away_{selected_week}_{idx}",  # ✅ UNIQUE KEY
                         label_visibility="collapsed"
                     )
                 
